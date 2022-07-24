@@ -52,14 +52,14 @@
           modules = [
             ./system.nix
 
-            # home-manager.nixosModules.home-manager {
-            #   home-manager.useGlobalPkgs = true;
-            #   home-manager.useUserPkgs = true;
-            #   home-manager.users.sergey = import ./home.nix;
-            #   # home-manager.users.sergey = {
-            #   #   imports = [ ./home.nix ];
-            #   # };
-            # }
+            #home-manager.nixosModules.home-manager {
+            #  home-manager.useGlobalPkgs = true;
+            #  home-manager.useUserPackages = true;
+            #  home-manager.users.sergey = import ./home.nix;
+            #  # home-manager.users.sergey = {
+            #  #   imports = [ ./home.nix ];
+            #  # };
+            #}
           ];
         };
       };

@@ -1,312 +1,317 @@
 { config, pkgs, ... }:
 
-let wm-sh = pkgs.writeScriptBin "wm.sh"
-  ''
-    #! /bin/sh
+let wmctrl-pkg = pkgs.wmctrl;
+
+    wm-sh = pkgs.writeScriptBin "wm.sh"
+      ''
+      #! /bin/sh
+      #
+      # File: wm.sh
+      #
+      # Created: 24 July 2022
+      #
+
+      # treat undefined variable substitutions as errors
+      set -u
+      set -e
+
+      err() {
+          echo "$1" >&2
+          exit 1
+      }
+
+      if [ "$#" -ne 1 -a "$#" -ne 2 ]; then
+        err "usage: $0 COMMAND [ARG]"
+      fi
+
+      wmctrl="${wmctrl-pkg}/bin/wmctrl"
+
+      command="$1"
+
+      last_workspace_file="/tmp/last-workspace"
+
+      current_desktop=$("$wmctrl" -d | awk '/^[0-9]+ +\*/ { print $1 }')
+
+      [ -z "$current_desktop" ] && err "Cannot determine current desktop"
+
+      case "$command" in
+          "switch" )
+              if [ "$#" -ne 2 ]; then
+                err "usage: $0 switch WORKSPACE-NUMBER"
+              fi
+              dest="$2"
+              [ -z "$dest" ] && err "Empty destination to switch to: '$dest'"
+              "$wmctrl" -s "$dest"
+              echo "$current_desktop" > "$last_workspace_file"
+              ;;
+          # "pop" )
+          #     ;;
+          "swap" )
+              if [ -f "$last_workspace_file" ]; then
+                  dest=$(cat "$last_workspace_file")
+                  [ -z "$dest" ] && err "Empty destination to swap with: '$dest'"
+                  "$wmctrl" -s "$dest"
+                  echo "$current_desktop" > "$last_workspace_file"
+              else
+                  err "No last workspace to swap with"
+              fi
+              ;;
+          "forward" )
+              workspace_count=$("$wmctrl" -d | wc -l)
+              dest="$(( ($current_desktop + 1) % $workspace_count ))"
+              "$wmctrl" -s "$dest"
+              echo "$current_desktop" > "$last_workspace_file"
+              ;;
+          "backward" )
+              workspace_count=$("$wmctrl" -d | wc -l)
+              dest="$(( ($current_desktop - 1) % $workspace_count ))"
+              if [ "$dest" -lt 0 ]; then
+                  dest="$(( $dest + $workspace_count ))"
+              fi
+              "$wmctrl" -s "$dest"
+              echo "$current_desktop" > "$last_workspace_file"
+              ;;
+          * )
+              err "Invalid command: '$command'"
+              ;;
+      esac
+      '';
+
+    # xbindkeys-config =
+    #   ''
+    #   # To specify a key, you can use 'xbindkeys --key' or
+    #   # 'xbindkeys --multikey' and put one of the two lines in this file.
+    #   #
+    #   # The format of a command line is:
+    #   #    "command to start"
+    #   #       associated key
+    #   #
+    #   #
+    #   # A list of keys is in /usr/include/X11/keysym.h and in
+    #   # /usr/include/X11/keysymdef.h
+    #   # The XK_ is not needed.
+    #   #
+    #   # List of modifier:
+    #   #   Release, Control, Shift, Mod1 (Alt), Mod2 (NumLock),
+    #   #   Mod3 (CapsLock), Mod4, Mod5 (Scroll).
+    #   #
     #
-    # File: wm.sh
+    #   # The release modifier is not a standard X modifier, but you can
+    #   # use it if you want to catch release events instead of press events
     #
-    # Created: 24 July 2022
+    #   # By defaults, xbindkeys does not pay attention with the modifiers
+    #   # NumLock, CapsLock and ScrollLock.
+    #   # Uncomment the lines above if you want to pay attention to them.
     #
-
-    # treat undefined variable substitutions as errors
-    set -u
-    set -e
-
-    err() {
-        echo "$1" >&2
-        exit 1
-    }
-
-    if [ "$#" -ne 1 -a "$#" -ne 2 ]; then
-      err "usage: $0 COMMAND [ARG]"
-    fi
-
-    command="$1"
-
-    last_workspace_file="/tmp/last-workspace"
-
-    current_desktop=$(wmctrl -d | awk '/^[0-9]+ +\*/ { print $1 }')
-
-    [ -z "$current_desktop" ] && err "Cannot determine current desktop"
-
-    case "$command" in
-        "switch" )
-            if [ "$#" -ne 2 ]; then
-              err "usage: $0 switch WORKSPACE-NUMBER"
-            fi
-            dest="$2"
-            [ -z "$dest" ] && err "Empty destination to switch to: '$dest'"
-            wmctrl -s "$dest"
-            echo "$current_desktop" > "$last_workspace_file"
-            ;;
-        # "pop" )
-        #     ;;
-        "swap" )
-            if [ -f "$last_workspace_file" ]; then
-                dest=$(cat "$last_workspace_file")
-                [ -z "$dest" ] && err "Empty destination to swap with: '$dest'"
-                wmctrl -s "$dest"
-                echo "$current_desktop" > "$last_workspace_file"
-            else
-                err "No last workspace to swap with"
-            fi
-            ;;
-        "forward" )
-            workspace_count=$(wmctrl -d | wc -l)
-            dest="$(( ($current_desktop + 1) % $workspace_count ))"
-            wmctrl -s "$dest"
-            echo "$current_desktop" > "$last_workspace_file"
-            ;;
-        "backward" )
-            workspace_count=$(wmctrl -d | wc -l)
-            dest="$(( ($current_desktop - 1) % $workspace_count ))"
-            if [ "$dest" -lt 0 ]; then
-                dest="$(( $dest + $workspace_count ))"
-            fi
-            wmctrl -s "$dest"
-            echo "$current_desktop" > "$last_workspace_file"
-            ;;
-        * )
-            err "Invalid command: '$command'"
-            ;;
-    esac
-  '';
-  xbindkeys-config =
-    ''
-      # To specify a key, you can use 'xbindkeys --key' or
-      # 'xbindkeys --multikey' and put one of the two lines in this file.
-      #
-      # The format of a command line is:
-      #    "command to start"
-      #       associated key
-      #
-      #
-      # A list of keys is in /usr/include/X11/keysym.h and in
-      # /usr/include/X11/keysymdef.h
-      # The XK_ is not needed.
-      #
-      # List of modifier:
-      #   Release, Control, Shift, Mod1 (Alt), Mod2 (NumLock),
-      #   Mod3 (CapsLock), Mod4, Mod5 (Scroll).
-      #
-
-      # The release modifier is not a standard X modifier, but you can
-      # use it if you want to catch release events instead of press events
-
-      # By defaults, xbindkeys does not pay attention with the modifiers
-      # NumLock, CapsLock and ScrollLock.
-      # Uncomment the lines above if you want to pay attention to them.
-
-      #keystate_numlock = enable
-      #keystate_capslock = enable
-      #keystate_scrolllock= enable
-
-      #"konsole"
-      #"mate-terminal"
-      #"exo-open --launch TerminalEmulator"
-      "mate-terminal"
-          m:0x40 + c:45
-          Mod4 + t
-      "wm.sh swap"
-          m:0x0 + c:90
-          KP_Insert
-      "wm.sh swap"
-          m:0x0 + c:135
-          XF86Go
-      "wm.sh switch 0"
-          m:0x0 + c:87
-          KP_End
-      "wm.sh switch 1"
-          m:0x0 + c:88
-          KP_Down
-      "wm.sh switch 2"
-          m:0x0 + c:89
-          KP_Next
-      "wm.sh switch 3"
-          m:0x0 + c:83
-          KP_Left
-      "wm.sh switch 4"
-          m:0x0 + c:84
-          KP_Begin
-      "wm.sh switch 5"
-          m:0x0 + c:85
-          KP_Right
-      "wm.sh switch 6"
-          m:0x0 + c:79
-          KP_Home
-      "wm.sh switch 7"
-          m:0x0 + c:80
-          KP_Up
-      "wm.sh switch 8"
-          m:0x0 + c:81
-          KP_Prior
-      "wm.sh switch 9"
-          m:0x0 + c:91
-          KP_Delete
-      "wm.sh backward"
-          m:0x0 + c:106
-          KP_Divide
-      "wm.sh forward"
-          m:0x0 + c:63
-          KP_Multiply
-      # "/tmp/wm_operate.py --pop"
-      #     m:0x0 + c:104
-      #     XF86Mail
-      "wmctrl -r :ACTIVE: -b toggle,fullscreen"
-          m:0x40 + c:135
-          Mod4 + XF86Go
-
-      # "/tmp/wm_operate.py --backward"
-      #     m:0x8 + c:113
-      #     Alt + Left
-      # "/tmp/wm_operate.py --forward"
-      #     m:0x8 + c:114
-      #     Alt + Right
-
-      "wmctrl -r :ACTIVE: -t 0"
-          m:0x1 + c:87
-          Shift + KP_End
-      "wmctrl -r :ACTIVE: -t 1"
-          m:0x1 + c:88
-          Shift + KP_Down
-      "wmctrl -r :ACTIVE: -t 2"
-          m:0x1 + c:89
-          Shift + KP_Next
-      "wmctrl -r :ACTIVE: -t 3"
-          m:0x1 + c:83
-          Shift + KP_Left
-      "wmctrl -r :ACTIVE: -t 4"
-          m:0x1 + c:84
-          Shift + KP_Begin
-      "wmctrl -r :ACTIVE: -t 5"
-          m:0x1 + c:85
-          Shift + KP_Right
-      "wmctrl -r :ACTIVE: -t 6"
-          m:0x1 + c:79
-          Shift + KP_Home
-      "wmctrl -r :ACTIVE: -t 7"
-          m:0x1 + c:80
-          Shift + KP_Up
-      "wmctrl -r :ACTIVE: -t 8"
-          m:0x1 + c:81
-          Shift + KP_Prior
-      "wmctrl -r :ACTIVE: -t 9"
-          m:0x1 + c:91
-          Shift + KP_Delete
-
-      # Kinesis Advantage mappings
-
-      "wm.sh switch 0"
-          m:0x40 + c:10
-          Mod4 + 1
-      "wm.sh switch 1"
-          m:0x40 + c:11
-          Mod4 + 2
-      "wm.sh switch 2"
-          m:0x40 + c:12
-          Mod4 + 3
-      "wm.sh switch 3"
-          m:0x40 + c:13
-          Mod4 + 4
-      "wm.sh switch 4"
-          m:0x40 + c:14
-          Mod4 + 5
-      "wm.sh switch 5"
-          m:0x40 + c:15
-          Mod4 + 6
-      "wm.sh switch 6"
-          m:0x40 + c:16
-          Mod4 + 7
-      "wm.sh switch 7"
-          m:0x40 + c:17
-          Mod4 + 8
-      "wm.sh switch 9"
-          m:0x40 + c:18
-          Mod4 + 9
-      "wm.sh switch 10"
-          m:0x40 + c:19
-          Mod4 + 0
-
-      "wm.sh switch 0"
-          m:0x40 + c:67
-          Mod4 + F1
-      "wm.sh switch 1"
-          m:0x40 + c:68
-          Mod4 + F2
-      "wm.sh switch 2"
-          m:0x40 + c:69
-          Mod4 + F3
-      "wm.sh switch 3"
-          m:0x40 + c:70
-          Mod4 + F4
-      "wm.sh switch 4"
-          m:0x40 + c:71
-          Mod4 + F5
-      "wm.sh switch 5"
-          m:0x40 + c:72
-          Mod4 + F6
-      "wm.sh switch 6"
-          m:0x40 + c:73
-          Mod4 + F7
-      "wm.sh switch 7"
-          m:0x40 + c:74
-          Mod4 + F8
-      "wm.sh switch 8"
-          m:0x40 + c:75
-          Mod4 + F9
-      "wm.sh switch 9"
-          m:0x40 + c:76
-          Mod4 + F10
-      "wm.sh switch 10"
-          m:0x40 + c:95
-          Mod4 + F11
-      "wm.sh switch 11"
-          m:0x40 + c:96
-          Mod4 + F12
-
-      #"wm.sh switch 18"
-      #    m:0x40 + c:18
-      #    Mod4 + 9
-      #"wm.sh switch 19"
-      #    m:0x40 + c:19
-      #    Mod4 + 0
-
-      "wmctrl -r :ACTIVE: -t 0"
-          m:0x44 + c:10
-          Control+Mod4 + 1
-      "wmctrl -r :ACTIVE: -t 1"
-          m:0x44 + c:11
-          Control+Mod4 + 2
-      "wmctrl -r :ACTIVE: -t 2"
-          m:0x44 + c:12
-          Control+Mod4 + 3
-      "wmctrl -r :ACTIVE: -t 3"
-          m:0x44 + c:13
-          Control+Mod4 + 4
-      "wmctrl -r :ACTIVE: -t 4"
-          m:0x44 + c:14
-          Control+Mod4 + 5
-      "wmctrl -r :ACTIVE: -t 5"
-          m:0x44 + c:15
-          Control+Mod4 + 6
-      "wmctrl -r :ACTIVE: -t 6"
-          m:0x44 + c:16
-          Control+Mod4 + 7
-      "wmctrl -r :ACTIVE: -t 7"
-          m:0x44 + c:17
-          Control+Mod4 + 8
-      "wmctrl -r :ACTIVE: -t 9"
-          m:0x44 + c:18
-          Control+Mod4 + 9
-      "wmctrl -r :ACTIVE: -t 10"
-          m:0x44 + c:19
-          Control+Mod4 + 0
-
-      "wm.sh swap"
-          m:0x40 + c:112
-          Mod4 + Prior
-    '';
+    #   #keystate_numlock = enable
+    #   #keystate_capslock = enable
+    #   #keystate_scrolllock= enable
+    #
+    #   #"konsole"
+    #   #"mate-terminal"
+    #   #"exo-open --launch TerminalEmulator"
+    #   "mate-terminal"
+    #       m:0x40 + c:45
+    #       Mod4 + t
+    #   "${wm-sh}/bin/wm.sh swap"
+    #       m:0x0 + c:90
+    #       KP_Insert
+    #   "${wm-sh}/bin/wm.sh swap"
+    #       m:0x0 + c:135
+    #       XF86Go
+    #   "${wm-sh}/bin/wm.sh switch 0"
+    #       m:0x0 + c:87
+    #       KP_End
+    #   "${wm-sh}/bin/wm.sh switch 1"
+    #       m:0x0 + c:88
+    #       KP_Down
+    #   "${wm-sh}/bin/wm.sh switch 2"
+    #       m:0x0 + c:89
+    #       KP_Next
+    #   "${wm-sh}/bin/wm.sh switch 3"
+    #       m:0x0 + c:83
+    #       KP_Left
+    #   "${wm-sh}/bin/wm.sh switch 4"
+    #       m:0x0 + c:84
+    #       KP_Begin
+    #   "${wm-sh}/bin/wm.sh switch 5"
+    #       m:0x0 + c:85
+    #       KP_Right
+    #   "${wm-sh}/bin/wm.sh switch 6"
+    #       m:0x0 + c:79
+    #       KP_Home
+    #   "${wm-sh}/bin/wm.sh switch 7"
+    #       m:0x0 + c:80
+    #       KP_Up
+    #   "${wm-sh}/bin/wm.sh switch 8"
+    #       m:0x0 + c:81
+    #       KP_Prior
+    #   "${wm-sh}/bin/wm.sh switch 9"
+    #       m:0x0 + c:91
+    #       KP_Delete
+    #   "${wm-sh}/bin/wm.sh backward"
+    #       m:0x0 + c:106
+    #       KP_Divide
+    #   "${wm-sh}/bin/wm.sh forward"
+    #       m:0x0 + c:63
+    #       KP_Multiply
+    #   # "/tmp/wm_operate.py --pop"
+    #   #     m:0x0 + c:104
+    #   #     XF86Mail
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -b toggle,fullscreen"
+    #       m:0x40 + c:135
+    #       Mod4 + XF86Go
+    #
+    #   # "/tmp/wm_operate.py --backward"
+    #   #     m:0x8 + c:113
+    #   #     Alt + Left
+    #   # "/tmp/wm_operate.py --forward"
+    #   #     m:0x8 + c:114
+    #   #     Alt + Right
+    #
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 0"
+    #       m:0x1 + c:87
+    #       Shift + KP_End
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 1"
+    #       m:0x1 + c:88
+    #       Shift + KP_Down
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 2"
+    #       m:0x1 + c:89
+    #       Shift + KP_Next
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 3"
+    #       m:0x1 + c:83
+    #       Shift + KP_Left
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 4"
+    #       m:0x1 + c:84
+    #       Shift + KP_Begin
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 5"
+    #       m:0x1 + c:85
+    #       Shift + KP_Right
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 6"
+    #       m:0x1 + c:79
+    #       Shift + KP_Home
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 7"
+    #       m:0x1 + c:80
+    #       Shift + KP_Up
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 8"
+    #       m:0x1 + c:81
+    #       Shift + KP_Prior
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 9"
+    #       m:0x1 + c:91
+    #       Shift + KP_Delete
+    #
+    #   # Kinesis Advantage mappings
+    #
+    #   "${wm-sh}/bin/wm.sh switch 0"
+    #       m:0x40 + c:10
+    #       Mod4 + 1
+    #   "${wm-sh}/bin/wm.sh switch 1"
+    #       m:0x40 + c:11
+    #       Mod4 + 2
+    #   "${wm-sh}/bin/wm.sh switch 2"
+    #       m:0x40 + c:12
+    #       Mod4 + 3
+    #   "${wm-sh}/bin/wm.sh switch 3"
+    #       m:0x40 + c:13
+    #       Mod4 + 4
+    #   "${wm-sh}/bin/wm.sh switch 4"
+    #       m:0x40 + c:14
+    #       Mod4 + 5
+    #   "${wm-sh}/bin/wm.sh switch 5"
+    #       m:0x40 + c:15
+    #       Mod4 + 6
+    #   "${wm-sh}/bin/wm.sh switch 6"
+    #       m:0x40 + c:16
+    #       Mod4 + 7
+    #   "${wm-sh}/bin/wm.sh switch 7"
+    #       m:0x40 + c:17
+    #       Mod4 + 8
+    #   "${wm-sh}/bin/wm.sh switch 9"
+    #       m:0x40 + c:18
+    #       Mod4 + 9
+    #   "${wm-sh}/bin/wm.sh switch 10"
+    #       m:0x40 + c:19
+    #       Mod4 + 0
+    #
+    #   "${wm-sh}/bin/wm.sh switch 0"
+    #       m:0x40 + c:67
+    #       Mod4 + F1
+    #   "${wm-sh}/bin/wm.sh switch 1"
+    #       m:0x40 + c:68
+    #       Mod4 + F2
+    #   "${wm-sh}/bin/wm.sh switch 2"
+    #       m:0x40 + c:69
+    #       Mod4 + F3
+    #   "${wm-sh}/bin/wm.sh switch 3"
+    #       m:0x40 + c:70
+    #       Mod4 + F4
+    #   "${wm-sh}/bin/wm.sh switch 4"
+    #       m:0x40 + c:71
+    #       Mod4 + F5
+    #   "${wm-sh}/bin/wm.sh switch 5"
+    #       m:0x40 + c:72
+    #       Mod4 + F6
+    #   "${wm-sh}/bin/wm.sh switch 6"
+    #       m:0x40 + c:73
+    #       Mod4 + F7
+    #   "${wm-sh}/bin/wm.sh switch 7"
+    #       m:0x40 + c:74
+    #       Mod4 + F8
+    #   "${wm-sh}/bin/wm.sh switch 8"
+    #       m:0x40 + c:75
+    #       Mod4 + F9
+    #   "${wm-sh}/bin/wm.sh switch 9"
+    #       m:0x40 + c:76
+    #       Mod4 + F10
+    #   "${wm-sh}/bin/wm.sh switch 10"
+    #       m:0x40 + c:95
+    #       Mod4 + F11
+    #   "${wm-sh}/bin/wm.sh switch 11"
+    #       m:0x40 + c:96
+    #       Mod4 + F12
+    #
+    #   #"${wm-sh}/bin/wm.sh switch 18"
+    #   #    m:0x40 + c:18
+    #   #    Mod4 + 9
+    #   #"${wm-sh}/bin/wm.sh switch 19"
+    #   #    m:0x40 + c:19
+    #   #    Mod4 + 0
+    #
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 0"
+    #       m:0x44 + c:10
+    #       Control+Mod4 + 1
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 1"
+    #       m:0x44 + c:11
+    #       Control+Mod4 + 2
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 2"
+    #       m:0x44 + c:12
+    #       Control+Mod4 + 3
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 3"
+    #       m:0x44 + c:13
+    #       Control+Mod4 + 4
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 4"
+    #       m:0x44 + c:14
+    #       Control+Mod4 + 5
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 5"
+    #       m:0x44 + c:15
+    #       Control+Mod4 + 6
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 6"
+    #       m:0x44 + c:16
+    #       Control+Mod4 + 7
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 7"
+    #       m:0x44 + c:17
+    #       Control+Mod4 + 8
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 9"
+    #       m:0x44 + c:18
+    #       Control+Mod4 + 9
+    #   "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 10"
+    #       m:0x44 + c:19
+    #       Control+Mod4 + 0
+    #
+    #   "${wm-sh}/bin/wm.sh swap"
+    #       m:0x40 + c:112
+    #       Mod4 + Prior
+    #   '';
 in
 {
   # Home Manager needs a bit of information about you and the
@@ -320,7 +325,7 @@ in
     # You can update Home Manager without changing this value. See
     # the Home Manager release notes for a list of state version
     # changes in each release.
-    stateVersion = "22.05";
+    #stateVersion = "22.05";
 
     username = "sergey";
     homeDirectory = "/home/sergey";
@@ -352,7 +357,8 @@ in
       # Note that bash variables in there are quoted with '',
       # strip them before feeding to bash
       ''
-        export PROMPT_COMMAND="''${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a"
+        #export PROMPT_COMMAND="''${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a"
+        export PROMPT_COMMAND="history -a"
 
         export PS1='\u@\h:\w\$ '
 
@@ -535,9 +541,9 @@ in
 
   programs.emacs = {
     enable        = true;
-    defaultEditor = true;
-    # package       = pkgs.emacs;
-    package       = pkgs.emacsNativeComp;
+    #defaultEditor = true;
+    package       = pkgs.emacs;
+    # package       = pkgs.emacsNativeComp;
   };
 
   programs.ssh = {
@@ -562,12 +568,92 @@ in
     pinentryFlavor  = "qt";
   };
 
+  services.sxhkd = {
+    enable      = true;
+    keybindings = {
+      "super + t"          = "; exo-open --launch TerminalEmulator";
+      "KP_Insert"          = "; ${wm-sh}/bin/wm.sh swap";
+      "XF86Go"             = "; ${wm-sh}/bin/wm.sh swap";
+      "KP_End"             = "${wm-sh}/bin/wm.sh switch 0";
+
+      "KP_Down"            = "${wm-sh}/bin/wm.sh switch 1";
+      "KP_Next"            = "${wm-sh}/bin/wm.sh switch 2";
+      "KP_Left"            = "${wm-sh}/bin/wm.sh switch 3";
+      "KP_Begin"           = "${wm-sh}/bin/wm.sh switch 4";
+      "KP_Right"           = "${wm-sh}/bin/wm.sh switch 5";
+      "KP_Home"            = "${wm-sh}/bin/wm.sh switch 6";
+      "KP_Up"              = "${wm-sh}/bin/wm.sh switch 7";
+      "KP_Prior"           = "${wm-sh}/bin/wm.sh switch 8";
+      "KP_Delete"          = "${wm-sh}/bin/wm.sh switch 9";
+      "KP_Divide"          = "${wm-sh}/bin/wm.sh backward";
+      "KP_Multiply"        = "${wm-sh}/bin/wm.sh forward";
+      # "XF86Mail"         = "/tmp/wm_operate.py --pop";
+      "mod4 + XF86Go"      = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -b toggle,fullscreen";
+
+      # "Alt + Left"       = "/tmp/wm_operate.py --backward";
+      # "Alt + Right"      = "/tmp/wm_operate.py --forward";
+
+      "shift + KP_End"     = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 0";
+      "shift + KP_Down"    = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 1";
+      "shift + KP_Next"    = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 2";
+      "shift + KP_Left"    = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 3";
+      "shift + KP_Begin"   = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 4";
+      "shift + KP_Right"   = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 5";
+      "shift + KP_Home"    = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 6";
+      "shift + KP_Up"      = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 7";
+      "shift + KP_Prior"   = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 8";
+      "shift + KP_Delete"  = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 9";
+
+      # Kinesis Advantage mappings
+
+      "mod4 + 1"           = "${wm-sh}/bin/wm.sh switch 0";
+      "mod4 + 2"           = "${wm-sh}/bin/wm.sh switch 1";
+      "mod4 + 3"           = "${wm-sh}/bin/wm.sh switch 2";
+      "mod4 + 4"           = "${wm-sh}/bin/wm.sh switch 3";
+      "mod4 + 5"           = "${wm-sh}/bin/wm.sh switch 4";
+      "mod4 + 6"           = "${wm-sh}/bin/wm.sh switch 5";
+      "mod4 + 7"           = "${wm-sh}/bin/wm.sh switch 6";
+      "mod4 + 8"           = "${wm-sh}/bin/wm.sh switch 7";
+      "mod4 + 9"           = "${wm-sh}/bin/wm.sh switch 9";
+      "mod4 + 0"           = "${wm-sh}/bin/wm.sh switch 10";
+
+      "mod4 + F1"          = "${wm-sh}/bin/wm.sh switch 0";
+      "mod4 + F2"          = "${wm-sh}/bin/wm.sh switch 1";
+      "mod4 + F3"          = "${wm-sh}/bin/wm.sh switch 2";
+      "mod4 + F4"          = "${wm-sh}/bin/wm.sh switch 3";
+      "mod4 + F5"          = "${wm-sh}/bin/wm.sh switch 4";
+      "mod4 + F6"          = "${wm-sh}/bin/wm.sh switch 5";
+      "mod4 + F7"          = "${wm-sh}/bin/wm.sh switch 6";
+      "mod4 + F8"          = "${wm-sh}/bin/wm.sh switch 7";
+      "mod4 + F9"          = "${wm-sh}/bin/wm.sh switch 8";
+      "mod4 + F10"         = "${wm-sh}/bin/wm.sh switch 9";
+      "mod4 + F11"         = "${wm-sh}/bin/wm.sh switch 10";
+      "mod4 + F12"         = "${wm-sh}/bin/wm.sh switch 11";
+
+      "control + mod4 + 1" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 0";
+      "control + mod4 + 2" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 1";
+      "control + mod4 + 3" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 2";
+      "control + mod4 + 4" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 3";
+      "control + mod4 + 5" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 4";
+      "control + mod4 + 6" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 5";
+      "control + mod4 + 7" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 6";
+      "control + mod4 + 8" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 7";
+      "control + mod4 + 9" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 9";
+      "control + mod4 + 0" = "${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 10";
+
+      "mod4 + Prior"       = "${wm-sh}/bin/wm.sh swap";
+    };
+  };
+
   xsession.enable = true;
 
   home.packages = [
     pkgs.aspell
+    pkgs.aspellDicts.en
+    pkgs.aspellDicts.en-computers
+    pkgs.aspellDicts.en-science
+    pkgs.aspellDicts.ru
     pkgs.aspellDicts.uk
-    pkgs.aspellDicts.us
     pkgs.audacious
     # pkgs.autoconf
     pkgs.baobab
@@ -591,34 +677,43 @@ in
     pkgs.imagemagick7
     pkgs.inkscape
     pkgs.iotop
-    pkgs.kdeApplications.okular
+    pkgs.okular
+    pkgs.oxygen-icons5
+    pkgs.lsof
     pkgs.lzip
     pkgs.lzop
     pkgs.mc
     pkgs.mplayer
-    pkgs.nix-repl
     pkgs.p7zip
-    pkgs.pinentry_qt;
+    pkgs.pinentry_qt
+    pkgs.pv
+    pkgs.sshfs
     pkgs.thunderbird
+    pkgs.unzip
     pkgs.vlc
     pkgs.vorbis-tools
     pkgs.wget
-    pkgs.wmctrl
+    pkgs.xorg.xev
     pkgs.zip
     # pkgs.yasm
     pkgs.zstd
     # pkgs.z3
 
+    wmctrl-pkg
+
     pkgs.cabal-install
     pkgs.haskellPackages.fast-tags
+    pkgs.universal-ctags
 
     pkgs.git
     pkgs.nix-diff
+
+    wm-sh
   ];
 
-  home.file = {
-    ".xbindkeysrc" = {
-      text = xbindkeys-config;
-    };
-  };
+  #home.file = {
+  #  ".xbindkeysrc" = {
+  #    text = xbindkeys-config;
+  #  };
+  #};
 }
