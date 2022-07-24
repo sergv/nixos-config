@@ -1,0 +1,249 @@
+#+TITLE:       notes
+#+DATE:         2 July 2022
+#+EMAIL:       serg.foo@gmail.com
+#+DESCRIPTION:
+#+KEYWORDS:
+#+STARTUP:     content
+#+STARTUP:     inlineimages
+
+# Disable treating underscores as subscripts
+#+OPTIONS: ^:nil
+
+* Nix Pills
+
+** Debug trace
+~builtins.trace <str> <return value>~
+
+** Manually instantiate derivation and check its references
+#+BEGIN_EXAMPLE
+$ nix-instantiate hello-minimalistic.nix
+warning: you did not specify '--add-root'; the result might be removed by the garbage collector
+/nix/store/6ygk7vjfdyqnjkn12r44w04xqjlhxx70-hello-minimalistic.drv
+$ nix-store -r /nix/store/6ygk7vjfdyqnjkn12r44w04xqjlhxx70-hello-minimalistic.drv
+warning: you did not specify '--add-root'; the result might be removed by the garbage collector
+/nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
+$ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
+/nix/store/hp2fa1cjwkyyfhrd6jdr7i2bqbgp4alh-glibc-2.34-210
+/nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
+#+END_EXAMPLE
+
+** Atomic types
+- booleans: ~true~, ~false~
+- integer numbers
+  + Support C-like arithmetic
+  + Support C-like comparisons
+- floating point numbers
+- strings
+  + ~''foo''~ or ~"foo"~
+  + interpelation of variable ~test~: ~"${test}"~
+  + Escaping of interpolation: ~"x \${test} y"~ or ~''x ''${test} y''~
+  + Newline: ~"x \n y"~ produces newline, ~''x \n y''~ produces backslash n verbatim, ~''x ''\n y''~ produces newline
+- paths
+  + ~./.~ denotes current directory
+  + ~foo/bar~ denotes foo/bar under current directory, same as ~./foo/bar~
+  + ~<foo>~ resolves path ~foo~ via ~NIX_PATH~ (list of paths separated by ~:~, similar to PATH)
+
+** Composite types
+*** ‘records’ - atttribute sets, dicts with string keys
++ E.g. ~{ foo = 1; "bar bar" = true; a-b = [1 2 3]; }~
++ Access by key: ~s.foo~, ~s."bar bar"~, ~s.a-b~
++ Recursive attribute sets allow values under some keys to depend on values under other keys
+  ~rec { a = 1; b = a + 1; }~
++ ~inherit~ keyword: ~{ inherit x y; }~ is equivalent to ~{ x = x; y = y; }~ for some ~x~ and ~y~ in current scope
++ Two attribute sets can be merged with ~//~ operator (the operator implements right-leaning set union)
+*** lists
+Delimited by space: ~[1 2 3]~
+*** functions
+E.g. ~x: x + 1~, ~x: y: x * y~
+
+Function can pattern-match on its argument:
+~{ a, b }: a + b~
+
+Default values:
+~{ a, b ? 4 }: a + b~
+
+Allow more keys in the argument than listed (variadic):
+~{ a, b, ... }: a * b~
+
+Access arguments in the variadic part:
+~whole @ { a, b, ... }: a + b * whole.c~
+
+** Variable names: can contain minus
+E.g. ~a-b~ is a valid identifier.
+
+** If expression
+~if <cond> then <t> else <f>~
+
+** Let expression
+~let foo = 1; in foo + foo~
+~let foo = 1; bar = 2; in foo + bar~
+
+By default its recursive:
+~let foo = 1; bar = foo * 2; in foo + bar~
+
+** With expression
+Brings attribute set keys into scope as identifiers (only strings
+represening valid identifiers will be brought):
+
+~with { a = 3; b = 2; }; a * b~ => 6
+
+If a value is already defined, it will *not* be shadowed:
+
+~let a = 10; in with { a = 3; b = 2; }; a * b~ => 20
+
+** Import
+~import~ is a built-in function which evaluates Nix expression at the given path and returns it.
+
+Imported file typically defines a function which can be applied.
+
+** Derivations
+Made via ~derivation~ built-in.
+
+Derivation is roughly a build action.
+
+Ultimately derivation is just an attribute set with a few special
+keys. Derivations can be automatically converted to strings (thanks to
+the presence of ~outPath~ attribute). Another distinctive feature of
+the derivation attribute set is presence of ~type~ attribute with
+value ~"derivation"~. E.g.
+
+#+BEGIN_EXAMPLE
+> :l <nixpkgs> # brings ‘coreutils’ derivation into scope, among others
+> "${coreutils}/bin/true" => "/nix/store/...-coreutils-0.1/bin/true"
+#+END_EXAMPLE
+
+** nixpkgs design patterns
+*** ‘input’
+Each package derivation is a function that can be parameterized by and
+used with different package repositories. Also some parts of packages
+can be disabled via extra arguments
+*** ‘call package’
+Make package derivations accept inputs (e.g. other packages) than are
+named in the same way that they appear in the bigger packages
+repository. This way whole repository can be passed to the function
+than produces derivation and most of the dependant tools can be
+supplied automatically. Yet there’s always an option to override
+specific inputs.
+*** ‘override’
+Make each package derivation carry an ‘override’ field that is a
+function able to produce altered package description similar to the
+one it’s contained in. This way given a derivation we don’t care where
+it came from or how it was constructed but have an option to re-build
+it with overridden inputs.
+
+config.nix contains packageOverrides that allows to override packages
+globaly, thanks to nixpkgs being constructed via fixpoint.
+
+** Environment variables
+*** NIX_PATH
+A :-separated list of paths that gets used to resolve paths of the form ~<foo>~.
+
+Entries should be either directories where search will be conducted or
+assignments of the form ~foo=/path/to/foo~ that specify direct path
+for particular reference.
+
+** Useful commands
+*** Evaluate given nix expression purely and print result
+nix-instantiate --eval -E '<nixpkgs>'
+*** Evaluate given nix expression and create a derivation in store
+nix-instantiate foo.nix
+*** Build derivation in store
+nix-store -r /nix/store/6ygk7vjfdyqnjkn12r44w04xqjlhxx70-hello-minimalistic.drv
+*** Check runtime dependencies of built package in store
+nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
+
+* Nix config in git
+~git-crypt~ can help with storing secrets in git
+
+* NixOs installation
+** Partition disk
+*** ~lsblk~ - check available disks
+*** ~fdisk~
++ ~m~ - help
++ ~g~ - “Create GPT partition table”
++ ~t~ - list partition types, note which one is ~efi~ partition
++ ~n~ - create new partition, 200Mb for efi is enough, make sure type is ‘efi partition’
++ EFI: ~sudo mkfs.fat -F 32 $efi-dev~
++ EIF: ~sudo fatlabel $efi-dev nixos-boot~
++ Root: ~sudo mkfs.ext4 $root-dev -L nixos-root~
++ Mount partitions ~sudo mount /dev/disk-by-label/nixos-root /mnt~
++ Mount partitions ~sudo mkdir /mnt/boot~
++ Mount partitions ~sudo mount /dev/disk-by-label/nixos-boot /mnt/boot~
+*** Generate config: ~sudo nixos-generate-config --root /mnt~
+*** Copy config
+*** Finish: ~nixos-install~, ~nixos-install --flake~
+
+** Install home-manager
+Go to https://github.com/nix-community/home-manager
+Also check out https://nixos.wiki/wiki/Home_Manager
+
+Run:
+~nix-channel --add https://github.com/nix-community/home-manager/archive/release-22.05.tar.gz home-manager~
+~nix-channel –update~
+~nix-shell '<home-manager>' -A install~
+
+Now work with ~/home/sergey/.config/nixpkgs/home.nix~
+~home-manager switch~ - apply home config
+
+** ! Maintetance
+~nix-channel --update~ - pull latest packages for user
+~nix-channel --remove <name>~ - remove unused channels
+~sudo nix-channel --update~ - pull latest packages for system
+~sudo nixos-rebuild switch~ - switch to new configuration with latest packages
+
+Get docs in terminal:
+~man configuration.nix~
+~man home-configuration.nix~
+
+Switch using custom nix files not at standard locations:
+~sudo nixos-rebuild switch -I nixos-config=/frobnicator/foo/bar/home.nix~
+~home-manager switch -f ./foo/bar/home.nix~
+
+*** with flakes
+
+~nixos-rebuild switch --flake .#~
+~nixos-rebuild switch --flake .#home~ - build for specific host called ~home~
+
+For custom home manager
+~nix build --flake .#homeManagerConfigurations.sergey.activationPackage~ - build for home manager
+~./result/activate~ - actually load
+
+Update ~flake.lock~:
+~nix flake update --recreate-lock-file~
+
+** Profiles
+~/nix/var/nix/profiles~
+
+** GC
+~nix-store --gc~
+
+** Deduplicate store
+~nix-store --optimise~
+
+** Packaging
+Wrap standalone games with the help of ~buildFHSUserEnv~ function
+https://ryantm.github.io/nixpkgs/builders/special/fhs-environments/
+
+*** Nixpkgs alternatives to ~derivation~ built-in:
+- ~mkDerivation~
+- ~runCommand~
+- ~writeScriptBin~
+
+** Build log for a package
+~nix log /nix/store/<path>~
+Can be checked out when something fails to build
+
+* Shell
+~nix-shell~ ~ ~nix develop~
+
+* NixOs TODO
+- [ ] Build firefox with addons baked-in
+- [ ] Install torrent client
+- [ ] Add [[https://github.com/nix-community/rnix-lsp][nix lsp]] to Emacs
+
+* Flakes
+flake ~ project file
+
+~nix build .#~ - build flake (~#~) in current directory (~.~)
+
+NUR - like AUR, Nix User Repository
