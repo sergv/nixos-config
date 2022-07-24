@@ -92,12 +92,10 @@
     # pkgs.veracrypt
     #(pkgs.wineFull.override { netapiSupport = false; })
     #pkgs.winetricks
-    #pkgs.xbindkeys
 
     #gvenview
     #okular
     #evince
-    #xbindkeys - configure
     #htop
     #kde system monitor
     #nix-bash-completions
@@ -300,24 +298,6 @@
 
   # Enable touchpad support.
   # services.xserver.libinput.enable = true;
-
-  #systemd.user.services.xbindkeys-daemon = {
-  #  enable      = true;
-  #  description = "xbindkeys";
-  #  #path        = [ pkgs.xbindkeys ];
-  #  #preStart    =
-  #  #  ''
-  #  #    config
-  #  #  '';
-  #  serviceConfig = {
-  #    Type      = "simple";
-  #    ExecStart = "${pkgs.xbindkeys}/bin/xbindkeys --nodaemon --poll-rc";
-  #    ExecStop  = "pkill xbindkeys";
-  #    Restart   = "always";
-  #  };
-  #  wantedBy = [ "graphicalSession.target" ];
-  #  partOf   = [ "graphicalSession.target" ];
-  #};
 
   services.udev = {
     extraRules =
