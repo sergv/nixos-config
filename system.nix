@@ -12,26 +12,26 @@
 
   # For booting see https://nixos.wiki/wiki/Bootloader
 
-  # # For EFI-based systems
-  # boot.loader.systemd-boot.enable = true;
-  # boot.loader.efi.canTouchEfiVariables = true;
+  # For EFI-based systems
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-  # More for legacy systems, use the GRUB 2 boot loader.
-  boot.loader.grub = {
-    enable      = true;
-    version     = 2;
-    # Define on which hard drive you want to install Grub.
-    device      = "/dev/sda";
-    # Include entries for other OSes.
-    useOSProber = true;
-    efiSupport  = true;
-  };
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  # # More for legacy systems, use the GRUB 2 boot loader.
+  # boot.loader.grub = {
+  #   enable      = true;
+  #   version     = 2;
+  #   # Define on which hard drive you want to install Grub.
+  #   device      = "/dev/sda";
+  #   # Include entries for other OSes.
+  #   useOSProber = true;
+  #   efiSupport  = true;
+  # };
 
   fileSystems = {
     "/" = {
-      device = "/dev/disk/by-label/nixos-root";
-      # device  = pkgs.lib.mkForce "/dev/disk/by-label/nixos-root";
+      device = "/dev/disk/by-label/NIXOS-ROOT";
+      # device  = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-ROOT";
       fsType = "ext4";
       #options = [ "discard" ]; # for ssds
       options = [
@@ -44,7 +44,8 @@
     };
     "/boot" = {
       device = "/dev/disk/by-label/nixos-boot";
-      # device  = pkgs.lib.mkForce "/dev/disk/by-label/nixos-boot";
+      device = "/dev/disk/by-label/NIXOS-BOOT";
+      # device  = "/dev/disk/by-uuid/459be4d4-751d-4032-abef-6faf9545790c";
       fsType = "vfat";
       options = [
         "nofail"
@@ -84,7 +85,7 @@
     pkgs.linuxPackages.perf
     pkgs.ltrace
     pkgs.man
-    pkgs.manpages
+    pkgs.man-pages
     pkgs.mkpasswd
     # pkgs.ocaml
     # pkgs.octaveFull
@@ -103,7 +104,7 @@
     # pkgs.veracrypt
     #(pkgs.wineFull.override { netapiSupport = false; })
     #pkgs.winetricks
-    pkgs.xbindkeys
+    #pkgs.xbindkeys
 
     #gvenview
     #okular
@@ -120,7 +121,6 @@
   nixpkgs.config = {
     allowUnfree = true; # For nvidia drivers.
     # allowBroken = true;
-    virtualbox.enableExtensionPack = true;
   };
 
   # For running within a VM
@@ -144,10 +144,13 @@
 
   sound.enable = true;
 
+  console = {
+    font = "Lat2-Terminus16";
+    keyMap = "dvorak";
+  };
+
   # Select internationalisation properties.
   i18n = {
-    consoleFont   = "Lat2-Terminus16";
-    consoleKeyMap = "dvorak";
     defaultLocale = "en_GB.UTF-8";
   };
 
@@ -248,7 +251,7 @@
     ];
   };
 
-  services.acpid.enable = false;
+  services.acpid.enable = true;
   powerManagement = {
     enable          = true;
     cpuFreqGovernor = "performance";
@@ -326,22 +329,23 @@
   # Enable touchpad support.
   # services.xserver.libinput.enable = true;
 
-  systemd.user.services.xbindkeys-daemon = {
-    enable      = true;
-    description = "xbindkeys";
-    # path        = [ pkgs.xbindkeys ];
-    preStart    = ''
-      config
-    '';
-    serviceConfig = {
-      Type      = "simple";
-      ExecStart = "${pkgs.xbindkeys}/bin/xbindkeys --nodaemon --poll-rc";
-      ExecStop  = "pkill xbindkeys";
-      Restart   = "always";
-    };
-    wantedBy = [ "graphicalSession.target" ];
-    partOf = [ "graphicalSession.target" ];
-  };
+  #systemd.user.services.xbindkeys-daemon = {
+  #  enable      = true;
+  #  description = "xbindkeys";
+  #  #path        = [ pkgs.xbindkeys ];
+  #  #preStart    =
+  #  #  ''
+  #  #    config
+  #  #  '';
+  #  serviceConfig = {
+  #    Type      = "simple";
+  #    ExecStart = "${pkgs.xbindkeys}/bin/xbindkeys --nodaemon --poll-rc";
+  #    ExecStop  = "pkill xbindkeys";
+  #    Restart   = "always";
+  #  };
+  #  wantedBy = [ "graphicalSession.target" ];
+  #  partOf   = [ "graphicalSession.target" ];
+  #};
 
   services.udev = {
     extraRules = ''
@@ -391,8 +395,10 @@
   users = {
     # Make sure that users are managed only through configuration.nix
     mutableUsers = false;
-    # Define a user account. Don't forget to set a password with ‘passwd’.
-    extraUsers = {
+    users = {
+      #};
+      ## Define a user account. Don't forget to set a password with ‘passwd’.
+      #extraUsers = {
       root = {
         hashedPassword = "Yeah, like I'm going to tell you even my password hash";
       };
@@ -412,6 +418,7 @@
         isNormalUser   = true;
         uid            = 1000;
         shell          = pkgs.bash;
+        # mkpasswd -m sha-512 <password>
         hashedPassword = "Yeah, like I'm going to tell you even my password hash";
       };
     };

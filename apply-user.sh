@@ -8,7 +8,9 @@
 # treat undefined variable substitutions as errors
 set -u
 
-nix build --flake .#homeManagerConfigurations.sergey.activationPackage
+set -e
+
+nix build .#homeManagerConfigurations.sergey.activationPackage "${@}"
 ./result/activate
 
 exit 0
