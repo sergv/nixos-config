@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [[ "${#@}" < 1 ]]; then
+    echo -e "usage:\n$0 DIR\n$0 ARCHIVE-NAME (DIR | FILE)+\n" >&2
+    exit 0
+fi
+
+target="${1%%/}"
+target="${target/%.xz}"
+target="${target/%.tar}.tar.xz"
+
+options="--compress --best --stdout --threads=0 --extreme --verbose"
+
+if [[ ! (-e "$target") ]]; then
+    if [[ "${#@}" -lt 2 ]]; then
+        tar cf - "$1" | xz $options - >"$target"
+    else
+        tar cf - "${@:2}" | xz $options - >"$target"
+    fi
+else
+    echo "error: file \"$target\" already exists"
+fi
+

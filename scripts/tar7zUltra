@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [[ "${#@}" < 1 ]]; then
+    echo -e "usage:\n$0 DIR\n$0 ARCHIVE-NAME (DIR | FILE)+\n" >&2
+    exit 0
+fi
+
+target="${1%%/}"
+target="${target/%.7z}"
+target="${target/%.tar}.tar.7z"
+
+opts="-mfb=256 -md=256m -ms=on -mx=9 -bt -m0=lzma2 -mmt=2" # -m0c=256m -mmt1"
+
+if [[ ! (-e "$target") ]]; then
+    if [[ "${#@}" -lt 2 ]]; then
+        tar cvf - "$1"
+    else
+        tar cvf - "${@:2}"
+    fi | 7z a -si -bd -t7z $opts "$target" >/dev/null
+else
+    echo "error: file \"$target\" already exists"
+fi
+
