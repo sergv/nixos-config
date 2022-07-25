@@ -340,6 +340,13 @@ in
 
   xsession.enable = true;
 
+  systemd.user.tmpfiles.rules = [
+    "d /tmp/cache                   0755 sergey users - -"
+    # Forcefully symlink, removing source if it exists.
+    "L+ /home/sergey/.cache         -    -      -     - /tmp/cache"
+    "L+ /home/sergey/.compose-cache -    -      -     - /tmp/cache"
+  ];
+
   home.packages = [
     pkgs.aspell
     pkgs.aspellDicts.en
