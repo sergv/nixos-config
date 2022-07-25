@@ -57,52 +57,60 @@
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = [
-    pkgs.alsaTools
-    pkgs.alsaUtils
-    # pkgs.android-studio
-    # pkgs.androidsdk
-    # pkgs.androidndk
-    pkgs.android-udev-rules
-    # pkgs.bumblebee
-    # pkgs.jdk7
-    # pkgs.jdk
-    pkgs.killall
-    # pkgs.libnotify # for showing notifications in wm_operate.py
-    # pkgs.libreoffice
-    pkgs.linuxPackages.perf
-    pkgs.ltrace
-    pkgs.man
-    pkgs.man-pages
-    pkgs.mkpasswd
-    # pkgs.ocaml
-    # pkgs.octaveFull
-    pkgs.pciutils
-    pkgs.plasma-systemmonitor
-    # pkgs.python36Packages.ipython
-    # pkgs.python36Packages.jupyter
-    # pkgs.python36Packages.jupyter_client
-    # pkgs.python36Packages.matplotlib
-    # pkgs.python36Packages.sympy
-    pkgs.redshift
-    pkgs.sudo
-    pkgs.strace
-    pkgs.xfce.thunar
-    pkgs.vim
-    # pkgs.veracrypt
-    #(pkgs.wineFull.override { netapiSupport = false; })
-    #pkgs.winetricks
+  environment = {
+    mate.excludePackages = [
+      pkgs.mate.caja
+      pkgs.mate.mate-calc
+      pkgs.mate.mate-user-guide
+      pkgs.mate.pluma
+    ];
+    systemPackages = [
+      pkgs.alsaTools
+      pkgs.alsaUtils
+      # pkgs.android-studio
+      # pkgs.androidsdk
+      # pkgs.androidndk
+      pkgs.android-udev-rules
+      # pkgs.bumblebee
+      # pkgs.jdk7
+      # pkgs.jdk
+      pkgs.killall
+      # pkgs.libnotify # for showing notifications in wm_operate.py
+      # pkgs.libreoffice
+      pkgs.linuxPackages.perf
+      pkgs.ltrace
+      pkgs.man
+      pkgs.man-pages
+      pkgs.mkpasswd
+      # pkgs.ocaml
+      # pkgs.octaveFull
+      pkgs.pciutils
+      pkgs.plasma-systemmonitor
+      # pkgs.python36Packages.ipython
+      # pkgs.python36Packages.jupyter
+      # pkgs.python36Packages.jupyter_client
+      # pkgs.python36Packages.matplotlib
+      # pkgs.python36Packages.sympy
+      pkgs.redshift
+      pkgs.sudo
+      pkgs.strace
+      pkgs.xfce.thunar
+      pkgs.vim
+      # pkgs.veracrypt
+      #(pkgs.wineFull.override { netapiSupport = false; })
+      #pkgs.winetricks
 
-    #gvenview
-    #okular
-    #evince
-    #htop
-    #kde system monitor
-    #nix-bash-completions
+      #gvenview
+      #okular
+      #evince
+      #htop
+      #kde system monitor
+      #nix-bash-completions
 
-    # # For Xfce
-    # pkgs.networkmanagerapplet
-  ];
+      # # For Xfce
+      # pkgs.networkmanagerapplet
+    ];
+  };
 
   nixpkgs.config = {
     allowUnfree = true; # For nvidia drivers.
@@ -273,14 +281,21 @@
 
     desktopManager = {
       plasma5.phononBackend = "vlc";
-      xfce                  = {
-        enable            = true;
-        enableScreensaver = false;
+      mate                  = {
+        enable = true;
       };
+      # xfce                  = {
+      #   enable            = true;
+      #   enableScreensaver = false;
+      # };
     };
     displayManager = {
-      defaultSession = "xfce";
-      lightdm.enable = true;
+      defaultSession = "mate";
+      sddm           = {
+        enable      = true;
+        enableHidpi = true;
+      };
+      # lightdm.enable = true;
     };
   };
 
