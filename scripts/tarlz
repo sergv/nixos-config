@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [[ "${#@}" < 1 ]]; then
+    echo -e "usage:\n$0 DIR\n$0 ARCHIVE-NAME (DIR | FILE)+\n" >&2
+    exit 0
+fi
+
+target="${1%%/}"
+target="${target/%.lz}"
+target="${target/%.tar}.tar.lz"
+
+options="--best --stdout --verbose"
+
+if [[ ! (-e "$target") ]]; then
+    if [[ "${#@}" -lt 2 ]]; then
+        tar cvf - "$1" | lzip $options >"$target"
+    else
+        tar cvf - "${@:2}" | lzip $options >"$target"
+    fi
+else
+    echo "error: file \"$target\" already exists"
+fi
+

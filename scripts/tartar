@@ -1,0 +1,9 @@
+#!/bin/bash
+
+target="${1%%/}.tar"
+if [[ ! (-e "$target") ]]; then
+    tar cf "$target" "$1"
+else
+    echo "error: file \"$target\" already exists"
+fi
+
