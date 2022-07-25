@@ -1,0 +1,45 @@
+#!/bin/bash
+
+if [[ "${#@}" -lt 1 ]]; then
+    echo -e "usage:\n$0 ARCHIVE\n" >&2
+fi
+
+
+for archive in "${@}"
+do
+    name=$(basename "${archive}")
+    ext="${name##*.}"
+    case "${ext}" in
+        gz | tgz)
+            echo tar xfvpz "${archive}"
+            tar xfvpz "${archive}"
+            ;;
+        bz2)
+            echo tar xfvpj "${archive}"
+            tar xfvpj "${archive}"
+            ;;
+        7z)
+            echo "7z e \"${archive}\" -so | tar xvp"
+            7z e "${archive}" -so | tar xvp
+            ;;
+        lz)
+            echo "lzip --decompress --stdout \"${archive}\" | tar tar xvp"
+            lzip --decompress --stdout "${archive}" | tar xvp
+            ;;
+        tar)
+            echo tar xfvp "${archive}"
+            tar xfvp "${archive}"
+            ;;
+        xz)
+            echo tar xfvpJ "${archive}"
+            tar xfvpJ "${archive}"
+            ;;
+        *)
+            echo "unknown extension '${ext}' in ${archive}" >&2
+            exit 1
+            ;;
+    esac
+done
+
+exit 0
+
