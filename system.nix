@@ -88,7 +88,6 @@
       pkgs.redshift
       pkgs.sudo
       pkgs.strace
-      pkgs.xfce.thunar
       pkgs.vim
       # pkgs.veracrypt
       #(pkgs.wineFull.override { netapiSupport = false; })
