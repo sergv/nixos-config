@@ -58,12 +58,6 @@
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment = {
-    mate.excludePackages = [
-      pkgs.mate.caja
-      pkgs.mate.mate-calc
-      pkgs.mate.mate-user-guide
-      pkgs.mate.pluma
-    ];
     systemPackages = [
       pkgs.alsaTools
       pkgs.alsaUtils
@@ -249,7 +243,7 @@
 
   services.redshift = {
     enable    = true;
-    # executable = "/bin/redshift"
+    # executable = "/bin/redshift";
     executable = "/bin/redshift-gtk";
     temperature = {
       day   = 5500;
@@ -280,9 +274,9 @@
     #desktopManager.plasma5.enable = false;
 
     desktopManager = {
-      plasma5.phononBackend = "vlc";
-      mate                  = {
-        enable = true;
+      plasma5 = {
+        phononBackend = "vlc";
+        enable        = true;
       };
       # xfce                  = {
       #   enable            = true;
@@ -290,12 +284,8 @@
       # };
     };
     displayManager = {
-      defaultSession = "mate";
-      sddm           = {
-        enable      = true;
-        enableHidpi = true;
-      };
-      # lightdm.enable = true;
+      defaultSession = "plasma";
+      lightdm.enable = true;
     };
   };
 

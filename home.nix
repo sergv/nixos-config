@@ -264,7 +264,8 @@ in
   services.sxhkd = {
     enable      = true;
     keybindings = {
-      "super + t"          = "; exo-open --launch TerminalEmulator";
+      # "super + t"          = "; exo-open --launch TerminalEmulator";
+      "super + t"          = "; konsole";
       "KP_Insert"          = "; ${wm-sh}/bin/wm.sh swap";
       "XF86Go"             = "; ${wm-sh}/bin/wm.sh swap";
       "KP_End"             = "${wm-sh}/bin/wm.sh switch 0";
@@ -378,12 +379,12 @@ in
     pkgs.inkscape
     pkgs.iotop
     pkgs.okular
-    pkgs.oxygen-icons5
     pkgs.lsof
     pkgs.lzip
     pkgs.lzop
     pkgs.mc
     pkgs.mplayer
+    pkgs.oxygen-icons5
     pkgs.p7zip
     pkgs.pinentry_qt
     pkgs.pv
