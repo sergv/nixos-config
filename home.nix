@@ -2,6 +2,8 @@
 
 let wmctrl-pkg = pkgs.wmctrl;
 
+    my-fonts = import ./fonts { inherit pkgs; };
+
     scripts = import ./scripts { inherit pkgs; wmctrl = wmctrl-pkg; };
 
     wm-sh = scripts.wm-sh;
@@ -30,11 +32,6 @@ in
     # };
   };
 
-  # Hacky way to add fotn:
-  # 1. copy font files to ~/.local/share/fonts
-  # 2. fc-cache
-  # Verify that the font has been installed:
-  # 3. fc-list -v | grep -i <font-name>
   fonts.fontconfig.enable = true;
 
   # Let Home Manager install and manage itself.
@@ -410,5 +407,6 @@ in
     pkgs.nix-diff
 
   ] ++
-  builtins.attrValues scripts;
+  builtins.attrValues scripts ++
+  builtins.attrValues my-fonts;
 }
