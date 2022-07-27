@@ -256,6 +256,7 @@
     enable     = true;
 
     layout     = "us,ru";
+    xkbModel   = "pc105";
     xkbVariant = "dvorak,";
     xkbOptions = "terminate:ctrl_alt_bksp,grp:shifts_toggle,caps:escape";
 
