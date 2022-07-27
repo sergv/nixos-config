@@ -187,6 +187,7 @@
 
   # Enable commands like ‘nix search’ and flakes.
   nix = {
+    allowedUsers = [ "@wheel" ];
     gc.automatic = false;
     package      = pkgs.nixFlakes;
     settings     = {
@@ -233,6 +234,7 @@
 
   security.sudo = {
     enable = true;
+    execWheelOnly = true;
     wheelNeedsPassword = true;
     extraRules = [
       {
