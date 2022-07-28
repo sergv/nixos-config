@@ -28,30 +28,257 @@
   #   efiSupport = true;
   # };
 
-
   fileSystems = {
+    # Includes /tmp
     "/" = {
-      device  = "/dev/disk/by-label/NIXOS-ROOT";
-      # device  = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-ROOT";
-      fsType  = "ext4";
-      #options = [ "discard" ]; # for ssds
-      options = [ "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
+      fsType  = "tmpfs";
+      options = [ "noatime" "nodiratime" "size=10000M" "mode=1777" ];
+    };
+    "/permanent" = {
+      device        = "/dev/disk/by-label/NIXOS-ROOT";
+      # device        = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-ROOT";
+      fsType        = "ext4";
+      # options       = [ "discard" ]; # for ssds
+      options       = [ "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
+      neededForBoot = true;
     };
     "/boot" = {
-<<<<<<< HEAD
       device  = "/dev/disk/by-label/nixos-boot";
-      # device  = pkgs.lib.mkForce "/dev/disk/by-label/nixos-boot";
-=======
-      device  = "/dev/disk/by-label/NIXOS-BOOT";
-      # device  = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-BOOT";
-      # device  = "/dev/disk/by-uuid/459be4d4-751d-4032-abef-6faf9545790c";
->>>>>>> d979a72 (System installed)
       fsType  = "vfat";
       options = [ "nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
     };
-    "/tmp" = {
-      fsType  = "tmpfs";
-      options = [ "noatime" "nodiratime" "size=10000M" "mode=1777" ];
+  };
+
+  environment.etc = {
+    # Maybe try this if ssh server doesn’t work.
+    "ssh/ssh_host_rsa_key".source         = "/persistence/etc/ssh/ssh_host_rsa_key";
+    "ssh/ssh_host_rsa_key.pub".source     = "/persistence/etc/ssh/ssh_host_rsa_key.pub";
+    "ssh/ssh_host_ed25519_key".source     = "/persistence/etc/ssh/ssh_host_ed25519_key";
+    "ssh/ssh_host_ed25519_key.pub".source = "/persistence/etc/ssh/ssh_host_ed25519_key.pub";
+  };
+
+  environment.persistence."/permanent" = {
+    hideMounts = true;
+
+    directories = [
+      "/etc/NetworkManager/system-connections"
+      "/var/lib"
+      "/var/log"
+    ];
+    files = [
+      "/etc/machine-id"
+      "/etc/ssh/ssh_host_rsa_key"
+      "/etc/ssh/ssh_host_rsa_key.pub"
+      "/etc/ssh/ssh_host_ed25519_key"
+      "/etc/ssh/ssh_host_ed25519_key.pub"
+    ];
+    users.sergey = {
+      directories = [
+        "bicycle"
+        "books"
+        "documents"
+        "Documents"
+        "Downloads"
+        "dwhelper"
+        "films"
+        "games"
+        "health"
+        "home" # remove?
+        "Katya"
+        "migration" # remove?
+        "Music"
+        "nix"
+        "Pictures"
+        { directory = "projects"; mode = "0700"; }
+        "recipes"
+        "relocation"
+        "scripts"
+        "sites"
+        "software"
+        "Telegram"
+        "tmp"
+        "torrents"
+        "travelling"
+        "Videos"
+        "vim"
+        "VirtualBox VMs"
+
+        { directory = ".cabal"; mode = "0700"; }
+        { directory = ".gradle"; mode = "0700"; }
+        { directory = ".isabelle"; mode = "0700"; }
+        { directory = ".stack"; mode = "0700"; }
+
+        { directory = ".bitcoin"; mode = "0700"; }
+        { directory = ".dosbox"; mode = "0700"; }
+        { directory = ".emacs.d"; mode = "0700"; }
+        { directory = ".ghc"; mode = "0700"; }
+        { directory = ".gnupg"; mode = "0700"; }
+        { directory = ".litecoin"; mode = "0700"; }
+        { directory = ".mozilla"; mode = "0700"; }
+        { directory = ".paradoxlauncher"; mode = "0700"; }
+        { directory = ".ssh"; mode = "0700"; }
+        { directory = ".thunderbird"; mode = "0700"; }
+
+        ".config/android"
+        ".config/AndroidStudio3.2"
+        ".config/.arduino15"
+        ".config/audacious"
+        # ".config/autostart"
+        ".config/bitcoin"
+        ".config/chromium"
+        ".config/dconf"
+        ".config/fontforce"
+        ".config/Google"
+        ".config/keybase"
+        ".config/libreoffice"
+        ".config/mc"
+        ".config/paradox-launcher-v2"
+        ".config/pulse"
+        ".config/ristretto"
+        ".config/Sandbox Interactive GmbH"
+        ".config/transmission"
+        ".config/vlc"
+        ".config/xfce4"
+        ".config/Xilinx"
+
+        ".local/share/direnv"
+        ".local/share/3909"
+        ".local/share/Anki"
+        ".local/share/Anki2"
+        ".local/share/aspyr-media"
+        { directory = ".local/share/keyrings"; mode = "0700"; }
+        ".local/share/mc"
+        ".local/share/mime"
+        ".local/share/openmw"
+        ".local/share/Paradox Interactive"
+        ".local/share/ristretto"
+        ".local/share/TelegramDesktop"
+        ".local/share/trash"
+        ".local/share/vlc"
+
+        # KDE
+        ".config/gtk-3.0"   # fuse mounted to /home/$USERNAME/.config/gtk-3.0
+        ".config/gtk-4.0"
+        ".config/KDE"
+        ".config/kde.org"
+        ".config/kdedefaults"
+        ".config/plasma-workspace"
+        ".config/xsettingsd"
+        ".kde"
+
+        ".local/share/RecentDocuments"
+        ".local/share/baloo"
+        ".local/share/dolphin"
+        ".local/share/gwenview"
+        ".local/share/kactivitymanagerd"
+        ".local/share/kate"
+        ".local/share/kcookiejar"
+        ".local/share/kded5"
+        ".local/share/klipper"
+        ".local/share/konsole"
+        ".local/share/kscreen"
+        ".local/share/ksysguard"
+        ".local/share/kwalletd"
+        ".local/share/kxmlgui5"
+        ".local/share/okular"
+        ".local/share/plasma_icons"
+        ".local/share/plasma_notes"
+        ".local/share/plasma-systemmonitor"
+        ".local/share/sddm"
+      ];
+      files = [
+        ".emacs"
+        "machine-specific-setup"
+
+        "github-recovery-codes.txt"
+        "mars.exe"
+        "password.org"
+        "todo.org"
+        ".rtorrent.rc"
+        ".viminfo"
+        ".vimrc"
+
+        "O0DGDxpMBNs.jpg"
+
+        ".config/Audaciousrc"
+        ".config/QtProject.conf"
+
+        ".local/ghci.conf"
+        ".local/share/recently-used.xbel"
+
+        # KDE
+        ".config/akregatorrc"
+        ".config/baloofileinformationrc"
+        ".config/baloofilerc"
+        ".config/bluedevilglobalrc"
+        ".config/device_automounter_kcmrc"
+        ".config/dolphinrc"
+        ".config/filetypesrc"
+        ".config/gtkrc"
+        ".config/gtkrc-2.0"
+        ".config/gwenviewrc"
+        ".config/kaccessrc-pluginsrc"
+        ".config/kactivitymanagerd-pluginsrc"
+        ".config/kactivitymanagerd-statsrc"
+        ".config/kactivitymanagerd-switcher"
+        ".config/kactivitymanagerdrc"
+        ".config/katemetainfos"
+        ".config/katerc"
+        ".config/kateschemarc"
+        ".config/katevirc"
+        ".config/kcmfonts"
+        ".config/kcminputrc"
+        ".config/kconf_updaterc"
+        ".config/kded5rc"
+        ".config/kded_device_automounterrc"
+        ".config/kdeglobals"
+        ".config/kgammarc"
+        ".config/kglobalshortcutsrc"
+        ".config/kfontinstuirc"
+        ".config/khotkeysrc"
+        ".config/kiorc"
+        ".config/kmenueditrc"
+        ".config/kmixrc"
+        ".config/konsolerc"
+        ".config/konsolesshconfig"
+        ".config/krunnerrc"
+        ".config/kscreenlockerrc"
+        ".config/kservicemenurc"
+        ".config/ksmserverrc"
+        ".config/ksplashrc"
+        ".config/ktimezonedrc"
+        ".config/kuriikwsfilterrc"
+        ".config/kwalletrc"
+        ".config/kwinrc"
+        ".config/kwinrulesrc"
+        ".config/kxkbrc"
+        ".config/mimeapps.list"
+        ".config/okularpartrc"
+        ".config/okularrc"
+        ".config/partitionmanagerrc"
+        ".config/plasma-localerc"
+        ".config/plasma-nm"
+        ".config/plasma-org.kde.plasma.desktop-appletsrc"
+        ".config/plasmanotifyrc"
+        ".config/plasmarc"
+        ".config/plasmashellrc"
+        ".config/PlasmaUserFeedback"
+        ".config/plasmawindowed-appletsrc"
+        ".config/plasmawindowedrc"
+        ".config/powerdevilrc"
+        ".config/powermanagementprofilesrc"
+        ".config/spectaclerc"
+        ".config/startkderc"
+        ".config/systemsettingsrc"
+        ".config/Trolltech.conf"
+        ".config/user-dirs.dirs"
+        ".config/user-dirs.locale"
+
+        ".local/share/krunnerstaterc"
+        ".local/share/user-places.xbel"
+        ".local/share/user-places.xbel.bak"
+        ".local/share/user-places.xbel.tbcache"
+      ];
     };
   };
 
@@ -348,6 +575,9 @@
         SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:1a:9f:0c:99:65", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth-usb"
       '';
   };
+
+  # Better for steam proton games.
+  systemd.extraConfig = "DefaultLimitNOFILE=1048576";
 
   # Set your time zone.
   time.timeZone = "Europe/London";
