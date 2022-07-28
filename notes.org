@@ -241,6 +241,17 @@ Can be checked out when something fails to build
 - [ ] Install torrent client
 - [ ] Add [[https://github.com/nix-community/rnix-lsp][nix lsp]] to Emacs
 
+* Cookbook
+** Building statically linked packages
+#+BEGIN_EXAMPLE
+$ nix-build -E 'with (import ./. {}); (curl.override { stdenv = makeStaticLibraries stdenv;}).out'
+#+END_EXAMPLE
+
+There is also an stdenv adapter that will build static binaries:
+#+BEGIN_EXAMPLE
+$ nix-build '<nixpkgs>' -A pkgsStatic.hello
+#+END_EXAMPLE
+
 * Flakes
 flake ~ project file
 
