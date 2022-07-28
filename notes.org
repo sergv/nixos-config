@@ -238,6 +238,7 @@ Can be checked out when something fails to build
 
 * NixOs TODO
 - [ ] Build firefox with addons baked-in
+- [ ] Build firefox with pre-disabled options https://github.com/hlissner/dotfiles/blob/master/modules/desktop/browsers/firefox.nix
 - [ ] Install torrent client
 - [ ] Add [[https://github.com/nix-community/rnix-lsp][nix lsp]] to Emacs
 
