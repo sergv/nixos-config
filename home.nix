@@ -376,6 +376,7 @@ in
     pkgs.inkscape
     pkgs.iotop
     pkgs.okular
+    pkgs.libreoffice
     pkgs.lsof
     pkgs.lzip
     pkgs.lzop
