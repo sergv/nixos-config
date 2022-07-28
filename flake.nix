@@ -11,10 +11,16 @@
 
     home-manager = {
       # # unstable
-      # url = "github:nix-community/home-manager/master";
-      url = "github:nix-community/home-manager/release-22.05";
+      # url                    = "github:nix-community/home-manager/master";
+      url                    = "github:nix-community/home-manager/release-22.05";
       # Make home-manager use our version of nixpkgs
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    impermanence = {
+      url                         = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows      = "nixpkgs";
+      inputs.home-manager.follows = "nixpkgs";
     };
 
     # nur = {
@@ -29,7 +35,7 @@
 
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, home-manager, impermanence, ... }:
     let system = "x86_64-linux";
 
         pkgs = import nixpkgs {
@@ -40,17 +46,35 @@
           };
         };
 
-        lib = nixpkgs.lib;
+        # impermanence-config =
+        #   impermanence.nixosModule {
+        #     environment.persistence."/permanent" = {
+        #       directories = [
+        #         "/etc/NetworkManager/system-connections"
+        #       ];
+        #       files = [
+        #         "/etc/machine-id"
+        #         "/etc/ssh/ssh_host_rsa_key"
+        #         "/etc/ssh/ssh_host_rsa_key.pub"
+        #         "/etc/ssh/ssh_host_ed25519_key"
+        #         "/etc/ssh/ssh_host_ed25519_key.pub"
+        #       ];
+        #     };
+        #   };
 
     in {
 
       # System configs
       nixosConfigurations = {
-        home = lib.nixosSystem {
+        home = nixpkgs.lib.nixosSystem {
           inherit system;
           # Main desktop
           modules = [
             ./system.nix
+
+            impermanence.nixosModule
+
+            # impermanence-config
 
             #home-manager.nixosModules.home-manager {
             #  home-manager.useGlobalPkgs = true;
