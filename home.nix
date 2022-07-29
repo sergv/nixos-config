@@ -341,9 +341,21 @@ in
   systemd.user.tmpfiles.rules = [
     "d /tmp/cache                   0755 sergey users - -"
     # Forcefully symlink, removing source if it exists.
-    "L+ /home/sergey/.cache         -    -      -     - /tmp/cache"
-    "L+ /home/sergey/.compose-cache -    -      -     - /tmp/cache"
+    "L+ /home/sergey/.emacs         -    -      -     - /permanent/home/sergey/.emacs"
+    "L+ /home/sergey/.vimrc         -    -      -     - /permanent/home/sergey/.vimrc"
   ];
+
+  # xdg.userDirs = {
+  #   enable            = true;
+  #   createDirectories = true;
+  #   documents         = "\$HOME/documents";
+  #   download          = "\$HOME/downloads";
+  #   pictures          = "\$HOME/pictures";
+  #   publicShare       = "\$HOME/misc";
+  #   music             = "\$HOME/misc/music";
+  #   templates         = "\$HOME/templates";
+  #   videos            = "\$HOME/misc/videos";
+  # };
 
   home.packages = [
     pkgs.aspell
@@ -369,6 +381,7 @@ in
     #pkgs.firefox
     pkgs.firefox-esr
     pkgs.gimp
+    pkgs.git
     pkgs.gparted
     pkgs.graphviz
     pkgs.htop

@@ -31,12 +31,18 @@
   fileSystems = {
     # Includes /tmp
     "/" = {
+      device  = "tmpfs";
       fsType  = "tmpfs";
-      options = [ "noatime" "nodiratime" "size=10000M" "mode=1777" ];
+      options = [ "noatime" "nodiratime" "size=10000M" # "mode=1777"
+                ];
+    };
+    "/nix" = {
+      device        = "/dev/disk/by-label/NIXOS-ROOT";
+      fsType        = "ext4";
+      options       = [ "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
     };
     "/permanent" = {
       device        = "/dev/disk/by-label/NIXOS-ROOT";
-      # device        = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-ROOT";
       fsType        = "ext4";
       # options       = [ "discard" ]; # for ssds
       options       = [ "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
@@ -49,13 +55,19 @@
     };
   };
 
-  environment.etc = {
-    # Maybe try this if ssh server doesn’t work.
-    "ssh/ssh_host_rsa_key".source         = "/persistence/etc/ssh/ssh_host_rsa_key";
-    "ssh/ssh_host_rsa_key.pub".source     = "/persistence/etc/ssh/ssh_host_rsa_key.pub";
-    "ssh/ssh_host_ed25519_key".source     = "/persistence/etc/ssh/ssh_host_ed25519_key";
-    "ssh/ssh_host_ed25519_key.pub".source = "/persistence/etc/ssh/ssh_host_ed25519_key.pub";
-  };
+  # Will activate home-manager profiles for each user upon login
+  # This is useful when using ephemeral installations
+  environment.loginShellInit = ''
+    [ -d "$HOME/.nix-profile" ] || /nix/var/nix/profiles/per-user/$USER/home-manager/activate &> /dev/null
+  '';
+
+  # environment.etc = {
+  #   # Maybe try this if ssh server doesn’t work.
+  #   "ssh/ssh_host_rsa_key".source         = "/permanent/etc/ssh/ssh_host_rsa_key";
+  #   "ssh/ssh_host_rsa_key.pub".source     = "/permanent/etc/ssh/ssh_host_rsa_key.pub";
+  #   "ssh/ssh_host_ed25519_key".source     = "/permanent/etc/ssh/ssh_host_ed25519_key";
+  #   "ssh/ssh_host_ed25519_key.pub".source = "/permanent/etc/ssh/ssh_host_ed25519_key.pub";
+  # };
 
   environment.persistence."/permanent" = {
     hideMounts = true;
@@ -74,6 +86,7 @@
     ];
     users.sergey = {
       directories = [
+        "art"
         "bicycle"
         "books"
         "documents"
@@ -157,7 +170,7 @@
         ".local/share/vlc"
 
         # KDE
-        ".config/gtk-3.0"   # fuse mounted to /home/$USERNAME/.config/gtk-3.0
+        ".config/gtk-3.0" # fuse mounted to /home/$USERNAME/.config/gtk-3.0
         ".config/gtk-4.0"
         ".config/KDE"
         ".config/kde.org"
@@ -187,24 +200,26 @@
         ".local/share/sddm"
       ];
       files = [
-        ".emacs"
-        "machine-specific-setup"
+        #".emacs" - done via symlink
+        "machine-specific-setup.el"
 
-        "github-recovery-codes.txt"
-        "mars.exe"
-        "password.org"
-        "todo.org"
+        ".bash_history"
         ".rtorrent.rc"
-        ".viminfo"
-        ".vimrc"
-
-        "O0DGDxpMBNs.jpg"
+        #".viminfo" - let it reset on each reboot. Vim cannot use bind-mounted one anyway because it tries to rename updated version over it.
+        #".vimrc" - done via symlink
 
         ".config/Audaciousrc"
         ".config/QtProject.conf"
 
         ".local/ghci.conf"
         ".local/share/recently-used.xbel"
+
+        "github-recovery-codes.txt"
+        #"mars.exe"
+        "password.org"
+        "todo.org"
+
+        "O0DGDxpMBNs.jpg"
 
         # KDE
         ".config/akregatorrc"
@@ -370,9 +385,6 @@
 
   # List services that you want to enable:
 
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = false;
-
   networking = {
     hostName = "home"; # Define your hostname.
     #hostName              = ""; # Use dhcp-provided hostname.
@@ -484,23 +496,29 @@
     autorun    = true; # Start automatically at boot time.
     enable     = true;
 
+    # # So that Xorg's config will be present in /etc
+    # exportConfiguration = false;
+
     layout     = "us,ru";
     xkbModel   = "pc105";
     xkbVariant = "dvorak,";
-    xkbOptions = "terminate:ctrl_alt_bksp,grp:shifts_toggle,caps:escape";
+    # terminate:ctrl_alt_bksp
+    xkbOptions = "grp:shifts_toggle,caps:escape";
 
     # Touchpad
     # synaptics  = {
     #   enable          = true;
     #   twoFingerScroll = true;
     # };
+    # Enable touchpad support.
+    # libinput.enable = true;
 
     #videoDrivers = [ "intel" "nvidia" ]
     videoDrivers = [ "nvidia" ];
+    #videoDrivers = [ "modesetting" ];
 
     #KDE
-    #displayManager.sddm.enable    = false;
-    #desktopManager.plasma5.enable = false;
+    #displayManager.sddm.enable = false;
 
     desktopManager = {
       plasma5 = {
@@ -529,9 +547,6 @@
   #   shadow          = true;
   #   fadeDelta       = 4;
   # };
-
-  # Enable touchpad support.
-  # services.xserver.libinput.enable = true;
 
   services.udev = {
     extraRules =

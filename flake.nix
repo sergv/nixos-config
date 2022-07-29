@@ -6,7 +6,8 @@
     nixpkgs = {
       # # unstable
       # url = "nixpkgs/nixos-unstable";
-      url = "nixpkgs/nixos-22.05";
+      #url = "nixpkgs/nixos-22.05";
+      url = "/home/sergey/nix/nixpkgs";
     };
 
     home-manager = {
