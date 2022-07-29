@@ -625,8 +625,19 @@
         shell          = pkgs.bash;
         # mkpasswd -m sha-512 <password>
         hashedPassword = "Yeah, like I'm going to tell you even my password hash";
+        openssh.authorizedKeys.keys = [
+          "Yeah, like I'm going to tell you even my public key. You'll need to WORK for it."
+        ];
       };
     };
+  };
+
+  # This setups a SSH server. Very important if you're setting up a headless system.
+  # Feel free to remove if you don't need it.
+  services.openssh = {
+    enable                 = true;
+    permitRootLogin        = "no";
+    passwordAuthentication = false;
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
