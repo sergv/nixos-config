@@ -401,6 +401,7 @@ in
     pkgs.pv
     pkgs.sshfs
     pkgs.thunderbird
+    pkgs.transmission-gtk
     pkgs.unzip
     pkgs.vlc
     pkgs.vorbis-tools
