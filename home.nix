@@ -398,6 +398,7 @@ in
     pkgs.oxygen-icons5
     pkgs.p7zip
     pkgs.pinentry_qt
+    pkgs.pmutils
     pkgs.pv
     pkgs.sshfs
     pkgs.thunderbird
