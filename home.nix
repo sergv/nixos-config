@@ -434,6 +434,7 @@ in
     pkgs.git
     pkgs.nix-diff
 
+    pkgs.steam-run
   ]
   ++ builtins.attrValues scripts
   ++ builtins.attrValues my-fonts;
