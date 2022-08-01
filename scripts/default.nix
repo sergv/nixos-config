@@ -10,6 +10,7 @@ let writePatchedScriptBin = name: buildInputs:
         postBuild   = "wrapProgram \"$out/bin/${name}\" --prefix PATH : \"$out/bin\"";
       };
 in {
+  reset-usb  = writePatchedScriptBin "reset-usb"  [];
   tar7z      = writePatchedScriptBin "tar7z"      [ pkgs.gnutar pkgs.p7zip ];
   tar7zUltra = writePatchedScriptBin "tar7zUltra" [ pkgs.gnutar pkgs.p7zip ];
   targz      = writePatchedScriptBin "targz"      [ pkgs.gnutar pkgs.gzip ];
