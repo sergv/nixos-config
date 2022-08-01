@@ -15,6 +15,7 @@ let
     };
 in
 {
+  reset-usb = writePatchedScriptBin "reset-usb" [ ];
   tar7z = writePatchedScriptBin "tar7z" [
     pkgs.gnutar
     pkgs.p7zip
