@@ -380,6 +380,7 @@ in
     pkgs.audacious
     # pkgs.autoconf
     pkgs.baobab
+    pkgs.bridge-utils
     # pkgs.ccache
     pkgs.chromium
     # pkgs.clang
@@ -417,6 +418,7 @@ in
     pkgs.thunderbird
     pkgs.transmission-gtk
     pkgs.unzip
+    pkgs.usbutils
     pkgs.vlc
     pkgs.vorbis-tools
     pkgs.wget
