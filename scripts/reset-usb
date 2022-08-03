@@ -2,10 +2,30 @@
 
 set -e
 
-if [[ $EUID != 0 ]]; then
+if [[ "$EUID" != 0 ]]; then
     echo "This must be run as root!" >&2
     exit 1
 fi
+
+if [[ "$#" != 0 && "$#" != 2 ]]; then
+    echo "usage: reset-usb [PRODUCT] [VENDOR]"
+    exit 1
+fi
+
+product="$1"
+vendor="$2"
+
+if [[ "${#product}" != 4 ]]; then
+    echo "Invalid product, must be 4 hex digits: '$product'" >&2
+    exit 1
+fi
+
+if [[ "${#vendor}" != 4 ]]; then
+    echo "Invalid vendor, must be 4 hex digits: '$vendor'" >&2
+    exit 1
+fi
+
+did_reset="0"
 
 for xhci in /sys/bus/pci/drivers/?hci_hcd; do
 
@@ -17,9 +37,23 @@ for xhci in /sys/bus/pci/drivers/?hci_hcd; do
     echo "Resetting devices from $xhci..."
 
     for i in ????:??:??.?; do
+        if [[ -n "$product" && -n "$vendor" ]]; then
+            if [[ "$(cat "$i/idProduct")" != "$product" || "$(cat "$i/idVendor")" != "$vendor" ]]; then
+                continue
+            fi
+        fi
         echo -n "Resetting $i..."
         echo -n "$i" >unbind
         echo -n "$i" >bind
         echo -e "\rResetting $i... OK"
+        did_reset=1
     done
 done
+
+if [[ "$did_reset" != 1 ]]; then
+    if [[ -n "$product" && -n "$vendor" ]]; then
+        echo "USB device '$product:$vendor' not found" >&2
+    else
+        echo "No devices reset" >&2
+    fi
+fi
