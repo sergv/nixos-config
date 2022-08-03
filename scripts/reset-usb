@@ -27,28 +27,43 @@ fi
 
 did_reset="0"
 
-for xhci in /sys/bus/pci/drivers/?hci_hcd; do
+if [[ -n "$product" && -n "$vendor" ]]; then
+    for device in /sys/bus/usb/devices/*;  do
 
-    if ! cd $xhci; then
-        echo "Weird error. Failed to change directory to $xhci" >&2
-        exit 1
-    fi
+        if [[ -f "$device/idProduct" && -f "$device/idVendor" && "$(cat "$device/idProduct")" == "$product" && "$(cat "$device/idVendor")" == "$vendor" ]]; then
+            bus="$(readlink -f "$device")"
 
-    echo "Resetting devices from $xhci..."
+            while [[ ! -z "$bus" && "$(basename "$bus")" != ????:??:??.? ]]; do
+                bus="$(dirname "$bus")"
+            done
 
-    for i in ????:??:??.?; do
-        if [[ -n "$product" && -n "$vendor" ]]; then
-            if [[ "$(cat "$i/idProduct")" != "$product" || "$(cat "$i/idVendor")" != "$vendor" ]]; then
-                continue
-            fi
+            bus="$(basename "$bus")"
+
+            echo -n "Resetting $bus/$device..."
+            echo -n "$bus" >/sys/bus/pci/drivers/xhci_hcd/unbind
+            echo -n "$bus" >/sys/bus/pci/drivers/xhci_hcd/bind
+            echo -e "\rResetting $bus/$device... OK"
+            did_reset=1
         fi
-        echo -n "Resetting $i..."
-        echo -n "$i" >unbind
-        echo -n "$i" >bind
-        echo -e "\rResetting $i... OK"
-        did_reset=1
     done
-done
+else
+    for xhci in /sys/bus/pci/drivers/?hci_hcd; do
+        if ! cd $xhci; then
+            echo "Weird error. Failed to change directory to $xhci" >&2
+            exit 1
+        fi
+
+        echo "Resetting devices from $xhci..."
+
+        for i in ????:??:??.?; do
+            echo -n "Resetting $i..."
+            echo -n "$i" >unbind
+            echo -n "$i" >bind
+            echo -e "\rResetting $i... OK"
+            did_reset=1
+        done
+    done
+fi
 
 if [[ "$did_reset" != 1 ]]; then
     if [[ -n "$product" && -n "$vendor" ]]; then
