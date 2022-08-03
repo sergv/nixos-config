@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ "$EUID" != 0 ]]; then
+    echo "This must be run as root!" >&2
+    exit 1
+fi
+
+# Reset usb-to-ethernet device
+reset-usb 7500 0424
+
+systemctl restart network-addresses-{br0,eth-usb,enp4s0}.service network-interfaces.target network-online.target network-setup.service

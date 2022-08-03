@@ -13,9 +13,11 @@ let
       buildInputs = [ pkgs.makeWrapper ];
       postBuild = "wrapProgram \"$out/bin/${name}\" --prefix PATH : \"$out/bin\"";
     };
+  reset-usb = writePatchedScriptBin "reset-usb" [ ];
 in
 {
-  reset-usb = writePatchedScriptBin "reset-usb" [ ];
+  inherit reset-usb;
+  reset-nixos-usb-network = writePatchedScriptBin "reset-nixos-usb-network" [ reset-usb ];
   tar7z = writePatchedScriptBin "tar7z" [
     pkgs.gnutar
     pkgs.p7zip
