@@ -410,6 +410,7 @@ in
     pkgs.vorbis-tools
     pkgs.wget
     pkgs.xorg.xev
+    pkgs.youtube-dl
     pkgs.zip
     # pkgs.yasm
     pkgs.zstd
