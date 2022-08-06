@@ -221,6 +221,7 @@ in
       }
     ];
     ignores = [
+      ".eproj-info"
       "cabal-project*.local"
       "dist-newstyle*"
       "dist"
