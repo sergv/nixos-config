@@ -384,6 +384,7 @@ in
     pkgs.firefox-esr
     pkgs.gimp
     pkgs.git
+    pkgs.glxinfo
     pkgs.gparted
     pkgs.graphviz
     pkgs.htop
@@ -410,6 +411,8 @@ in
     pkgs.vlc
     pkgs.vorbis-tools
     pkgs.wget
+    pkgs.winePackages.stagingFull
+    pkgs.winetricks
     pkgs.xorg.xev
     pkgs.youtube-dl
     pkgs.zip
