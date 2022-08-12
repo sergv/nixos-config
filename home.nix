@@ -145,14 +145,14 @@ in
       signByDefault = true;
     };
     aliases   = {
-      "lg" = "log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(red)%h %G?%C(reset)%C(yellow)%d%C(reset) %C(white)%s%C(reset) - %C(dim white)%an%C(reset) %C(green)(%ar)%C(reset)'";
+      "lg"  = "log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(red)%h %G?%C(reset)%C(yellow)%d%C(reset) %C(white)%s%C(reset) - %C(dim white)%an%C(reset) %C(green)(%ar)%C(reset)'";
       "lgm" = "lg --no-merges";
-      "ch" = "checkout";
-      "st" = "status";
-      "co" = "commit";
-      "me" = "merge";
-      "br" = "branch";
-      "m"  = "merge";
+      "ch"  = "checkout";
+      "st"  = "status";
+      "co"  = "commit";
+      "me"  = "merge";
+      "br"  = "branch";
+      "m"   = "merge";
     };
     includes = [
       { contents = {
