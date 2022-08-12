@@ -44,7 +44,7 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
   + ~<foo>~ resolves path ~foo~ via ~NIX_PATH~ (list of paths separated by ~:~, similar to PATH)
 
 ** Composite types
-*** ‘records’ - atttribute sets, dicts with string keys
+*** ‘records’ - attribute sets, dicts with string keys
 + E.g. ~{ foo = 1; "bar bar" = true; a-b = [1 2 3]; }~
 + Access by key: ~s.foo~, ~s."bar bar"~, ~s.a-b~
 + Recursive attribute sets allow values under some keys to depend on values under other keys
