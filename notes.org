@@ -52,7 +52,8 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
 + ~inherit~ keyword: ~{ inherit x y; }~ is equivalent to ~{ x = x; y = y; }~ for some ~x~ and ~y~ in current scope
 + Two attribute sets can be merged with ~//~ operator (the operator implements right-leaning set union)
 *** lists
-Delimited by space: ~[1 2 3]~
++ Delimited by space: ~[1 2 3]~
++ Concatenation: ~++~
 *** functions
 E.g. ~x: x + 1~, ~x: y: x * y~
 
