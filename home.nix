@@ -25,11 +25,11 @@ in
     username      = "sergey";
     homeDirectory = "/home/sergey";
 
-    # keyboard = {
-    #   layout  = "us,ru";
-    #   variant = "dvorak,";
-    #   options = "terminate:ctrl_alt_bksp,grp:shifts_toggle,caps:escape";
-    # };
+    keyboard = {
+      layout  = "us,ru";
+      variant = "dvorak,";
+      options = [ "grp:shifts_toggle" "caps:escape" ];
+    };
   };
 
   fonts.fontconfig.enable = true;
