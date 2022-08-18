@@ -46,23 +46,6 @@
             virtualbox.enableExtensionPack = true;
           };
         };
-
-        # impermanence-config =
-        #   impermanence.nixosModule {
-        #     environment.persistence."/permanent" = {
-        #       directories = [
-        #         "/etc/NetworkManager/system-connections"
-        #       ];
-        #       files = [
-        #         "/etc/machine-id"
-        #         "/etc/ssh/ssh_host_rsa_key"
-        #         "/etc/ssh/ssh_host_rsa_key.pub"
-        #         "/etc/ssh/ssh_host_ed25519_key"
-        #         "/etc/ssh/ssh_host_ed25519_key.pub"
-        #       ];
-        #     };
-        #   };
-
     in {
 
       # System configs
@@ -75,16 +58,15 @@
 
             impermanence.nixosModule
 
-            # impermanence-config
-
-            #home-manager.nixosModules.home-manager {
+            # # Enable Home Manager as NixOs module
+            # home-manager.nixosModules.home-manager {
             #  home-manager.useGlobalPkgs = true;
             #  home-manager.useUserPackages = true;
             #  home-manager.users.sergey = import ./home.nix;
             #  # home-manager.users.sergey = {
             #  #   imports = [ ./home.nix ];
             #  # };
-            #}
+            # }
           ];
         };
       };
