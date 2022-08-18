@@ -262,8 +262,9 @@ in
   services.sxhkd = {
     enable      = true;
     keybindings = {
-      # "super + t"          = "; exo-open --launch TerminalEmulator";
+      # "super + t"          = "exo-open --launch TerminalEmulator";
       "mod4 + t"           = "konsole";
+
       "KP_Insert"          = "; ${wm-sh}/bin/wm.sh swap";
       "XF86Go"             = "; ${wm-sh}/bin/wm.sh swap";
       "KP_End"             = "; ${wm-sh}/bin/wm.sh switch 0";
