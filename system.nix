@@ -117,6 +117,7 @@
         "VirtualBox VMs"
 
         { directory = ".cabal"; mode = "0700"; }
+        { directory = ".cargo"; mode = "0700"; }
         { directory = ".gradle"; mode = "0700"; }
         { directory = ".isabelle"; mode = "0700"; }
         { directory = ".stack"; mode = "0700"; }
@@ -198,101 +199,6 @@
         ".local/share/plasma_notes"
         ".local/share/plasma-systemmonitor"
         ".local/share/sddm"
-      ];
-      files = [
-        #".emacs" - done via symlink
-        "machine-specific-setup.el"
-
-        ".bash_history"
-        ".rtorrent.rc"
-        #".viminfo" - let it reset on each reboot. Vim cannot use bind-mounted one anyway because it tries to rename updated version over it.
-        #".vimrc" - done via symlink
-
-        ".config/Audaciousrc"
-        ".config/QtProject.conf"
-
-        ".local/ghci.conf"
-        ".local/share/recently-used.xbel"
-
-        "github-recovery-codes.txt"
-        #"mars.exe"
-        "password.org"
-        "todo.org"
-
-        "O0DGDxpMBNs.jpg"
-
-        # KDE
-        ".config/akregatorrc"
-        ".config/baloofileinformationrc"
-        ".config/baloofilerc"
-        ".config/bluedevilglobalrc"
-        ".config/device_automounter_kcmrc"
-        ".config/dolphinrc"
-        ".config/filetypesrc"
-        ".config/gtkrc"
-        ".config/gtkrc-2.0"
-        ".config/gwenviewrc"
-        ".config/kaccessrc-pluginsrc"
-        ".config/kactivitymanagerd-pluginsrc"
-        ".config/kactivitymanagerd-statsrc"
-        ".config/kactivitymanagerd-switcher"
-        ".config/kactivitymanagerdrc"
-        ".config/katemetainfos"
-        ".config/katerc"
-        ".config/kateschemarc"
-        ".config/katevirc"
-        ".config/kcmfonts"
-        ".config/kcminputrc"
-        ".config/kconf_updaterc"
-        ".config/kded5rc"
-        ".config/kded_device_automounterrc"
-        ".config/kdeglobals"
-        ".config/kgammarc"
-        ".config/kglobalshortcutsrc"
-        ".config/kfontinstuirc"
-        ".config/khotkeysrc"
-        ".config/kiorc"
-        ".config/kmenueditrc"
-        ".config/kmixrc"
-        ".config/konsolerc"
-        ".config/konsolesshconfig"
-        ".config/krunnerrc"
-        ".config/kscreenlockerrc"
-        ".config/kservicemenurc"
-        ".config/ksmserverrc"
-        ".config/ksplashrc"
-        ".config/ktimezonedrc"
-        ".config/kuriikwsfilterrc"
-        ".config/kwalletrc"
-        ".config/kwinrc"
-        ".config/kwinrulesrc"
-        ".config/kxkbrc"
-        ".config/mimeapps.list"
-        ".config/okularpartrc"
-        ".config/okularrc"
-        ".config/partitionmanagerrc"
-        ".config/plasma-localerc"
-        ".config/plasma-nm"
-        ".config/plasma-org.kde.plasma.desktop-appletsrc"
-        ".config/plasmanotifyrc"
-        ".config/plasmarc"
-        ".config/plasmashellrc"
-        ".config/PlasmaUserFeedback"
-        ".config/plasmawindowed-appletsrc"
-        ".config/plasmawindowedrc"
-        ".config/powerdevilrc"
-        ".config/powermanagementprofilesrc"
-        ".config/spectaclerc"
-        ".config/startkderc"
-        ".config/systemsettingsrc"
-        ".config/Trolltech.conf"
-        ".config/user-dirs.dirs"
-        ".config/user-dirs.locale"
-
-        ".local/share/krunnerstaterc"
-        ".local/share/user-places.xbel"
-        ".local/share/user-places.xbel.bak"
-        ".local/share/user-places.xbel.tbcache"
       ];
     };
   };

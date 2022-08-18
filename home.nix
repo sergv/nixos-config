@@ -340,11 +340,110 @@ in
   xsession.enable = true;
 
   systemd.user.tmpfiles.rules = [
-    "d /tmp/cache                   0755 sergey users - -"
-    # Forcefully symlink, removing source if it exists.
-    "L+ /home/sergey/.emacs         -    -      -     - /permanent/home/sergey/.emacs"
-    "L+ /home/sergey/.vimrc         -    -      -     - /permanent/home/sergey/.vimrc"
-  ];
+    "d /tmp/cache           0755 sergey users - -"
+    "d /home/sergey/.config -    -      -     - -"
+    "d /home/sergey/.local  -    -      -     - -"
+    "d /home/sergey/Desktop -    -      -     - -"
+  ] ++ map
+    (x:
+      # Forcefully symlink, removing source if it exists.
+      "L+ \"/home/sergey/${x}\" - - - - /permanent/home/sergey/${x}"
+    )
+    [
+        ".emacs"
+        "machine-specific-setup.el"
+
+        ".bash_history"
+        ".rtorrent.rc"
+        ".viminfo"
+        ".vimrc"
+
+        ".config/Audaciousrc"
+        ".config/QtProject.conf"
+
+        ".local/ghci.conf"
+        ".local/share/recently-used.xbel"
+
+        "github-recovery-codes.txt"
+        #"mars.exe"
+        "password.org"
+        "todo.org"
+
+        "O0DGDxpMBNs.jpg"
+
+        # KDE
+        ".config/akregatorrc"
+        ".config/baloofileinformationrc"
+        ".config/baloofilerc"
+        ".config/bluedevilglobalrc"
+        ".config/device_automounter_kcmrc"
+        ".config/dolphinrc"
+        ".config/filetypesrc"
+        ".config/gtkrc"
+        ".config/gtkrc-2.0"
+        ".config/gwenviewrc"
+        ".config/kaccessrc-pluginsrc"
+        ".config/kactivitymanagerd-pluginsrc"
+        ".config/kactivitymanagerd-statsrc"
+        ".config/kactivitymanagerd-switcher"
+        ".config/kactivitymanagerdrc"
+        ".config/katemetainfos"
+        ".config/katerc"
+        ".config/kateschemarc"
+        ".config/katevirc"
+        ".config/kcmfonts"
+        ".config/kcminputrc"
+        ".config/kconf_updaterc"
+        ".config/kded5rc"
+        ".config/kded_device_automounterrc"
+        ".config/kdeglobals"
+        ".config/kgammarc"
+        ".config/kglobalshortcutsrc"
+        ".config/kfontinstuirc"
+        ".config/khotkeysrc"
+        ".config/kiorc"
+        ".config/kmenueditrc"
+        ".config/kmixrc"
+        ".config/konsolerc"
+        ".config/konsolesshconfig"
+        ".config/krunnerrc"
+        ".config/kscreenlockerrc"
+        ".config/kservicemenurc"
+        ".config/ksmserverrc"
+        ".config/ksplashrc"
+        ".config/ktimezonedrc"
+        ".config/kuriikwsfilterrc"
+        ".config/kwalletrc"
+        ".config/kwinrc"
+        ".config/kwinrulesrc"
+        ".config/kxkbrc"
+        ".config/mimeapps.list"
+        ".config/okularpartrc"
+        ".config/okularrc"
+        ".config/partitionmanagerrc"
+        ".config/plasma-localerc"
+        ".config/plasma-nm"
+        ".config/plasma-org.kde.plasma.desktop-appletsrc"
+        ".config/plasmanotifyrc"
+        ".config/plasmarc"
+        ".config/plasmashellrc"
+        ".config/PlasmaUserFeedback"
+        ".config/plasmawindowed-appletsrc"
+        ".config/plasmawindowedrc"
+        ".config/powerdevilrc"
+        ".config/powermanagementprofilesrc"
+        ".config/spectaclerc"
+        ".config/startkderc"
+        ".config/systemsettingsrc"
+        ".config/Trolltech.conf"
+        ".config/user-dirs.dirs"
+        ".config/user-dirs.locale"
+
+        ".local/share/krunnerstaterc"
+        ".local/share/user-places.xbel"
+        ".local/share/user-places.xbel.bak"
+        ".local/share/user-places.xbel.tbcache"
+    ];
 
   # xdg.userDirs = {
   #   enable            = true;
@@ -412,6 +511,7 @@ in
     pkgs.vorbis-tools
     pkgs.wget
     pkgs.winePackages.stagingFull
+    # pkgs.wine64Packages.stagingFull
     pkgs.winetricks
     pkgs.xorg.xev
     pkgs.youtube-dl
