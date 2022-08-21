@@ -464,80 +464,112 @@ in
   #   videos            = "\$HOME/misc/videos";
   # };
 
-  home.packages = [
-    pkgs.aspell
-    pkgs.aspellDicts.en
-    pkgs.aspellDicts.en-computers
-    pkgs.aspellDicts.en-science
-    pkgs.aspellDicts.ru
-    pkgs.aspellDicts.uk
-    pkgs.audacious
-    # pkgs.autoconf
-    pkgs.baobab
-    pkgs.bridge-utils
-    # pkgs.ccache
-    pkgs.chromium
-    # pkgs.clang
-    # pkgs.clang-tools
-    pkgs.cmake
-    # pkgs.coq
-    pkgs.curl
-    pkgs.diffutils
-    pkgs.dmidecode
-    pkgs.file
-    pkgs.findutils
-    #pkgs.firefox
-    pkgs.firefox-esr
-    pkgs.gimp
-    pkgs.git
-    pkgs.glxinfo
-    pkgs.gparted
-    pkgs.graphviz
-    pkgs.htop
-    pkgs.imagemagick7
-    pkgs.inkscape
-    pkgs.iotop
-    pkgs.okular
-    pkgs.libreoffice
-    pkgs.lsof
-    pkgs.lzip
-    pkgs.lzop
-    pkgs.mc
-    pkgs.mplayer
-    pkgs.oxygen-icons5
-    pkgs.p7zip
-    pkgs.pinentry_qt
-    pkgs.pmutils
-    pkgs.pv
-    pkgs.sshfs
-    pkgs.thunderbird
-    pkgs.transmission-gtk
-    pkgs.unzip
-    pkgs.usbutils
-    pkgs.vlc
-    pkgs.vorbis-tools
-    pkgs.wget
-    pkgs.winePackages.stagingFull
-    # pkgs.wine64Packages.stagingFull
-    pkgs.winetricks
-    pkgs.xorg.xev
-    pkgs.youtube-dl
-    pkgs.zip
-    # pkgs.yasm
-    pkgs.zstd
-    # pkgs.z3
+  home.packages =
+    let
+      tex-pkg = (pkgs.texlive.combine {
+        inherit (pkgs.texlive)
+          scheme-basic
+          dvisvgm dvipng # for preview and export as html
+          wrapfig
+          amsmath
+          ulem
+          hyperref
 
-    wmctrl-pkg
+          arydshln
+          fontawesome5
+          moderncv
+          multirow
 
-    pkgs.cabal-install
-    pkgs.haskellPackages.fast-tags
-    pkgs.universal-ctags
+          capt-of
+          collection-basic
+          collection-binextra
+          collection-context
+          collection-fontsrecommended
+          collection-fontutils
+          collection-langenglish
+          collection-latex
+          collection-latexrecommended
+          collection-luatex
+          collection-metapost
+          collection-texworks
+          collection-xetex;
+      });
+    in
+      [
+        pkgs.aspell
+        pkgs.aspellDicts.en
+        pkgs.aspellDicts.en-computers
+        pkgs.aspellDicts.en-science
+        pkgs.aspellDicts.ru
+        pkgs.aspellDicts.uk
+        pkgs.audacious
+        # pkgs.autoconf
+        pkgs.baobab
+        pkgs.bridge-utils
+        # pkgs.ccache
+        pkgs.chromium
+        # pkgs.clang
+        # pkgs.clang-tools
+        pkgs.cmake
+        # pkgs.coq
+        pkgs.curl
+        pkgs.diffutils
+        pkgs.dmidecode
+        pkgs.file
+        pkgs.findutils
+        #pkgs.firefox
+        pkgs.firefox-esr
+        pkgs.gimp
+        pkgs.git
+        pkgs.glxinfo
+        pkgs.gparted
+        pkgs.graphviz
+        pkgs.htop
+        pkgs.imagemagick7
+        pkgs.inkscape
+        pkgs.iotop
+        pkgs.okular
+        pkgs.libreoffice
+        pkgs.lsof
+        pkgs.lzip
+        pkgs.lzop
+        pkgs.mc
+        pkgs.mplayer
+        pkgs.oxygen-icons5
+        pkgs.p7zip
+        pkgs.pinentry_qt
+        pkgs.pmutils
+        pkgs.pv
+        pkgs.sshfs
+        pkgs.thunderbird
+        pkgs.transmission-gtk
+        pkgs.unzip
+        pkgs.usbutils
+        pkgs.vlc
+        pkgs.vorbis-tools
+        pkgs.wget
+        pkgs.winePackages.stagingFull
+        # pkgs.wine64Packages.stagingFull
+        pkgs.winetricks
+        pkgs.xorg.xev
+        pkgs.youtube-dl
+        pkgs.zip
+        # pkgs.yasm
+        pkgs.zstd
+        # pkgs.z3
 
-    pkgs.git
-    pkgs.nix-diff
+        pkgs.cabal-install
+        pkgs.haskellPackages.fast-tags
+        pkgs.universal-ctags
 
-    pkgs.steam-run
-  ] ++
-  builtins.attrValues scripts ++
-  builtins.attrValues my-fonts;
+        pkgs.git
+        pkgs.nix-diff
+
+        pkgs.steam-run
+
+        tex-pkg
+        wmctrl-pkg
+      ] ++
+      builtins.attrValues scripts ++
+      builtins.attrValues my-fonts;
 }
