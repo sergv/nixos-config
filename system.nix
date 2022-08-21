@@ -329,6 +329,9 @@
 
   programs.bash.enableCompletion = true;
 
+  # To be able to manipulate gtk settings.
+  programs.dconf.enable = true;
+
   # Recommendations for secure secure shell, https://stribika.github.io/2015/01/04/secure-secure-shell.html
   programs.ssh = {
     ciphers = [
