@@ -465,6 +465,12 @@ in
         ".local/share/user-places.xbel.tbcache"
       ];
 
+  dconf.settings = {
+    "org/gtk/settings/file-chooser" = {
+      "sort-directories-first" = true;
+    };
+  };
+
   # xdg.userDirs = {
   #   enable            = true;
   #   createDirectories = true;
