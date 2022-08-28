@@ -378,6 +378,14 @@
     cpuFreqGovernor = "performance";
   };
 
+  services.locate = {
+    enable    = true;
+    locate    = pkgs.mlocate;
+    interval  = "monthly";
+    # Silence warning.
+    localuser = null;
+  };
+
   # Enable CUPS to print documents.
   services.printing.enable = false;
 
