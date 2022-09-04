@@ -394,8 +394,9 @@
   nix = {
     allowedUsers = [ "@wheel" ];
     gc.automatic = false;
-    package      = pkgs.nixFlakes;
+    package      = pkgs.unstable.nixFlakes;
     settings     = {
+      bash-prompt-prefix = "[nix] ";
       experimental-features = [
         "nix-command"
         "flakes"
