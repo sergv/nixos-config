@@ -261,3 +261,12 @@ flake ~ project file
 ~nix build .#~ - build flake (~#~) in current directory (~.~)
 
 NUR - like AUR, Nix User Repository
+
+* FAQ
+** ~buildInputs~ vs ~nativeBuildInputs~
+*** ~buildInputs~
+Programs and libraries used by the new derivation at run-time
+*** ~nativeBuildInputs~
+Programs and libraries used at build-time that, if they are a compiler
+or similar tool, produce code to run at run-time — i.e. tools used to
+build the new derivation
