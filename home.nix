@@ -50,7 +50,7 @@ in
         #export PROMPT_COMMAND="''${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a"
         export PROMPT_COMMAND="history -a"
 
-        export PS1="\''${NIX_DEVELOP_PROMPT:-}\u@\h:\w\$ "
+        export PS1="\u@\h:\w\$ "
 
         function genpasswd {
             local len="$1"

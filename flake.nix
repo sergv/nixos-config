@@ -10,6 +10,10 @@
       url = "/home/sergey/nix/nixpkgs";
     };
 
+    nixpkgs-unstable = {
+      url = "nixpkgs/nixos-unstable";
+    };
+
     home-manager = {
       # # unstable
       # url                    = "github:nix-community/home-manager/master";
@@ -36,7 +40,7 @@
 
   };
 
-  outputs = { nixpkgs, home-manager, impermanence, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, impermanence, ... }:
     let system = "x86_64-linux";
 
         pkgs = import nixpkgs {
@@ -54,6 +58,19 @@
           inherit system;
           # Main desktop
           modules = [
+            ({ config, pkgs, ... }:
+              let
+                overlay-unstable = final: prev: {
+                  unstable = nixpkgs-unstable.legacyPackages.x86_64-linux;
+                };
+              in
+	              {
+                 nixpkgs.overlays = [ overlay-unstable ];
+                 # environment.systemPackages = with pkgs; [
+	                #  unstable.qutebrowser
+	               # ];
+	             })
+
             ./system.nix
 
             impermanence.nixosModule
