@@ -581,7 +581,6 @@ in
       pkgs.zstd
       # pkgs.z3
 
-      pkgs.cabal-install
       pkgs.haskellPackages.fast-tags
       pkgs.universal-ctags
 
