@@ -7,6 +7,22 @@ let wmctrl-pkg = pkgs.wmctrl;
     scripts = import ./scripts { inherit pkgs; wmctrl = wmctrl-pkg; };
 
     wm-sh = scripts.wm-sh;
+
+    emacs-wrapped = pkgs.writeScriptBin "emacs" ''
+      #!${pkgs.bash}/bin/bash
+      if [[ ! -z "''${EMACS_ROOT+x}" ]]; then
+          dump_file="$EMACS_ROOT/emacs.dmp"
+      else
+          dump_file="$HOME/.emacs.d/emacs.dmp"
+      fi
+
+      if [[ ! -f "$dump_file" || ! -z "''${EMACS_FORCE_PRISTINE+x}" ]]; then
+        ${pkgs.emacs}/bin/emacs "''${@}"
+      else
+        ${pkgs.emacs}/bin/emacs --dump-file "$dump_file" "''${@}"
+      fi
+    '';
+
 in
 {
   # Home Manager needs a bit of information about you and the
@@ -228,13 +244,6 @@ in
       "*~"
       "*.bak"
     ];
-  };
-
-  programs.emacs = {
-    enable        = true;
-    #defaultEditor = true;
-    package       = pkgs.emacs;
-    # package       = pkgs.emacsNativeComp;
   };
 
   programs.ssh = {
@@ -568,7 +577,10 @@ in
 
         tex-pkg
         wmctrl-pkg
+
+        emacs-wrapped
       ] ++
       builtins.attrValues scripts ++
       builtins.attrValues my-fonts;
+
 }
