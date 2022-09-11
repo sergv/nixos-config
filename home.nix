@@ -23,6 +23,42 @@ let wmctrl-pkg = pkgs.wmctrl;
       fi
     '';
 
+    emacsDesktopItem = pkgs.lib.generators.toINI {} {
+      "Desktop Entry" = {
+        Type = "Application";
+        Exec = "${emacs-wrapped}/bin/emacs %u";
+        Terminal = false;
+        Name = "Emacs";
+        Icon = "emacs";
+        Comment = "Edit text";
+        GenericName = "Text Editor";
+        MimeType = pkgs.lib.concatMapStrings (s: s + ";") emacsMimeTypes;
+        Categories = "Utility;TextEditor;";
+        StartupWMClass = "Emacs";
+      };
+    };
+
+    emacsMimeTypes = [
+      "application/x-shellscript"
+      "text/english"
+      "text/plain"
+      "text/x-c"
+      "text/x-c++"
+      "text/x-c++hdr"
+      "text/x-c++src"
+      "text/x-chdr"
+      "text/x-csrc"
+      "text/x-java"
+      "text/x-haskell"
+      "text/x-makefile"
+      "text/x-moc"
+      "text/x-pascal"
+      "text/x-tcl"
+      "text/x-tex"
+      "x-scheme-handler/org-protocol"
+    ];
+
+
 in
 {
   # Home Manager needs a bit of information about you and the
@@ -459,6 +495,10 @@ in
     "org/gtk/settings/file-chooser" = {
       "sort-directories-first" = true;
     };
+  };
+
+  xdg = {
+    dataFile."applications/emacs.desktop".text = emacsDesktopItem;
   };
 
   # xdg.userDirs = {
