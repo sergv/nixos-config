@@ -8,6 +8,12 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     wm-sh = scripts.wm-sh;
 
+    game-run-wrapper = pkgs.writeScriptBin "game-run" ''
+      #!${pkgs.bash}/bin/bash
+      exec ${pkgs.steam-run}/bin/steam-run "''${@}"
+    '';
+
+
     emacs-wrapped = pkgs.writeScriptBin "emacs" ''
       #!${pkgs.bash}/bin/bash
       if [[ ! -z "''${EMACS_ROOT+x}" ]]; then
@@ -613,7 +619,7 @@ in
         pkgs.git
         pkgs.nix-diff
 
-        pkgs.steam-run
+        game-run-wrapper
 
         tex-pkg
         wmctrl-pkg
