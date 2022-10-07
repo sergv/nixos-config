@@ -183,6 +183,7 @@
         ".local/share/RecentDocuments"
         ".local/share/baloo"
         ".local/share/dolphin"
+        ".local/share/feral-interactive"
         ".local/share/gwenview"
         ".local/share/kactivitymanagerd"
         ".local/share/kate"

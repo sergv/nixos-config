@@ -603,15 +603,17 @@ in
         pkgs.vlc
         pkgs.vorbis-tools
         pkgs.wget
-        pkgs.winePackages.stagingFull
-        # pkgs.wine64Packages.stagingFull
-        pkgs.winetricks
         pkgs.xorg.xev
         pkgs.youtube-dl
         pkgs.zip
         # pkgs.yasm
         pkgs.zstd
         # pkgs.z3
+
+        pkgs.cabextract
+        pkgs.winePackages.stagingFull
+        # pkgs.wine64Packages.stagingFull
+        pkgs.winetricks
 
         pkgs.haskellPackages.fast-tags
         pkgs.universal-ctags
