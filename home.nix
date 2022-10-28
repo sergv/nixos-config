@@ -679,6 +679,7 @@ in
       pkgs.winetricks
 
       pkgs.haskellPackages.fast-tags
+      pkgs.haskellPackages.hp2pretty
       pkgs.universal-ctags
 
       pkgs.git
