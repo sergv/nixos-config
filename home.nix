@@ -45,6 +45,12 @@ let wmctrl-pkg = pkgs.wmctrl;
         }
     );
 
+    emacs-pkg = pkgs.emacs.overrideAttrs (old: {
+      patches = (old.patches or []) ++ [
+        ./patches/emacs-gc-block-increase.patch
+      ];
+    });
+
     emacs-wrapped = pkgs.writeScriptBin "emacs" ''
       #!${pkgs.bash}/bin/bash
       if [[ ! -z "''${EMACS_ROOT+x}" ]]; then
@@ -54,9 +60,9 @@ let wmctrl-pkg = pkgs.wmctrl;
       fi
 
       if [[ ! -f "$dump_file" || ! -z "''${EMACS_FORCE_PRISTINE+x}" ]]; then
-        ${pkgs.emacs}/bin/emacs "''${@}"
+        ${emacs-pkg}/bin/emacs "''${@}"
       else
-        ${pkgs.emacs}/bin/emacs --dump-file "$dump_file" "''${@}"
+        ${emacs-pkg}/bin/emacs --dump-file "$dump_file" "''${@}"
       fi
     '';
 
