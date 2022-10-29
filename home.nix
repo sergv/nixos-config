@@ -352,6 +352,11 @@ in
         user         = "git";
         identityFile = "/home/sergey/.ssh/github_sergv_id_rsa";
       };
+      "gitlab.haskell.org" = {
+        hostname = "gitlab.haskell.org";
+        user = "git";
+        identityFile = "/home/sergey/.ssh/haskell-ghc-gitlab-key";
+      };
     };
   };
 
