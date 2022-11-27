@@ -540,7 +540,7 @@
           "video"
           "wheel"
         ];
-        description    = "Sergey Vinokurov";
+        description    = "sergey"; # "Sergey Vinokurov";
         isNormalUser   = true;
         uid            = 1000;
         shell          = pkgs.bash;
