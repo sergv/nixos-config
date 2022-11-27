@@ -612,6 +612,7 @@ in
         pkgs.curl
         pkgs.diffutils
         pkgs.dmidecode
+        pkgs.ffmpeg
         pkgs.file
         pkgs.findutils
         #pkgs.firefox
@@ -634,6 +635,7 @@ in
         pkgs.mplayer
         pkgs.oxygen-icons5
         pkgs.p7zip
+        pkgs.pavucontrol
         pkgs.pinentry_qt
         pkgs.pmutils
         pkgs.pv
