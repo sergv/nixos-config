@@ -245,6 +245,9 @@ Can be checked out when something fails to build
 - [x] Turn root into a tmpfs
 
 * Cookbook
+** Dummy hash function
+~pkgs.lib.fakeHash~
+~pkgs.lib.fakeSha256~
 ** Building statically linked packages
 #+BEGIN_EXAMPLE
 $ nix-build -E 'with (import ./. {}); (curl.override { stdenv = makeStaticLibraries stdenv;}).out'
