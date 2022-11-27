@@ -101,7 +101,6 @@ let wmctrl-pkg = pkgs.wmctrl;
       "x-scheme-handler/org-protocol"
     ];
 
-
 in
 {
   # Home Manager needs a bit of information about you and the
@@ -528,6 +527,7 @@ in
         ".config/powermanagementprofilesrc"
         ".config/spectaclerc"
         ".config/startkderc"
+        ".config/systemmonitorrc"
         ".config/systemsettingsrc"
         ".config/Trolltech.conf"
         ".config/user-dirs.dirs"
