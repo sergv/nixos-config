@@ -550,6 +550,7 @@ in
         ".config/powermanagementprofilesrc"
         ".config/spectaclerc"
         ".config/startkderc"
+        ".config/systemmonitorrc"
         ".config/systemsettingsrc"
         ".config/Trolltech.conf"
         ".config/user-dirs.dirs"
