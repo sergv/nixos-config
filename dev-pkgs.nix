@@ -73,9 +73,9 @@ in {
   fast-tags       = hpkgs.fast-tags;
   universal-ctags = pkgs.universal-ctags;
 
-  clang = pkgs.clang_14;
-  llvm = pkgs.llvm_14;
-  lld = pkgs.lld_14;
+  clang = pkgs.clang_13;
+  llvm = pkgs.llvm_13;
+  lld = pkgs.lld_13;
 
   gdb = pkgs.gdb;
 
