@@ -45,10 +45,11 @@ let wmctrl-pkg = pkgs.wmctrl;
         }
     );
 
-    emacs-pkg = pkgs.emacs.overrideAttrs (old: {
+    emacs-pkg = (pkgs.emacs.override (old: { nativeComp = false; })).overrideAttrs (old: {
       patches = (old.patches or []) ++ [
         ./patches/emacs-gc-block-increase.patch
       ];
+      nativeComp = false;
     });
 
     emacs-wrapped = pkgs.writeScriptBin "emacs" ''
@@ -118,6 +119,7 @@ in
 
     username      = "sergey";
     homeDirectory = "/home/sergey";
+    stateVersion  = "22.05";
 
     keyboard = {
       layout  = "us,ru";
