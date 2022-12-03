@@ -5,9 +5,9 @@ let writePatchedScriptBin = name: buildInputs:
           });
       in pkgs.symlinkJoin {
         inherit name;
-        paths       = [ script ] ++ buildInputs;
-        buildInputs = [ pkgs.makeWrapper ];
-        postBuild   = "wrapProgram \"$out/bin/${name}\" --prefix PATH : \"$out/bin\"";
+        paths             = [ script ];
+        postBuild         = "wrapProgram \"$out/bin/${name}\" --prefix PATH : \"$out/bin:${pkgs.lib.makeBinPath buildInputs}\"";
+        nativeBuildInputs = [ pkgs.makeWrapper ];
       };
     reset-usb = writePatchedScriptBin "reset-usb" [];
 in {
