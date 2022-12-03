@@ -74,15 +74,15 @@
 
             impermanence.nixosModule
 
-            # Enable Home Manager as NixOs module
-            home-manager.nixosModules.home-manager {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.sergey = import ./home.nix;
-              # home-manager.users.sergey = {
-              #   imports = [ ./home.nix ];
-              # };
-            }
+            # # Enable Home Manager as NixOs module
+            # home-manager.nixosModules.home-manager {
+            #   home-manager.useGlobalPkgs = true;
+            #   home-manager.useUserPackages = true;
+            #   home-manager.users.sergey = import ./home.nix;
+            #   # home-manager.users.sergey = {
+            #   #   imports = [ ./home.nix ];
+            #   # };
+            # }
           ];
         };
       };
