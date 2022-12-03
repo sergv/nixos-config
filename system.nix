@@ -404,8 +404,8 @@
 
   services.redshift = {
     enable    = true;
-    # executable = "/bin/redshift";
-    executable = "/bin/redshift-gtk";
+    executable = "/bin/redshift";
+    # executable = "/bin/redshift-gtk";
     temperature = {
       day   = 5500;
       night = 1900;
