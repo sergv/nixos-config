@@ -10,6 +10,8 @@ let
     wmctrl = wmctrl-pkg;
   };
 
+  dev-pkgs = import ./dev-pkgs.nix { inherit pkgs; };
+
   wm-sh = scripts.wm-sh;
 
   game-run-wrapper = pkgs.writeScriptBin "game-run" ''
@@ -640,10 +642,8 @@ in
       pkgs.chromium
       # pkgs.clang
       # pkgs.clang-tools
-      pkgs.cmake
       # pkgs.coq
       pkgs.curl
-      pkgs.diffutils
       pkgs.dmidecode
       pkgs.ffmpeg
       pkgs.file
@@ -651,7 +651,6 @@ in
       #pkgs.firefox
       pkgs.firefox-esr
       pkgs.gimp
-      pkgs.git
       pkgs.glxinfo
       pkgs.gparted
       pkgs.graphviz
@@ -692,11 +691,6 @@ in
       # pkgs.wine64Packages.stagingFull
       pkgs.winetricks
 
-      pkgs.haskellPackages.fast-tags
-      pkgs.haskellPackages.hp2pretty
-      pkgs.universal-ctags
-
-      pkgs.git
       pkgs.nix-diff
 
       isabelle-pkg
@@ -708,7 +702,8 @@ in
 
       emacs-wrapped
     ]
-    ++ builtins.attrValues scripts
-    ++ builtins.attrValues my-fonts;
+    ++ builtins.attrValues dev-pkgs
+    ++ builtins.attrValues my-fonts
+    ++ builtins.attrValues scripts;
 
 }
