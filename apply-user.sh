@@ -10,7 +10,7 @@ set -u
 
 set -e
 
-nix build .#homeManagerConfigurations.sergey.activationPackage "${@}"
+nix build --print-build-logs .#homeManagerConfigurations.sergey.activationPackage "${@}"
 ./result/activate
 
 exit 0
