@@ -320,10 +320,10 @@
 
   # Enable commands like ‘nix search’ and flakes.
   nix = {
-    allowedUsers = [ "@wheel" ];
     gc.automatic = false;
     package      = pkgs.unstable.nixFlakes;
     settings     = {
+      allowed-users         = [ "@wheel" ];
       bash-prompt-prefix    = "[nix] ";
       experimental-features = [ "nix-command" "flakes" ];
     };

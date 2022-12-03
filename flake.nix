@@ -7,7 +7,8 @@
       # # unstable
       # url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
-      url = "/home/sergey/nix/nixpkgs";
+      #url = "/home/sergey/nix/nixpkgs";
+      url = "nixpkgs/nixos-22.11";
     };
 
     nixpkgs-unstable = {
@@ -17,7 +18,7 @@
     home-manager = {
       # # unstable
       # url                    = "github:nix-community/home-manager/master";
-      url                    = "github:nix-community/home-manager/release-22.05";
+      url                    = "github:nix-community/home-manager/release-22.11";
       # Make home-manager use our version of nixpkgs
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -75,15 +76,15 @@
 
             impermanence.nixosModule
 
-            # # Enable Home Manager as NixOs module
-            # home-manager.nixosModules.home-manager {
-            #  home-manager.useGlobalPkgs = true;
-            #  home-manager.useUserPackages = true;
-            #  home-manager.users.sergey = import ./home.nix;
-            #  # home-manager.users.sergey = {
-            #  #   imports = [ ./home.nix ];
-            #  # };
-            # }
+            # Enable Home Manager as NixOs module
+            home-manager.nixosModules.home-manager {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.sergey = import ./home.nix;
+              # home-manager.users.sergey = {
+              #   imports = [ ./home.nix ];
+              # };
+            }
           ];
         };
       };
@@ -91,13 +92,10 @@
       # Home configs for user
       homeManagerConfigurations = {
         sergey = home-manager.lib.homeManagerConfiguration {
-          inherit system pkgs;
-          username      = "sergey";
-          homeDirectory = "/home/sergey";
-          # stateVersion  = "22.05";
-          configuration = {
-            imports = [ ./home.nix ];
-          };
+          inherit pkgs;
+          modules = [
+            ./home.nix
+          ];
         };
       };
     };
