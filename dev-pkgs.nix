@@ -79,6 +79,7 @@ in {
   lld = pkgs.lld_13;
 
   gdb = pkgs.gdb;
+  patchelf = pkgs.patchelf;
 
   pkg-config = pkgs.pkg-config;
 
