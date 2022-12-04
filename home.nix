@@ -597,7 +597,7 @@ in
       tex-pkg = (
         pkgs.texlive.combine {
           inherit (pkgs.texlive)
-            scheme-basic
+            scheme-small
             dvisvgm
             dvipng # for preview and export as html
             wrapfig
@@ -623,6 +623,13 @@ in
             collection-metapost
             collection-texworks
             collection-xetex
+
+            fncychap
+            framed
+            needspace
+            tabulary
+            titlesec
+            varwidth
             ;
         }
       );
