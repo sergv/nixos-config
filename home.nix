@@ -569,7 +569,7 @@ in
     let
       tex-pkg = (pkgs.texlive.combine {
         inherit (pkgs.texlive)
-          scheme-basic
+          scheme-small
           dvisvgm dvipng # for preview and export as html
           wrapfig
           amsmath
@@ -593,7 +593,14 @@ in
           collection-luatex
           collection-metapost
           collection-texworks
-          collection-xetex;
+          collection-xetex
+
+          fncychap
+          framed
+          needspace
+          tabulary
+          titlesec
+          varwidth;
       });
     in
       [
