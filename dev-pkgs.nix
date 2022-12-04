@@ -68,13 +68,14 @@ in
   hp2pretty       = hpkgs.hp2pretty;
   fast-tags       = hpkgs.fast-tags;
   universal-ctags = pkgs.universal-ctags;
-  pretty-show = hpkgs.pretty-show;
+  pretty-show     = hpkgs.pretty-show;
 
   clang           = pkgs.clang_13;
   llvm            = pkgs.llvm_13;
   lld             = pkgs.lld_13;
 
   gdb             = pkgs.gdb;
+  patchelf        = pkgs.patchelf;
 
   pkg-config      = pkgs.pkg-config;
 
