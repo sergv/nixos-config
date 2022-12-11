@@ -78,6 +78,7 @@ in {
   llvm = pkgs.llvm_13;
   lld = pkgs.lld_13;
 
+  gnumake = pkgs.gnumake;
   gdb = pkgs.gdb;
   patchelf = pkgs.patchelf;
 
