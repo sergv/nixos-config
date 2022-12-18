@@ -635,6 +635,7 @@ in
       );
     in
     [
+      pkgs.ark
       pkgs.aspell
       pkgs.aspellDicts.en
       pkgs.aspellDicts.en-computers
