@@ -537,6 +537,8 @@ in
         ".config/user-dirs.dirs"
         ".config/user-dirs.locale"
 
+        ".config/PCSX2"
+
         ".local/share/krunnerstaterc"
         ".local/share/user-places.xbel"
         ".local/share/user-places.xbel.bak"
