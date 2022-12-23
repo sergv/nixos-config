@@ -34,8 +34,13 @@ do
             echo tar xfvpJ "${archive}"
             tar xfvpJ "${archive}"
             ;;
+        zst | zstd)
+            echo tar xfvpJ "${archive}"
+            zstd -d -c "${archive}" | tar xvp
+            # tar xfvpJ "${archive}"
+            ;;
         *)
-            echo "unknown extension '${ext}' in ${archive}" >&2
+            echo "unknown extension ‘${ext}’ in ${archive}" >&2
             exit 1
             ;;
     esac
