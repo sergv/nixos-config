@@ -1,5 +1,9 @@
-{ pkgs, ... }:
-let # pkgs = nixpkgs.legacyPackages.${system};
+{ nixpkgs-fresh-ghc,
+  system,
+  # pkgs,
+  ...
+}:
+let pkgs = nixpkgs-fresh-ghc.legacyPackages.${system};
     t    = pkgs.lib.trivial;
     hl   = pkgs.haskell.lib;
 
@@ -12,7 +16,7 @@ let # pkgs = nixpkgs.legacyPackages.${system};
       sha256 = "sha256-m0hHnC460ZoB9o/YweRMCG5onqgMrwPfexYzZDriR30="; # pkgs.lib.fakeSha256;
     };
 
-    hpkgs = pkgs.haskell.packages.ghc943;
+    hpkgs = pkgs.haskell.packages.ghc944;
 
     hpkgsCabal = hpkgs.override {
       overrides = new: old:
@@ -85,7 +89,6 @@ in {
   pkg-config = pkgs.pkg-config;
 
   cmake = pkgs.cmake;
-  git = pkgs.git;
   diffutils = pkgs.diffutils;
 
 }
