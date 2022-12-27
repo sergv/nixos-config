@@ -1,7 +1,17 @@
-{ pkgs, ... }:
+{
+  nixpkgs-fresh-ghc,
+  system,
+  # pkgs,
+  ...
+}:
 let
+<<<<<<< HEAD
   # pkgs = nixpkgs.legacyPackages.${system};
   t  = pkgs.lib.trivial;
+=======
+  pkgs = nixpkgs-fresh-ghc.legacyPackages.${system};
+  t = pkgs.lib.trivial;
+>>>>>>> 8f631bb (Switch to GHC 9.4.4 which is not yet available in nixpkgs master)
   hl = pkgs.haskell.lib;
 
   # hpkgs = pkgs.haskell.packages.ghc924;
@@ -13,7 +23,7 @@ let
     sha256 = "sha256-m0hHnC460ZoB9o/YweRMCG5onqgMrwPfexYzZDriR30="; # pkgs.lib.fakeSha256;
   };
 
-  hpkgs = pkgs.haskell.packages.ghc943;
+  hpkgs = pkgs.haskell.packages.ghc944;
 
   hpkgsCabal = hpkgs.override {
     overrides =
@@ -81,7 +91,6 @@ in
   pkg-config      = pkgs.pkg-config;
 
   cmake           = pkgs.cmake;
-  git             = pkgs.git;
   diffutils       = pkgs.diffutils;
 
 }

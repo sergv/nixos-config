@@ -1,4 +1,10 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  nixpkgs-fresh-ghc,
+  system,
+  ...
+}:
 
 let
   wmctrl-pkg = pkgs.wmctrl;
@@ -10,7 +16,7 @@ let
     wmctrl = wmctrl-pkg;
   };
 
-  dev-pkgs = import ./dev-pkgs.nix { inherit pkgs; };
+  dev-pkgs = import ./dev-pkgs.nix { inherit pkgs nixpkgs-fresh-ghc system; };
 
   wm-sh = scripts.wm-sh;
 

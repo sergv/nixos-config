@@ -15,6 +15,10 @@
       url = "nixpkgs/nixos-unstable";
     };
 
+    nixpkgs-fresh-ghc = {
+      url = "git+https://github.com/sternenseemann/nixpkgs.git?ref=ghc-9.4.4";
+    };
+
     home-manager = {
       # # unstable
       # url                    = "github:nix-community/home-manager/master";
@@ -43,6 +47,7 @@
     {
       nixpkgs,
       nixpkgs-unstable,
+      nixpkgs-fresh-ghc,
       home-manager,
       impermanence,
       ...
@@ -71,6 +76,7 @@
               let
                 overlay-unstable = final: prev: {
                   unstable = nixpkgs-unstable.legacyPackages.x86_64-linux;
+                  fresh-ghc = nixpkgs-fresh-ghc.legacyPackages.x86_64-linux;
                 };
               in
               {
@@ -105,6 +111,9 @@
           modules = [
             ./home.nix
           ];
+          extraSpecialArgs = {
+            inherit nixpkgs-fresh-ghc system;
+          };
         };
       };
     };

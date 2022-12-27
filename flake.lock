@@ -52,6 +52,22 @@
         "type": "indirect"
       }
     },
+    "nixpkgs-fresh-ghc": {
+      "locked": {
+        "lastModified": 1671991748,
+        "narHash": "sha256-C5obZ3QqGUutbYUPh/UN4WuqufWTzC1JLkQ1myIGz2s=",
+        "ref": "ghc-9.4.4",
+        "rev": "394076d8151ca165f06c11246457ac8d0569d708",
+        "revCount": 437504,
+        "type": "git",
+        "url": "https://github.com/sternenseemann/nixpkgs.git"
+      },
+      "original": {
+        "ref": "ghc-9.4.4",
+        "type": "git",
+        "url": "https://github.com/sternenseemann/nixpkgs.git"
+      }
+    },
     "nixpkgs-unstable": {
       "locked": {
         "lastModified": 1662019588,
@@ -72,6 +88,7 @@
         "home-manager": "home-manager",
         "impermanence": "impermanence",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-fresh-ghc": "nixpkgs-fresh-ghc",
         "nixpkgs-unstable": "nixpkgs-unstable"
       }
     },
