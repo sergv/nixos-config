@@ -10,10 +10,10 @@ let pkgs = nixpkgs-fresh-ghc.legacyPackages.${system};
     # hpkgs = pkgs.haskell.packages.ghc924;
 
     cabal-repo = pkgs.fetchFromGitHub {
-      owner = "sergv";
-      repo = "cabal";
-      rev = "dev";
-      sha256 = "sha256-m0hHnC460ZoB9o/YweRMCG5onqgMrwPfexYzZDriR30="; # pkgs.lib.fakeSha256;
+      owner  = "sergv";
+      repo   = "cabal";
+      rev    = "c2473316fed37102e45b3a277bab4018441edd9e"; # "dev";
+      sha256 = "sha256-/ii9zRQ6+Nd63Z75p6pDP6IZggY8kz8HddeD3gPupOM="; # pkgs.lib.fakeSha256;
     };
 
     hpkgs = pkgs.haskell.packages.ghc944;
