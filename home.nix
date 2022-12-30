@@ -468,6 +468,9 @@ in
 
         "O0DGDxpMBNs.jpg"
 
+        ".aspell.en.prepl"
+        ".aspell.en.pws"
+
         # KDE
         ".config/akregatorrc"
         ".config/baloofileinformationrc"
