@@ -443,7 +443,7 @@ in
     "d /home/sergey/Desktop -    -      -     - -"
   ] ++ map
     (x:
-      # Forcefully symlink, removing source if it exists.
+      # Forcefully symlink, removing destination if it exists.
       "L+ \"/home/sergey/${x}\" - - - - /permanent/home/sergey/${x}"
     )
     [
