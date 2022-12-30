@@ -607,12 +607,7 @@ in
     in
       [
         pkgs.ark
-        pkgs.aspell
-        pkgs.aspellDicts.en
-        pkgs.aspellDicts.en-computers
-        pkgs.aspellDicts.en-science
-        pkgs.aspellDicts.ru
-        pkgs.aspellDicts.uk
+        (pkgs.aspellWithDicts (d: [d.en d.en-computers d.en-science d.ru d.uk]))
         pkgs.audacious
         # pkgs.autoconf
         pkgs.baobab
