@@ -1,11 +1,11 @@
-{
-  nixpkgs-fresh-ghc,
+args@{
+  nixpkgs-unstable,
   system,
-  # pkgs,
+  # , pkgs
   ...
 }:
 let
-  pkgs = nixpkgs-fresh-ghc.legacyPackages.${system};
+  pkgs = nixpkgs-unstable.legacyPackages.${system};
   t    = pkgs.lib.trivial;
   hl   = pkgs.haskell.lib;
 
@@ -69,9 +69,16 @@ in
 
   cabal-install   = hpkgsCabal.cabal-install;
 
+<<<<<<< HEAD
   profiterole     = hpkgsCabal.profiterole;
   hp2pretty       = hpkgs.hp2pretty;
   fast-tags       = hpkgs.fast-tags;
+=======
+  profiterole = hpkgsCabal.profiterole;
+  hp2pretty = hpkgs.hp2pretty;
+  fast-tags = hpkgs.fast-tags;
+  threadscope = args.pkgs.haskellPackages.threadscope;
+>>>>>>> 7c3b7de (Install ghc from unstable nixpkgs. Also install threadscope)
   universal-ctags = pkgs.universal-ctags;
   pretty-show     = hpkgs.pretty-show;
 

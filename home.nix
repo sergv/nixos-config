@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  nixpkgs-fresh-ghc,
+  nixpkgs-unstable,
   system,
   ...
 }:
@@ -16,7 +16,7 @@ let
     wmctrl = wmctrl-pkg;
   };
 
-  dev-pkgs = import ./dev-pkgs.nix { inherit pkgs nixpkgs-fresh-ghc system; };
+  dev-pkgs = import ./dev-pkgs.nix { inherit pkgs nixpkgs-unstable system; };
 
   wm-sh = scripts.wm-sh;
 
