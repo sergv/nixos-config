@@ -1,9 +1,10 @@
-{ nixpkgs-fresh-ghc,
-  system,
-  # pkgs,
-  ...
-}:
-let pkgs = nixpkgs-fresh-ghc.legacyPackages.${system};
+args @
+  { nixpkgs-unstable
+  , system
+  # , pkgs
+  , ...
+  }:
+let pkgs = nixpkgs-unstable.legacyPackages.${system};
     t    = pkgs.lib.trivial;
     hl   = pkgs.haskell.lib;
 
@@ -75,6 +76,7 @@ in {
   profiterole     = hpkgsCabal.profiterole;
   hp2pretty       = hpkgs.hp2pretty;
   fast-tags       = hpkgs.fast-tags;
+  threadscope     = args.pkgs.haskellPackages.threadscope;
   universal-ctags = pkgs.universal-ctags;
   pretty-show     = hpkgs.pretty-show;
 
