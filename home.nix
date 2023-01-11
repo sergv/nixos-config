@@ -692,6 +692,7 @@ in
       pkgs.pmutils
       pkgs.pv
       pkgs.sshfs
+      pkgs.tdesktop
       pkgs.thunderbird
       pkgs.transmission-gtk
       pkgs.unzip
