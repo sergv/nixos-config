@@ -473,7 +473,7 @@
   services.locate = {
     enable = true;
     locate = pkgs.mlocate;
-    interval = "monthly";
+    interval = "daily";
     # Silence warning.
     localuser = null;
   };
