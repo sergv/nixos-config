@@ -73,24 +73,23 @@ in {
 
   cabal-install = hpkgsCabal.cabal-install;
 
-  profiterole     = hpkgsCabal.profiterole;
-  hp2pretty       = hpkgs.hp2pretty;
-  fast-tags       = hpkgs.fast-tags;
-  threadscope     = args.pkgs.haskellPackages.threadscope;
-  universal-ctags = pkgs.universal-ctags;
-  pretty-show     = hpkgs.pretty-show;
+  profiterole        = hpkgsCabal.profiterole;
+  hp2pretty          = hpkgs.hp2pretty;
+  fast-tags          = hpkgs.fast-tags;
+  threadscope        = args.pkgs.haskellPackages.threadscope;
+  universal-ctags    = pkgs.universal-ctags;
+  pretty-show        = hpkgs.pretty-show;
 
   clang = pkgs.clang_13;
-  llvm = pkgs.llvm_13;
-  lld = pkgs.lld_13;
+  llvm  = pkgs.llvm_13;
+  lld   = pkgs.lld_13;
 
-  gnumake = pkgs.gnumake;
-  gdb = pkgs.gdb;
-  patchelf = pkgs.patchelf;
-
+  cmake      = pkgs.cmake;
+  gnumake    = pkgs.gnumake;
+  gdb        = pkgs.gdb;
+  patchelf   = pkgs.patchelf;
   pkg-config = pkgs.pkg-config;
 
-  cmake = pkgs.cmake;
   diffutils = pkgs.diffutils;
 
 }
