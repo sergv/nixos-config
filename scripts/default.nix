@@ -47,6 +47,10 @@ in
     pkgs.gnutar
     pkgs.xz
   ];
+  tarzstd = writePatchedScriptBin "tarzstd" [
+    pkgs.gnutar
+    pkgs.zstd
+  ];
   untar = writePatchedScriptBin "untar" [
     pkgs.gnutar
     pkgs.p7zip
@@ -54,6 +58,7 @@ in
     pkgs.bzip2
     pkgs.lzip
     pkgs.xz
+    pkgs.zstd
   ];
   wm-sh = writePatchedScriptBin "wm.sh" [
     pkgs.wmctrl
