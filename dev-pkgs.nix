@@ -69,16 +69,10 @@ in
 
   cabal-install   = hpkgsCabal.cabal-install;
 
-<<<<<<< HEAD
   profiterole     = hpkgsCabal.profiterole;
   hp2pretty       = hpkgs.hp2pretty;
   fast-tags       = hpkgs.fast-tags;
-=======
-  profiterole = hpkgsCabal.profiterole;
-  hp2pretty = hpkgs.hp2pretty;
-  fast-tags = hpkgs.fast-tags;
-  threadscope = args.pkgs.haskellPackages.threadscope;
->>>>>>> 7c3b7de (Install ghc from unstable nixpkgs. Also install threadscope)
+  threadscope     = args.pkgs.haskellPackages.threadscope;
   universal-ctags = pkgs.universal-ctags;
   pretty-show     = hpkgs.pretty-show;
 
@@ -86,13 +80,12 @@ in
   llvm            = pkgs.llvm_13;
   lld             = pkgs.lld_13;
 
+  cmake           = pkgs.cmake;
   gnumake         = pkgs.gnumake;
   gdb             = pkgs.gdb;
   patchelf        = pkgs.patchelf;
-
   pkg-config      = pkgs.pkg-config;
 
-  cmake           = pkgs.cmake;
   diffutils       = pkgs.diffutils;
 
 }
