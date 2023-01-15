@@ -21,6 +21,7 @@ in {
   tarlz                   = writePatchedScriptBin "tarlz"                   [ pkgs.gnutar pkgs.lzip ];
   tartar                  = writePatchedScriptBin "tartar"                  [ pkgs.gnutar ];
   tarxz                   = writePatchedScriptBin "tarxz"                   [ pkgs.gnutar pkgs.xz ];
-  untar                   = writePatchedScriptBin "untar"                   [ pkgs.gnutar pkgs.p7zip pkgs.gzip pkgs.bzip2 pkgs.lzip pkgs.xz ];
+  tarzstd                 = writePatchedScriptBin "tarzstd"                 [ pkgs.gnutar pkgs.zstd ];
+  untar                   = writePatchedScriptBin "untar"                   [ pkgs.gnutar pkgs.p7zip pkgs.gzip pkgs.bzip2 pkgs.lzip pkgs.xz pkgs.zstd ];
   wm-sh                   = writePatchedScriptBin "wm.sh"                   [ pkgs.wmctrl pkgs.coreutils ];
 }
