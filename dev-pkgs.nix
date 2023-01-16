@@ -1,5 +1,6 @@
 args @
-  { nixpkgs-unstable
+  { pinned-pkgs
+  , nixpkgs-unstable
   , system
   # , pkgs
   , ...
@@ -64,12 +65,39 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
     #   pkgs.zlib
     # ];
 
+    disable-docs = ghc:
+      ghc.override (oldAttrs: oldAttrs // {
+        enableDocs = false;
+      });
+
+    wrap-ghc = version: pkg:
+      pkgs.runCommand ("wrapped-ghc-" + version) {
+        # buildInputs = [ pkgs.makeWrapper ];
+      }
+        ''
+          mkdir -p "$out/bin"
+          for x in ghc ghci ghc-pkg haddock-ghc runghc; do
+            ln -s "${pkg}/bin/$x-${version}" "$out/bin"
+          done
+        '';
+
 in {
 
-  ghc = hpkgs.ghc.override (oldAttrs: {
+  ghc = hpkgs.ghc.override (oldAttrs: oldAttrs // {
     enableNativeBignum = true;
     enableDocs         = false;
   });
+
+  ghc7103 = wrap-ghc "7.10.3" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  ghc802  = wrap-ghc "8.0.2"  pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
+  ghc822  = wrap-ghc "8.2.2"  pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  ghc844  = wrap-ghc "8.4.4"  pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
+  ghc865  = wrap-ghc "8.6.5"  pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+
+  ghc884  = wrap-ghc "8.8.4"  pkgs.haskell.packages.ghc884.ghc;
+  ghc8107 = wrap-ghc "8.10.7" (disable-docs pkgs.haskell.packages.ghc8107.ghc);
+  ghc902  = wrap-ghc "9.0.2"  (disable-docs pkgs.haskell.packages.ghc902.ghc);
+  ghc925  = wrap-ghc "9.2.5"  (disable-docs pkgs.haskell.packages.ghc925.ghc);
 
   cabal-install = hpkgsCabal.cabal-install;
 
