@@ -11,6 +11,14 @@
       url = "nixpkgs/nixos-22.11";
     };
 
+    nixpkgs-20-03 = {
+      url = "nixpkgs/nixos-20.03";
+    };
+
+    nixpkgs-20-09 = {
+      url = "nixpkgs/nixos-20.09";
+    };
+
     nixpkgs-unstable = {
       url = "nixpkgs/nixos-unstable";
     };
@@ -45,6 +53,8 @@
 
   outputs =
     { nixpkgs
+    , nixpkgs-20-03
+    , nixpkgs-20-09
     , nixpkgs-unstable
     # , nixpkgs-fresh-ghc
     , home-manager
@@ -60,6 +70,24 @@
             virtualbox.enableExtensionPack = true;
           };
         };
+
+        nixpkgs-18-09 = builtins.fetchGit {
+          # Descriptive name to make the store path easier to identify
+          name = "nixos-nixos-18.09";
+          url = "https://github.com/NixOS/nixpkgs/";
+          # Commit hash for nixos-unstable as of 2018-09-12
+          # git ls-remote https://github.com/nixos/nixpkgs nixos-unstable
+          ref = "refs/heads/nixos-18.09";
+          rev = "a7e559a5504572008567383c3dc8e142fa7a8633";
+        };
+
+        nixpkgs-19-09 = builtins.fetchGit {
+          name = "nixos-nixos-19.09";
+          url = "https://github.com/NixOS/nixpkgs/";
+          ref = "refs/heads/nixos-19.09";
+          rev = "75f4ba05c63be3f147bcc2f7bd4ba1f029cedcb1";
+        };
+
     in {
 
       # System configs
@@ -109,6 +137,12 @@
           extraSpecialArgs = {
             # inherit nixpkgs-fresh-ghc system;
             inherit nixpkgs-unstable system;
+            pinned-pkgs = {
+              nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };
+              nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
+              nixpkgs-20-03 = import nixpkgs-20-03 { inherit system; };
+              nixpkgs-20-09 = import nixpkgs-20-09 { inherit system; };
+            };
           };
         };
       };
