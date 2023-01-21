@@ -98,6 +98,7 @@ in {
   ghc8107 = wrap-ghc "8.10.7" (disable-docs pkgs.haskell.packages.ghc8107.ghc);
   ghc902  = wrap-ghc "9.0.2"  (disable-docs pkgs.haskell.packages.ghc902.ghc);
   ghc925  = wrap-ghc "9.2.5"  (disable-docs pkgs.haskell.packages.ghc925.ghc);
+  ghc943  = wrap-ghc "9.4.3"  pkgs.haskell.packages.ghc943.ghc;
 
   cabal-install = hpkgsCabal.cabal-install;
 
