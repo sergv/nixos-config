@@ -217,9 +217,11 @@ Update ~flake.lock~:
 
 ** GC
 ~nix-store --gc~
+~nix store gc~
 
 ** Deduplicate store
 ~nix-store --optimise~
+~nix store optimise~
 
 ** Packaging
 Wrap standalone games with the help of ~buildFHSUserEnv~ function
