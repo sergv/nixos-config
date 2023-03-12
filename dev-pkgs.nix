@@ -100,6 +100,31 @@ in {
   ghc925  = wrap-ghc "9.2.5"  (disable-docs pkgs.haskell.packages.ghc925.ghc);
   ghc943  = wrap-ghc "9.4.3"  pkgs.haskell.packages.ghc943.ghc;
 
+  # callPackage = newScope {
+  #   haskellLib = haskellLibUncomposable.compose;
+  #   overrides = pkgs.haskell.packageOverrides;
+  # };
+
+  ghc961  = wrap-ghc "9.6.0.20230111" (import ./ghc-9.6.1-alpha1.nix {
+    inherit (pkgs)
+      lib
+      stdenv
+      fetchurl
+      perl
+      gcc
+      ncurses5
+      ncurses6
+      gmp
+      libiconv
+      numactl
+      libffi
+      llvmPackages
+      coreutils
+      targetPackages;
+
+    # llvmPackages = pkgs.llvmPackages_13;
+  });
+
   cabal-install = hpkgsCabal.cabal-install;
 
   profiterole        = hpkgsCabal.profiterole;
