@@ -4,6 +4,8 @@
 
 { config, pkgs, ... }:
 
+let nix-daemon-build-dir = "/permanent/tmp/nix-daemon";
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -498,7 +500,6 @@
             MODE:="0666", \
             SYMLINK+="stm32_dfu"
 
-
         ## Network adapters
 
         # Recognize my usb wifi router.
@@ -512,8 +513,15 @@
       '';
   };
 
+  systemd = {
   # Better for steam proton games.
-  systemd.extraConfig = "DefaultLimitNOFILE=1048576";
+    extraConfig = "DefaultLimitNOFILE=1048576";
+    services.nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
+
+    tmpfiles.rules = [
+      "d ${nix-daemon-build-dir} - root nixbld 7d -"
+    ];
+  };
 
   # Set your time zone.
   time.timeZone = "Europe/London";
