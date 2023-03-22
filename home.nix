@@ -344,6 +344,11 @@ in
         user         = "git";
         identityFile = "/home/sergey/.ssh/github_sergv_id_rsa";
       };
+      "gitlab.com" = {
+        hostname     = "gitlab.com";
+        user         = "git";
+        identityFile = "/home/sergey/.ssh/anon-gitlab-key";
+      };
       "gitlab.haskell.org" = {
         hostname     = "gitlab.haskell.org";
         user         = "git";
