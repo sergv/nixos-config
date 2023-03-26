@@ -19,6 +19,12 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  boot.kernel.sysctl = {
+    # Allow ‘perf’ without root.
+    "kernel.perf_event_paranoid" = -1;
+    "kernel.kptr_restrict" = pkgs.lib.mkForce 0;
+  };
+
   # # More for legacy systems, use the GRUB 2 boot loader.
   # boot.loader.grub = {
   #   enable  = true;
