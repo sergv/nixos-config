@@ -23,7 +23,7 @@ let wmctrl-pkg = pkgs.wmctrl;
       exec ${pkgs.steam-run}/bin/steam-run "''${@}"
     '';
 
-    isabelle-icon = ./icons/isabelle.svg;
+    isabelle-icon = ./icons/isabelle.png;
 
     isabelle-pkg = pkgs.isabelle.overrideAttrs (oldAttrs:
       let newDesktopItem = pkgs.makeDesktopItem {
