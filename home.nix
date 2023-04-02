@@ -33,7 +33,7 @@ let
     exec ${pkgs.steam-run}/bin/steam-run "''${@}"
   '';
 
-  isabelle-icon = ./icons/isabelle.svg;
+  isabelle-icon = ./icons/isabelle.png;
 
   isabelle-pkg = pkgs.isabelle.overrideAttrs (
     oldAttrs:
