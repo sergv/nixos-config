@@ -678,8 +678,7 @@ in
         # pkgs.z3
 
         pkgs.cabextract
-        pkgs.winePackages.stagingFull
-        # pkgs.wine64Packages.stagingFull
+        pkgs.wineWowPackages.stagingFull
         pkgs.winetricks
 
         pkgs.nix-diff
