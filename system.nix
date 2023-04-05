@@ -303,6 +303,8 @@ in
   # List services that you want to enable:
 
   networking = {
+    # Supreme Commander’s faf cilent doesn’t work with IPv6 at all.
+    enableIPv6 = false;
     hostName = "home"; # Define your hostname.
     #hostName              = ""; # Use dhcp-provided hostname.
     # networkmanager.enable = true;
