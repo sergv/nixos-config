@@ -496,6 +496,9 @@ in
         ".emacs"
         "machine-specific-setup.el"
 
+        ".gapforever"
+        ".faforever"
+
         ".bash_history"
         ".rtorrent.rc"
         ".viminfo"
