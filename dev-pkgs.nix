@@ -18,8 +18,25 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
       sha256 = "sha256-w0dwRNsbMGkX5FaI+0j6I+qLh7q/rkw8L22lYHqMmGI="; #pkgs.lib.fakeSha256;
     };
 
+    doctest-repo = pkgs.fetchFromGitHub {
+      owner  = "sergv";
+      repo   = "doctest";
+      rev    = "5d47e8591862a89dac01be52fe1a89e46285d2df";
+      sha256 = "sha256-8eU9l4QNRGlCcMQ/9JN0q83GIch5BX4sFDezhKgpDGM="; #pkgs.lib.fakeSha256;
+    };
+
     # hpkgs = pkgs.haskell.packages.ghc944;
+    # Doesn’t work but could be cool: static executables
+    # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
     hpkgs = pkgs.haskell.packages.ghc961.override {
+      overrides = new: old: {
+        ghc = smaller-ghc(old.ghc);
+      };
+    };
+
+    # Doesn’t work but could be cool: static executables
+    # hpkgs944 = pkgs.pkgsStatic.haskell.packages.ghc944.override {
+    hpkgs944 = pkgs.haskell.packages.ghc944.override {
       overrides = new: old: {
         ghc = smaller-ghc(old.ghc);
       };
@@ -33,10 +50,40 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
 
     # hpkgsCabal-raw = pkgs.haskell.packages.ghc944.o
 
-    hpkgs944 = pkgs.haskell.packages.ghc944.override {
-      overrides = new: old: {
-        ghc = smaller-ghc(old.ghc);
-      };
+    makeHaskellPackageSmaller = x:
+      pkgs.haskell.lib.dontHaddock
+        (pkgs.haskell.lib.disableLibraryProfiling
+          (pkgs.haskell.lib.disableExecutableProfiling x));
+
+    hpkgsDoctest = hpkgs.override {
+      overrides = new: old:
+        # (builtins.mapAttrs (_name: value: if builtins.isAttrs value then makeHaskellPackageSmaller value else value) old)
+        # //
+        builtins.mapAttrs (_name: value: makeHaskellPackageSmaller value) {
+          doctest = (new.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
+            # buildInputs = [haskellPackages.GLFW-b];
+            configureFlags = oldAttrs.configureFlags ++ [
+              # cabal config passes RTS options to GHC so doctest will receive them too
+              # ‘cabal repl --with-ghc=doctest’
+              "--ghc-option=-rtsopts"
+            ];
+          });
+          primitive = pkgs.haskell.lib.dontCheck (new.callHackage
+            "primitive"
+            "0.8.0.0"
+            {});
+          tagged = new.callHackage
+            "tagged"
+            "0.8.7"
+            {};
+
+          syb = new.callHackageDirect {
+            pkg = "syb";
+            ver = "0.7.2.3";
+            sha256 = "sha256-kyvGOhNYMob/bPddylVhRGkm515zf+1tRoHrU7wXT+w="; # pkgs.lib.fakeSha256;
+          }
+            {};
+        };
     };
 
     # pkgs.haskell.packages.ghc961
@@ -123,7 +170,7 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
 
 in {
 
-  ghc = hpkgs.ghc;
+  ghc     = hpkgs.ghc;
 
   ghc7103 = wrap-ghc "7.10.3" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
   ghc802  = wrap-ghc "8.0.2"  pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
@@ -162,8 +209,8 @@ in {
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  cabal-install = hpkgsCabal.cabal-install;
-
+  cabal-install      = hpkgsCabal.cabal-install;
+  doctest            = hpkgsDoctest.doctest;
   fast-tags          = hpkgs944.fast-tags;
   hp2pretty          = hpkgs944.hp2pretty;
   pretty-show        = hpkgs.pretty-show;
@@ -182,5 +229,4 @@ in {
   pkg-config = pkgs.pkg-config;
 
   diffutils = pkgs.diffutils;
-
 }
