@@ -50,16 +50,23 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
 
     # hpkgsCabal-raw = pkgs.haskell.packages.ghc944.o
 
-    makeHaskellPackageSmaller = x:
-      pkgs.haskell.lib.dontHaddock
-        (pkgs.haskell.lib.disableLibraryProfiling
-          (pkgs.haskell.lib.disableExecutableProfiling x));
+    # Disable profiling and haddock
+    makeHaskellPackageSmaller = name: x:
+      if builtins.isNull x ||
+         builtins.elem
+           name
+           ["callCabal2nix" "callCabal2nixWithOptions" "haskellSrc2nix" "ghc" "mkDerivation" "buildHaskellPackages" "callHackage" "callHackageDirect" "callPackage" "hackage2nix"]
+      then x
+      else
+        # # If we missed something in the above check, uncomment this and see what’s being accessed
+        # builtins.trace { inherit name; type = builtins.typeOf x; }
+        pkgs.haskell.lib.dontHaddock
+          (pkgs.haskell.lib.disableLibraryProfiling
+            (pkgs.haskell.lib.disableExecutableProfiling x));
 
     hpkgsDoctest = hpkgs.override {
       overrides = new: old:
-        # (builtins.mapAttrs (_name: value: if builtins.isAttrs value then makeHaskellPackageSmaller value else value) old)
-        # //
-        builtins.mapAttrs (_name: value: makeHaskellPackageSmaller value) {
+        builtins.mapAttrs makeHaskellPackageSmaller (old // {
           doctest = (new.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
             # buildInputs = [haskellPackages.GLFW-b];
             configureFlags = oldAttrs.configureFlags ++ [
@@ -83,61 +90,62 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
             sha256 = "sha256-kyvGOhNYMob/bPddylVhRGkm515zf+1tRoHrU7wXT+w="; # pkgs.lib.fakeSha256;
           }
             {};
-        };
+        });
     };
 
     # pkgs.haskell.packages.ghc961
     hpkgsCabal = hpkgs944.override {
-      overrides = new: old: {
-        ghc = smaller-ghc(old.ghc);
+      overrides = new: old:
+        builtins.mapAttrs makeHaskellPackageSmaller (old // {
+          ghc = smaller-ghc(old.ghc);
 
-        # builtins.mapAttrs (_name: value: pkgs.haskell.lib.doJailbreak value) old //
-        Cabal = new.callCabal2nix
-          "Cabal"
-          (cabal-repo + "/Cabal")
-          {};
-        Cabal-syntax = new.callCabal2nix
-          "Cabal-syntax"
-          (cabal-repo + "/Cabal-syntax")
-          {};
-        cabal-install-solver = pkgs.haskell.lib.doJailbreak (new.callCabal2nix
-          "cabal-install-solver"
-          (cabal-repo + "/cabal-install-solver")
-          {});
-        # pkgs.haskell.lib.dontCheck
-        # (new.callHackage "cabal-install-solver" "3.8.1.0" {});
-        cabal-install = pkgs.haskell.lib.doJailbreak (new.callCabal2nix
-          "cabal-install"
-          (cabal-repo + "/cabal-install")
-          { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
-          });
+          # builtins.mapAttrs (_name: value: pkgs.haskell.lib.doJailbreak value) old //
+          Cabal = new.callCabal2nix
+            "Cabal"
+            (cabal-repo + "/Cabal")
+            {};
+          Cabal-syntax = new.callCabal2nix
+            "Cabal-syntax"
+            (cabal-repo + "/Cabal-syntax")
+            {};
+          cabal-install-solver = pkgs.haskell.lib.doJailbreak (new.callCabal2nix
+            "cabal-install-solver"
+            (cabal-repo + "/cabal-install-solver")
+            {});
+          # pkgs.haskell.lib.dontCheck
+          # (new.callHackage "cabal-install-solver" "3.8.1.0" {});
+          cabal-install = pkgs.haskell.lib.doJailbreak (new.callCabal2nix
+            "cabal-install"
+            (cabal-repo + "/cabal-install")
+            { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
+            });
 
-        # indexed-traversable = pkgs.haskell.lib.doJailbreak old.ghc-lib-parser;
-        # ghc-lib-parser = pkgs.haskell.lib.doJailbreak old.ghc-lib-parser;
+          # indexed-traversable = pkgs.haskell.lib.doJailbreak old.ghc-lib-parser;
+          # ghc-lib-parser = pkgs.haskell.lib.doJailbreak old.ghc-lib-parser;
 
 
-        # ghc-lib-parser = pkgs.haskell.lib.markBroken old.ghc-lib-parser;
-        # ghc-prof = pkgs.haskell.lib.doJailbreak old.ghc-prof;
+          # ghc-lib-parser = pkgs.haskell.lib.markBroken old.ghc-lib-parser;
+          # ghc-prof = pkgs.haskell.lib.doJailbreak old.ghc-prof;
 
-        # process = pkgs.haskell.lib.dontCheck
-        #   (new.callHackage "process" "1.6.15.0" {});
+          # process = pkgs.haskell.lib.dontCheck
+          #   (new.callHackage "process" "1.6.15.0" {});
 
-        tar = pkgs.haskell.lib.doJailbreak old.tar;
-        ed25519 = pkgs.haskell.lib.doJailbreak old.ed25519;
-        indexed-traversable = pkgs.haskell.lib.doJailbreak old.indexed-traversable;
+          tar = pkgs.haskell.lib.doJailbreak old.tar;
+          ed25519 = pkgs.haskell.lib.doJailbreak old.ed25519;
+          indexed-traversable = pkgs.haskell.lib.doJailbreak old.indexed-traversable;
 
-        # ed25519 = #pkgs.haskell.lib.dontCheck
-        #   (overrideCabal
-        #     "7"
-        #     "sha256-PbBNfBi55oul7vP6fuygXh4kiVjdGCKQyOawEMge9z4="
-        #     #"sha256-JKx7Xz2fo8L3AmKzKfKnXyTn/YKfiMGJs4jvobzWfrI="
-        #     (new.callHackageDirect {
-        #       pkg = "ed25519";
-        #       ver = "0.0.5.0";
-        #       sha256 = "sha256-x/8O0KFlj2SDVDKp3IPIvqklmZHfBYKGwygbG48q5Ig=";
-        #     }
-        #       {}));
-      };
+          # ed25519 = #pkgs.haskell.lib.dontCheck
+          #   (overrideCabal
+          #     "7"
+          #     "sha256-PbBNfBi55oul7vP6fuygXh4kiVjdGCKQyOawEMge9z4="
+          #     #"sha256-JKx7Xz2fo8L3AmKzKfKnXyTn/YKfiMGJs4jvobzWfrI="
+          #     (new.callHackageDirect {
+          #       pkg = "ed25519";
+          #       ver = "0.0.5.0";
+          #       sha256 = "sha256-x/8O0KFlj2SDVDKp3IPIvqklmZHfBYKGwygbG48q5Ig=";
+          #     }
+          #       {}));
+        });
     };
 
     # nativeDeps = [
