@@ -28,7 +28,9 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
     # hpkgs = pkgs.haskell.packages.ghc944;
     # Doesn’t work but could be cool: static executables
     # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
-    hpkgs = pkgs.haskell.packages.ghc961.override {
+
+    # hpkgs = pkgs.haskell.packages.ghc961.override {
+    hpkgs = pkgs.haskell.packages.native-bignum.ghc961.override {
       overrides = new: old: {
         ghc = smaller-ghc(old.ghc);
       };
@@ -36,7 +38,9 @@ let pkgs = nixpkgs-unstable.legacyPackages.${system};
 
     # Doesn’t work but could be cool: static executables
     # hpkgs944 = pkgs.pkgsStatic.haskell.packages.ghc944.override {
-    hpkgs944 = pkgs.haskell.packages.ghc944.override {
+
+    # hpkgs944 = pkgs.haskell.packages.ghc944.override {
+    hpkgs944 = pkgs.haskell.packages.native-bignum.ghc944.override {
       overrides = new: old: {
         ghc = smaller-ghc(old.ghc);
       };
