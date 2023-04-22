@@ -8,7 +8,7 @@ let nix-daemon-build-dir = "/permanent/tmp/nix-daemon";
 in
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [# Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
 
@@ -41,25 +41,25 @@ in
     "/" = {
       device  = "tmpfs";
       fsType  = "tmpfs";
-      options = [ "noatime" "nodiratime" "size=10000M" # "mode=1777"
+      options = ["noatime" "nodiratime" "size=10000M" # "mode=1777"
                 ];
     };
     "/nix" = {
       device        = "/dev/disk/by-label/NIXOS-ROOT";
       fsType        = "ext4";
-      options       = [ "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
+      options       = ["errors=remount-ro" "noatime" "nodiratime" "lazytime"];
     };
     "/permanent" = {
       device        = "/dev/disk/by-label/NIXOS-ROOT";
       fsType        = "ext4";
-      # options       = [ "discard" ]; # for ssds
-      options       = [ "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
+      # options       = ["discard"]; # for ssds
+      options       = ["rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
       neededForBoot = true;
     };
     "/boot" = {
       device  = "/dev/disk/by-label/nixos-boot";
       fsType  = "vfat";
-      options = [ "nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" ];
+      options = ["nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
     };
   };
 
@@ -314,7 +314,7 @@ in
     useDHCP = false;
     bridges = {
       br0 = {
-        interfaces = [ "eth-usb" "enp4s0" ];
+        interfaces = ["eth-usb" "enp4s0"];
       };
     };
     interfaces.br0 = {
@@ -323,8 +323,8 @@ in
   };
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  # networking.firewall.allowedTCPPorts = [... ];
+  # networking.firewall.allowedUDPPorts = [... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
 
@@ -333,9 +333,9 @@ in
     gc.automatic = false;
     package      = pkgs.unstable.nixFlakes;
     settings     = {
-      allowed-users         = [ "@wheel" ];
+      allowed-users         = ["@wheel"];
       bash-prompt-prefix    = "[nix] ";
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = ["nix-command" "flakes"];
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixFlakes)
     #   "experimental-features = nix-command flakes";
@@ -356,7 +356,7 @@ in
       "aes192-ctr"
       "aes128-ctr"
     ];
-    hostKeyAlgorithms = [ "ssh-ed25519" "ssh-rsa" ];
+    hostKeyAlgorithms = ["ssh-ed25519" "ssh-rsa"];
     kexAlgorithms = [
       "curve25519-sha256@libssh.org"
       "diffie-hellman-group-exchange-sha256"
@@ -367,7 +367,7 @@ in
       "hmac-sha2-512"
       "hmac-sha2-256"
     ];
-    pubkeyAcceptedKeyTypes = [ "ssh-ed25519" "ssh-rsa" ];
+    pubkeyAcceptedKeyTypes = ["ssh-ed25519" "ssh-rsa"];
   };
 
   security.sudo = {
@@ -376,10 +376,10 @@ in
     wheelNeedsPassword = true;
     extraRules         = [
       {
-        users = [ "sergey" ];
+        users = ["sergey"];
         commands = [
           { command = "ALL";
-            options = [ "SETENV" "NOPASSWD" ];
+            options = ["SETENV" "NOPASSWD"];
           }
         ];
       }
@@ -444,9 +444,9 @@ in
     # Enable touchpad support.
     # libinput.enable = true;
 
-    #videoDrivers = [ "intel" "nvidia" ]
-    videoDrivers = [ "nvidia" ];
-    #videoDrivers = [ "modesetting" ];
+    #videoDrivers = ["intel" "nvidia"]
+    videoDrivers = ["nvidia"];
+    #videoDrivers = ["modesetting"];
 
     #KDE
     #displayManager.sddm.enable = false;
@@ -556,12 +556,12 @@ in
           "video"
           "wheel"
         ];
-        description    = "sergey"; # "Sergey Vinokurov";
-        isNormalUser   = true;
-        uid            = 1000;
-        shell          = pkgs.bash;
-        # mkpasswd -m sha-512 <password>
-        hashedPassword = "Yeah, like I'm going to tell you even my password hash";
+        description                 = "sergey"; # "Sergey Vinokurov";
+        isNormalUser                = true;
+        uid                         = 1000;
+        shell                       = pkgs.bash;
+        # mkpasswd -m sha-512       <password>
+        hashedPassword              = "Yeah, like I'm going to tell you even my password hash";
         openssh.authorizedKeys.keys = [
           "Yeah, like I'm going to tell you even my public key. You'll need to WORK for it."
         ];

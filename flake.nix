@@ -3,7 +3,7 @@
 
   inputs = {
 
-    nixpkgs = {
+    nixpkgs-stable = {
       # # unstable
       # url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
@@ -32,7 +32,7 @@
       # url                    = "github:nix-community/home-manager/master";
       url                    = "github:nix-community/home-manager/release-22.11";
       # Make home-manager use our version of nixpkgs
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     impermanence = {
@@ -52,7 +52,7 @@
   };
 
   outputs =
-    { nixpkgs
+    { nixpkgs-stable
     , nixpkgs-20-03
     , nixpkgs-20-09
     , nixpkgs-unstable
@@ -63,12 +63,32 @@
     }:
     let system = "x86_64-linux";
 
-        pkgs = import nixpkgs {
+        # Fix when upgrading 22.11 -> nixos-unstable circa 2023-04-11
+        fcitx-overlay = _: _: {
+          fcitx = pkgs.fcitx5;
+          fcitx-engines = pkgs.fcitx5;
+        };
+
+        # In configuration.nix
+        ssh-overlay = _: prev: {
+          openssh = prev.openssh.overrideAttrs (old: {
+            patches = (old.patches or []) ++ [patches/openssh-disable-permission-check.patch];
+            # Whether to run tests
+            # doCheck = false;
+          });
+        };
+
+        pkgs = import nixpkgs-unstable {
           inherit system;
           config = {
+            allowBroken                    = true;
             allowUnfree                    = true;
             virtualbox.enableExtensionPack = true;
           };
+          overlays = [
+            fcitx-overlay
+            ssh-overlay
+          ];
         };
 
         nixpkgs-18-09 = builtins.fetchGit {
@@ -92,19 +112,20 @@
 
       # System configs
       nixosConfigurations = {
-        home = nixpkgs.lib.nixosSystem {
+        home = nixpkgs-stable.lib.nixosSystem {
           inherit system;
-          # Main desktop
           modules = [
             ({ config, pkgs, ... }:
               let
-                overlay-unstable = final: prev: {
+                overlay-unstable = _: _: {
                   unstable  = nixpkgs-unstable.legacyPackages.x86_64-linux;
                   # fresh-ghc = nixpkgs-fresh-ghc.legacyPackages.x86_64-linux;
                 };
               in
 	              {
-                 nixpkgs.overlays = [ overlay-unstable ];
+                 nixpkgs-stable.overlays = [
+                   overlay-unstable
+                 ];
                  # environment.systemPackages = with pkgs; [
 	                #  unstable.qutebrowser
 	               # ];
@@ -136,7 +157,7 @@
           ];
           extraSpecialArgs = {
             # inherit nixpkgs-fresh-ghc system;
-            inherit nixpkgs-unstable system;
+            inherit nixpkgs-stable nixpkgs-unstable system;
             pinned-pkgs = {
               nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };
               nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
