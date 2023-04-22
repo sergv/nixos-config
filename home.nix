@@ -1,6 +1,7 @@
 { config
 , pkgs
 , pinned-pkgs
+, nixpkgs-stable
 , nixpkgs-unstable
 , system
 , ...
@@ -13,7 +14,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     scripts = import ./scripts { inherit pkgs; wmctrl = wmctrl-pkg; };
 
     dev-pkgs = import ./dev-pkgs.nix {
-      inherit pkgs pinned-pkgs nixpkgs-unstable system;
+      inherit pkgs pinned-pkgs nixpkgs-stable nixpkgs-unstable system;
     };
 
     wm-sh = scripts.wm-sh;
@@ -134,7 +135,7 @@ in
     keyboard = {
       layout  = "us,ru";
       variant = "dvorak,";
-      options = [ "grp:shifts_toggle" "caps:escape" ];
+      options = ["grp:shifts_toggle" "caps:escape"];
     };
   };
 
@@ -145,10 +146,10 @@ in
 
   programs.bash = {
     enable           = true;
-    historyControl   = [ "ignorespace" "ignoredups" "erasedups" ];
+    historyControl   = ["ignorespace" "ignoredups" "erasedups"];
     historyFileSize  = 100000;
 
-    shellOptions     = [ "histappend" "checkwinsize" "globstar" ];
+    shellOptions     = ["histappend" "checkwinsize" "globstar"];
     initExtra        =
       # Note that bash variables in there are quoted with '',
       # strip them before feeding to bash
@@ -562,6 +563,9 @@ in
         ".local/share/user-places.xbel"
         ".local/share/user-places.xbel.bak"
         ".local/share/user-places.xbel.tbcache"
+
+        ".steam"
+        ".local/share/Steam"
     ];
 
   dconf.settings = {
@@ -632,7 +636,8 @@ in
         pkgs.baobab
         pkgs.bridge-utils
         # pkgs.ccache
-        pkgs.chromium
+        # pkgs.chromium
+        pkgs.google-chrome
         # pkgs.clang
         # pkgs.clang-tools
         # pkgs.coq
@@ -688,6 +693,7 @@ in
 
         isabelle-pkg
 
+        pkgs.steam
         game-run-wrapper
 
         tex-pkg
