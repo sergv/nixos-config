@@ -128,6 +128,25 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
         });
     };
 
+   hpkgsEventlog2html = hpkgs.override {
+      overrides = _: old:
+        builtins.mapAttrs makeHaskellPackageSmaller (old // {
+          eventlog2html = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
+          vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
+          statistics = hlib.dontCheck old.statistics;
+
+          # ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
+          # SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" {};
+
+          ghc-events = old.callHackageDirect {
+            pkg = "ghc-events";
+            ver = "0.19.0.1";
+            sha256 = "sha256-pXgAybMMdevqQOTBPdViCQL3avyycBxhSkaQSHbFfak="; # pkgs.lib.fakeSha256;
+          }
+            {};
+        });
+    };
+
     # pkgs.haskell.packages.ghc961
     hpkgsCabal = hpkgs944.override {
       overrides = new: old:
@@ -279,7 +298,7 @@ in {
 
   cabal-install      = hpkgsCabal.cabal-install;
   doctest            = hpkgsDoctest.doctest;
-  eventlog2html      = threadscopePkgs.eventlog2html;
+  eventlog2html      = hpkgsEventlog2html.eventlog2html;
   fast-tags          = hpkgs944.fast-tags;
   ghc-events-analyze = hpkgsGhcEvensAnalyze.ghc-events-analyze;
   hp2pretty          = hpkgs944.hp2pretty;
