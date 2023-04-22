@@ -61,7 +61,7 @@ in
     "/permanent" = {
       device = "/dev/disk/by-label/NIXOS-ROOT";
       fsType = "ext4";
-      # options       = [ "discard" ]; # for ssds
+      # options       = ["discard"]; # for ssds
       options = [
         "rw"
         "errors=remount-ro"
@@ -399,8 +399,8 @@ in
   };
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  # networking.firewall.allowedTCPPorts = [... ];
+  # networking.firewall.allowedUDPPorts = [... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
 
@@ -533,9 +533,9 @@ in
     # Enable touchpad support.
     # libinput.enable = true;
 
-    #videoDrivers = [ "intel" "nvidia" ]
+    #videoDrivers = ["intel" "nvidia"]
     videoDrivers = [ "nvidia" ];
-    #videoDrivers = [ "modesetting" ];
+    #videoDrivers = ["modesetting"];
 
     #KDE
     #displayManager.sddm.enable = false;
@@ -648,7 +648,7 @@ in
         isNormalUser                = true;
         uid                         = 1000;
         shell                       = pkgs.bash;
-        # mkpasswd -m sha-512 <password>
+        # mkpasswd -m sha-512       <password>
         hashedPassword              = "Yeah, like I'm going to tell you even my password hash";
         openssh.authorizedKeys.keys = [
           "Yeah, like I'm going to tell you even my public key. You'll need to WORK for it."

@@ -2,6 +2,7 @@
   config,
   pkgs,
   pinned-pkgs,
+  nixpkgs-stable,
   nixpkgs-unstable,
   system,
   ...
@@ -21,6 +22,7 @@ let
     inherit
       pkgs
       pinned-pkgs
+      nixpkgs-stable
       nixpkgs-unstable
       system
       ;
@@ -595,6 +597,9 @@ in
         ".local/share/user-places.xbel"
         ".local/share/user-places.xbel.bak"
         ".local/share/user-places.xbel.tbcache"
+
+        ".steam"
+        ".local/share/Steam"
       ];
 
   dconf.settings = {
@@ -675,7 +680,8 @@ in
       pkgs.baobab
       pkgs.bridge-utils
       # pkgs.ccache
-      pkgs.chromium
+      # pkgs.chromium
+      pkgs.google-chrome
       # pkgs.clang
       # pkgs.clang-tools
       # pkgs.coq
@@ -731,6 +737,7 @@ in
 
       isabelle-pkg
 
+      pkgs.steam
       game-run-wrapper
 
       tex-pkg
