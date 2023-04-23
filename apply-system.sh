@@ -13,4 +13,7 @@ if [[ "$EUID" != 0 ]] ; then
   exit 1
 fi
 
-nixos-rebuild switch --flake .#home
+export TMPDIR=/permanent/tmp/nix-daemon
+export TEMPDIR=/permanent/tmp/nix-daemon
+
+nixos-rebuild switch --flake .#home "${@}"
