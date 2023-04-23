@@ -162,14 +162,16 @@ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mini
 *** ~fdisk~
 + ~m~ - help
 + ~g~ - “Create GPT partition table”
-+ ~t~ - list partition types, note which one is ~efi~ partition
++ ~p~ - print current partition table
 + ~n~ - create new partition, 200Mb for efi is enough, make sure type is ‘efi partition’
++ ~t~ - amend & list partition types, note which one is ~efi~ partition
 + EFI: ~sudo mkfs.fat -F 32 $efi-dev~
 + EIF: ~sudo fatlabel $efi-dev nixos-boot~
 + Root: ~sudo mkfs.ext4 $root-dev -L nixos-root~
-+ Mount partitions ~sudo mount /dev/disk-by-label/nixos-root /mnt~
++ Root SSD: ~mkfs.f2fs -l nixos-root -O extra_attr,inode_checksum,sb_checksum,compression $root-dev~
++ Mount partitions ~sudo mount /dev/disk/by-label/nixos-root /mnt~
 + Mount partitions ~sudo mkdir /mnt/boot~
-+ Mount partitions ~sudo mount /dev/disk-by-label/nixos-boot /mnt/boot~
++ Mount partitions ~sudo mount /dev/disk/by-label/nixos-boot /mnt/boot~
 *** Generate config: ~sudo nixos-generate-config --root /mnt~
 *** Copy config
 *** Finish: ~nixos-install~, ~nixos-install --flake~
@@ -216,8 +218,12 @@ Update ~flake.lock~:
 ~/nix/var/nix/profiles~
 
 ** GC
+Old ones
 ~nix-store --gc~
-~nix store gc~
+~nix store gc -v~
+
+New one that also removes stale GC roots:
+~nix-collect-garbage -d~
 
 ** Deduplicate store
 ~nix-store --optimise~
