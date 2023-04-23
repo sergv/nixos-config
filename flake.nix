@@ -29,8 +29,8 @@
 
     home-manager = {
       # # unstable
-      # url                    = "github:nix-community/home-manager/master";
-      url = "github:nix-community/home-manager/release-22.11";
+      url = "github:nix-community/home-manager/master";
+      # url                    = "github:nix-community/home-manager/release-22.11";
       # Make home-manager use our version of nixpkgs
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
@@ -110,12 +110,23 @@
         rev = "75f4ba05c63be3f147bcc2f7bd4ba1f029cedcb1";
       };
 
+      home-manager-extra-args = {
+        # inherit nixpkgs-fresh-ghc system;
+        inherit nixpkgs-stable nixpkgs-unstable system;
+        pinned-pkgs = {
+          nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };
+          nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
+          nixpkgs-20-03 = import nixpkgs-20-03 { inherit system; };
+          nixpkgs-20-09 = import nixpkgs-20-09 { inherit system; };
+        };
+      };
+
     in
     {
 
       # System configs
       nixosConfigurations = {
-        home = nixpkgs-stable.lib.nixosSystem {
+        home = nixpkgs-unstable.lib.nixosSystem {
           inherit system;
           modules = [
             (
@@ -127,8 +138,11 @@
                 };
               in
               {
-                nixpkgs-stable.overlays = [
+                nixpkgs.overlays = [
                   overlay-unstable
+                  fcitx-overlay
+                  ssh-overlay
+                  # arch-native-overrlay
                 ];
                 # environment.systemPackages = with pkgs; [
                 #  unstable.qutebrowser
@@ -142,9 +156,10 @@
 
             # # Enable Home Manager as NixOs module
             # home-manager.nixosModules.home-manager {
-            #   home-manager.useGlobalPkgs = true;
-            #   home-manager.useUserPackages = true;
-            #   home-manager.users.sergey = import ./home.nix;
+            #   home-manager.useGlobalPkgs    = true;
+            #   home-manager.useUserPackages  = true;
+            #   home-manager.users.sergey     = import ./home.nix;
+            #   home-manager.extraSpecialArgs = home-manager-extra-args;
             #   # home-manager.users.sergey = {
             #   #   imports = [ ./home.nix ];
             #   # };
@@ -160,16 +175,7 @@
           modules = [
             ./home.nix
           ];
-          extraSpecialArgs = {
-            # inherit nixpkgs-fresh-ghc system;
-            inherit nixpkgs-stable nixpkgs-unstable system;
-            pinned-pkgs = {
-              nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };
-              nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
-              nixpkgs-20-03 = import nixpkgs-20-03 { inherit system; };
-              nixpkgs-20-09 = import nixpkgs-20-09 { inherit system; };
-            };
-          };
+          extraSpecialArgs = home-manager-extra-args;
         };
       };
     };

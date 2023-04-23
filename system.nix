@@ -661,8 +661,10 @@ in
   # Feel free to remove if you don't need it.
   services.openssh = {
     enable = true;
-    permitRootLogin = "no";
-    passwordAuthentication = false;
+    settings = {
+      PermitRootLogin = "no";
+      PasswordAuthentication = false;
+    };
   };
 
   services.tor = {
