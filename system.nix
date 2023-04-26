@@ -11,6 +11,7 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./zram-root.nix
   ];
 
   # For booting see https://nixos.wiki/wiki/Bootloader
@@ -41,17 +42,16 @@ in
 
   # New desktop
   fileSystems = {
-    # Includes /tmp
-    "/" = {
-      device = "tmpfs";
-      fsType = "tmpfs";
-      options = [
-        "noatime"
-        "nodiratime"
-        "size=8000M" # "mode=1777"
-      ];
-    };
+    # # Vanilla tmpfs root, includes /tmp.
+    # "/" = {
+    #   device  = "tmpfs";
+    #   fsType  = "tmpfs";
+    #   options = ["noatime" "nodiratime" "size=8000M" # "mode=1777"
+    #             ];
+    # };
+
     "/nix" = {
+      depends = [ "/" ];
       device = "/dev/disk/by-label/nixos-root";
       fsType = "f2fs";
       # https://wiki.archlinux.org/title/F2FS
@@ -65,9 +65,9 @@ in
         "gc_merge"
         "x-gvfs-hide"
       ];
-      neededForBoot = true;
     };
     "/permanent" = {
+      depends = [ "/" ];
       device = "/dev/disk/by-label/nixos-permanent";
       fsType = "ext4";
       # options       = ["discard"]; # for ssds
@@ -82,7 +82,8 @@ in
       neededForBoot = true;
     };
     "/boot" = {
-      device = "/dev/disk/by-label/nixos-boot";
+      depends = [ "/" ];
+      device = "/dev/disk/by-label/NIXOS-BOOT";
       fsType = "vfat";
       options = [
         "nofail"
