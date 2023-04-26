@@ -8,4 +8,4 @@ fi
 # Reset usb-to-ethernet device
 reset-usb 7500 0424
 
-systemctl restart network-addresses-{br0,eth-usb,enp4s0}.service network-interfaces.target network-online.target network-setup.service
+systemctl restart network-addresses-{br0,eth-usb,eno1}.service network-interfaces.target network-online.target network-setup.service

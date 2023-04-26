@@ -74,8 +74,12 @@
           openssh = prev.openssh.overrideAttrs (old: {
             patches = (old.patches or []) ++ [patches/openssh-disable-permission-check.patch];
             # Whether to run tests
-            # doCheck = false;
+            doCheck = false;
           });
+        };
+
+        arch-native-overrlay = self: super: {
+          stdenv = super.impureUseNativeOptimizations super.stdenv;
         };
 
         pkgs = import nixpkgs-unstable {
@@ -88,6 +92,7 @@
           overlays = [
             fcitx-overlay
             ssh-overlay
+            # arch-native-overrlay
           ];
         };
 
@@ -148,16 +153,16 @@
 
             impermanence.nixosModule
 
-            # # Enable Home Manager as NixOs module
-            # home-manager.nixosModules.home-manager {
-            #   home-manager.useGlobalPkgs    = true;
-            #   home-manager.useUserPackages  = true;
-            #   home-manager.users.sergey     = import ./home.nix;
-            #   home-manager.extraSpecialArgs = home-manager-extra-args;
-            #   # home-manager.users.sergey = {
-            #   #   imports = [ ./home.nix ];
-            #   # };
-            # }
+            # Enable Home Manager as NixOs module
+            home-manager.nixosModules.home-manager {
+              home-manager.useGlobalPkgs    = true;
+              home-manager.useUserPackages  = true;
+              home-manager.users.sergey     = import ./home.nix;
+              home-manager.extraSpecialArgs = home-manager-extra-args;
+              # home-manager.users.sergey = {
+              #   imports = [ ./home.nix ];
+              # };
+            }
           ];
         };
       };

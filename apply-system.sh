@@ -16,4 +16,4 @@ fi
 export TMPDIR=/permanent/tmp/nix-daemon
 export TEMPDIR=/permanent/tmp/nix-daemon
 
-nixos-rebuild switch --flake .#home "${@}"
+nixos-rebuild switch --flake .#home --verbose --keep-going "${@}"

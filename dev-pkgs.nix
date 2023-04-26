@@ -40,7 +40,7 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
       sha256 = "sha256-RRa3bB6As5QnHaOH9AP4yc5b4cigGY27MeQsyiYo65k="; #pkgs.lib.fakeSha256;
     };
 
-    # hpkgs = pkgs.haskell.packages.ghc944;
+    # hpkgs = pkgs.haskell.packages.ghc945;
     # Doesn’t work but could be cool: static executables
     # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
 
@@ -53,10 +53,10 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     };
 
     # Doesn’t work but could be cool: static executables
-    # hpkgs945 = pkgs.pkgsStatic.haskell.packages.ghc944.override {
+    # hpkgs945 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
-    # hpkgs945 = pkgs.haskell.packages.ghc944.override {
-    hpkgs945 = pkgs.haskell.packages.native-bignum.ghc944.override {
+    # hpkgs945 = pkgs.haskell.packages.ghc945.override {
+    hpkgs945 = pkgs.haskell.packages.native-bignum.ghc945.override {
       overrides = _: old:
         builtins.mapAttrs makeHaskellPackageSmaller (old // {
           ghc = smaller-ghc(old.ghc);
@@ -69,7 +69,7 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
         editedCabalFile = editedSha;
       };
 
-    # hpkgsCabal-raw = pkgs.haskell.packages.ghc944.o
+    # hpkgsCabal-raw = pkgs.haskell.packages.ghc945.o
 
     # Disable profiling and haddock
     makeHaskellPackageSmaller = name: x:
@@ -253,7 +253,7 @@ in {
   ghc8107    = wrap-ghc        "8.10.7"            (disable-docs pkgs.haskell.packages.ghc8107.ghc);
   #ghc902     = wrap-ghc        "9.0.2"             (smaller-ghc pkgs.haskell.packages.ghc902.ghc);
   ghc927     = wrap-ghc        "9.2.7"             (smaller-ghc pkgs.haskell.packages.ghc927.ghc);
-  ghc944     = wrap-ghc        "9.4.4"             (smaller-ghc pkgs.haskell.packages.ghc944.ghc);
+  ghc945     = wrap-ghc        "9.4.5"             (smaller-ghc pkgs.haskell.packages.ghc945.ghc);
   ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (smaller-ghc pkgs.haskell.packages.ghc961.ghc));
 
   # callPackage = newScope {
