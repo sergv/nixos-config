@@ -14,6 +14,8 @@ in
 
   # For booting see https://nixos.wiki/wiki/Bootloader
 
+  #boot.initrd.kernelModules = ["amdgpu"];
+
   # For EFI-based systems
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -36,24 +38,27 @@ in
   #   efiSupport = true;
   # };
 
+  # New desktop
   fileSystems = {
     # Includes /tmp
     "/" = {
       device  = "tmpfs";
       fsType  = "tmpfs";
-      options = ["noatime" "nodiratime" "size=10000M" # "mode=1777"
+      options = ["noatime" "nodiratime" "size=8000M" # "mode=1777"
                 ];
     };
     "/nix" = {
-      device        = "/dev/disk/by-label/NIXOS-ROOT";
-      fsType        = "ext4";
-      options       = ["errors=remount-ro" "noatime" "nodiratime" "lazytime"];
+      device        = "/dev/disk/by-label/nixos-root";
+      fsType        = "f2fs";
+      # https://wiki.archlinux.org/title/F2FS
+      options       = ["noatime" "nodiratime" "lazytime" "compress_algorithm=zstd:6" "compress_chksum" "atgc" "gc_merge" "x-gvfs-hide"];
+      neededForBoot = true;
     };
     "/permanent" = {
-      device        = "/dev/disk/by-label/NIXOS-ROOT";
+      device        = "/dev/disk/by-label/nixos-permanent";
       fsType        = "ext4";
       # options       = ["discard"]; # for ssds
-      options       = ["rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
+      options       = ["rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" "x-gvfs-hide"];
       neededForBoot = true;
     };
     "/boot" = {
@@ -62,6 +67,36 @@ in
       options = ["nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
     };
   };
+
+  # Old desktop
+  # fileSystems = {
+  #   # Includes /tmp
+  #   "/" = {
+  #     device  = "tmpfs";
+  #     fsType  = "tmpfs";
+  #     options = ["noatime" "nodiratime" "size=10000M" # "mode=1777"
+  #               ];
+  #   };
+  #   "/nix" = {
+  #     device        = "/dev/disk/by-label/NIXOS-ROOT";
+  #     fsType        = "ext4";
+  #     options       = ["errors=remount-ro" "noatime" "nodiratime" "lazytime"];
+  #   };
+  #   "/permanent" = {
+  #     device        = "/dev/disk/by-label/NIXOS-ROOT";
+  #     fsType        = "ext4";
+  #     # options       = ["discard"]; # for ssds
+  #     options       = ["rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
+  #     neededForBoot = true;
+  #   };
+  #   "/boot" = {
+  #     device  = "/dev/disk/by-label/NIXOS-BOOT";
+  #     # device  = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-BOOT";
+  #     # device  = "/dev/disk/by-uuid/459be4d4-751d-4032-abef-6faf9545790c";
+  #     fsType  = "vfat";
+  #     options = ["nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
+  #   };
+  # };
 
   # Will activate home-manager profiles for each user upon login
   # This is useful when using ephemeral installations
@@ -305,7 +340,7 @@ in
   networking = {
     # Supreme Commander’s faf cilent doesn’t work with IPv6 at all.
     enableIPv6 = false;
-    hostName = "home"; # Define your hostname.
+    hostName   = "home"; # Define your hostname.
     #hostName              = ""; # Use dhcp-provided hostname.
     # networkmanager.enable = true;
     #wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
@@ -314,12 +349,15 @@ in
     useDHCP = false;
     bridges = {
       br0 = {
-        interfaces = ["eth-usb" "enp4s0"];
+        interfaces = ["eth-usb" "eno1"];
       };
     };
     interfaces.br0 = {
       useDHCP = true;
     };
+    #interfaces.eno1 = {
+    #  useDHCP = true;
+    #};
   };
 
   # Open ports in the firewall.
@@ -445,6 +483,7 @@ in
     # libinput.enable = true;
 
     #videoDrivers = ["intel" "nvidia"]
+    #videoDrivers = ["amdgpu" "nvidia"];
     videoDrivers = ["nvidia"];
     #videoDrivers = ["modesetting"];
 
@@ -522,13 +561,18 @@ in
   };
 
   systemd = {
-  # Better for steam proton games.
-    extraConfig = "DefaultLimitNOFILE=1048576";
     services.nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
 
     tmpfiles.rules = [
       "d ${nix-daemon-build-dir} - root nixbld 7d -"
     ];
+
+    # File limit is for better for steam proton games.
+    # Timeout is for starting jobs that hang for any reason.
+    extraConfig = ''
+      DefaultLimitNOFILE=1048576
+      DefaultTimeoutStopSec=10s
+    '';
   };
 
   # Set your time zone.
