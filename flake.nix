@@ -96,22 +96,32 @@
           ];
         };
 
-        nixpkgs-18-09 = builtins.fetchGit {
-          # Descriptive name to make the store path easier to identify
-          name = "nixos-nixos-18.09";
-          url = "https://github.com/NixOS/nixpkgs/";
-          # Commit hash for nixos-unstable as of 2018-09-12
-          # git ls-remote https://github.com/nixos/nixpkgs nixos-unstable
-          ref = "refs/heads/nixos-18.09";
-          rev = "a7e559a5504572008567383c3dc8e142fa7a8633";
+        nixpkgs-18-09 = builtins.fetchTarball {
+          url    = "https://github.com/NixOS/nixpkgs/archive/a7e559a5504572008567383c3dc8e142fa7a8633.tar.gz";
+          sha256 = "sha256:16j95q58kkc69lfgpjkj76gw5sx8rcxwi3civm0mlfaxxyw9gzp6";
         };
 
-        nixpkgs-19-09 = builtins.fetchGit {
-          name = "nixos-nixos-19.09";
-          url = "https://github.com/NixOS/nixpkgs/";
-          ref = "refs/heads/nixos-19.09";
-          rev = "75f4ba05c63be3f147bcc2f7bd4ba1f029cedcb1";
+        nixpkgs-19-09 = builtins.fetchTarball {
+          url    = "https://github.com/NixOS/nixpkgs/archive/75f4ba05c63be3f147bcc2f7bd4ba1f029cedcb1.tar.gz";
+          sha256 = "sha256:157c64220lf825ll4c0cxsdwg7cxqdx4z559fdp7kpz0g6p8fhhr";
         };
+
+        # nixpkgs-18-09 = builtins.fetchGit {
+        #   # Descriptive name to make the store path easier to identify
+        #   name = "nixos-nixos-18.09";
+        #   url = "https://github.com/NixOS/nixpkgs/";
+        #   # Commit hash for nixos-unstable as of 2018-09-12
+        #   # git ls-remote https://github.com/nixos/nixpkgs nixos-unstable
+        #   ref = "refs/heads/nixos-18.09";
+        #   rev = "a7e559a5504572008567383c3dc8e142fa7a8633";
+        # };
+        #
+        # nixpkgs-19-09 = builtins.fetchGit {
+        #   name = "nixos-nixos-19.09";
+        #   url = "https://github.com/NixOS/nixpkgs/";
+        #   ref = "refs/heads/nixos-19.09";
+        #   rev = "75f4ba05c63be3f147bcc2f7bd4ba1f029cedcb1";
+        # };
 
         home-manager-extra-args = {
           # inherit nixpkgs-fresh-ghc system;
