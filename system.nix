@@ -424,20 +424,23 @@ in
     # networkmanager.enable = true;
     #wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
 
+    # Prefer eth0 to eno1 and the like.
+    usePredictableInterfaceNames = true;
+
     # Don’t autoconfigure all network interfaces
     useDHCP = false;
     bridges = {
       br0 = {
         interfaces = [
           "eth-usb"
-          "eno1"
+          "eth0"
         ];
       };
     };
     interfaces.br0 = {
       useDHCP = true;
     };
-    #interfaces.eno1 = {
+    #interfaces.eth0 = {
     #  useDHCP = true;
     #};
   };
