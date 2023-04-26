@@ -10,6 +10,7 @@ in
   imports =
     [# Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./zram-root.nix
     ];
 
   # For booting see https://nixos.wiki/wiki/Bootloader
@@ -17,14 +18,14 @@ in
   #boot.initrd.kernelModules = ["amdgpu"];
 
   # For EFI-based systems
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.enable      = true;
   boot.loader.efi.canTouchEfiVariables = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
   boot.kernel.sysctl = {
     # Allow ‘perf’ without root.
     "kernel.perf_event_paranoid" = -1;
-    "kernel.kptr_restrict" = pkgs.lib.mkForce 0;
+    "kernel.kptr_restrict"       = pkgs.lib.mkForce 0;
   };
 
   # # More for legacy systems, use the GRUB 2 boot loader.
@@ -40,21 +41,23 @@ in
 
   # New desktop
   fileSystems = {
-    # Includes /tmp
-    "/" = {
-      device  = "tmpfs";
-      fsType  = "tmpfs";
-      options = ["noatime" "nodiratime" "size=8000M" # "mode=1777"
-                ];
-    };
+    # # Vanilla tmpfs root, includes /tmp.
+    # "/" = {
+    #   device  = "tmpfs";
+    #   fsType  = "tmpfs";
+    #   options = ["noatime" "nodiratime" "size=8000M" # "mode=1777"
+    #             ];
+    # };
+
     "/nix" = {
+      depends       = ["/"];
       device        = "/dev/disk/by-label/nixos-root";
       fsType        = "f2fs";
       # https://wiki.archlinux.org/title/F2FS
       options       = ["noatime" "nodiratime" "lazytime" "compress_algorithm=zstd:6" "compress_chksum" "atgc" "gc_merge" "x-gvfs-hide"];
-      neededForBoot = true;
     };
     "/permanent" = {
+      depends       = ["/"];
       device        = "/dev/disk/by-label/nixos-permanent";
       fsType        = "ext4";
       # options       = ["discard"]; # for ssds
@@ -62,7 +65,8 @@ in
       neededForBoot = true;
     };
     "/boot" = {
-      device  = "/dev/disk/by-label/nixos-boot";
+      depends = ["/"];
+      device  = "/dev/disk/by-label/NIXOS-BOOT";
       fsType  = "vfat";
       options = ["nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
     };
