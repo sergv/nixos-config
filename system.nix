@@ -4,13 +4,15 @@
 
 { config, pkgs, ... }:
 
-let nix-daemon-build-dir = "/permanent/tmp/nix-daemon";
+let nix-daemon-build-dir = "/tmp/nix-daemon";
 in
 {
   imports =
     [# Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./zram-root.nix
+      ./compressed-root.nix
+      # ./zram-root.nix
+      # ./smaller-kernel.nix
     ];
 
   # For booting see https://nixos.wiki/wiki/Bootloader
