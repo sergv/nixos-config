@@ -1,4 +1,5 @@
-{ self, config, pkgs, ... }: {
+{ self, config, lib, pkgs, ... }: {
+
   # nixosModules.zramMount = { config, pkgs, ... }: {
 
     # Copied from <nixpkgs>/nixos/modules/config/zram.nix
@@ -8,17 +9,21 @@
 
     # Works before ‘/’ is mounted.
     boot = {
+      kernelPatches = lib.singleton {
+        name = "zram zstd";
+        patch = null;
+        extraStructuredConfig = {
+          ZSWAP_COMPRESSOR_DEFAULT_ZSTD = lib.kernel.yes;
+        };
+      };
       extraModprobeConfig = ''
         options zram num_devices=1
       '';
       initrd = {
         availableKernelModules = ["zram"];
         kernelModules          = ["zram"];
-        # services.udev.rules = ''
-        #   ACTION == "add", KERNEL == "zram0", ATTR{comp_algorithm} = "zstd", ATTR{disksize} = "10G", RUN = "${pkgs.e2fsprogs}/sbin/mkfs.ext4 -F -m 0 -O ^has_journal /dev/%k"
-        # '';
         services.udev.rules = ''
-          ACTION == "add", KERNEL == "zram0", ATTR{comp_algorithm} = "zstd", ATTR{disksize} = "10G"
+          ACTION == "add", KERNEL == "zram0", ATTR{comp_algorithm} = "zstd", ATTR{disksize} = "40G", ATTR{mem_limit} = "10G"
         '';
         postDeviceCommands = ''
           ${pkgs.e2fsprogs}/sbin/mkfs.ext4 -F -m 0 -O ^has_journal /dev/zram0
@@ -90,7 +95,7 @@
     # #   unitConfig.DefaultDependencies = false; # needed to prevent a cycle
     # # };
 
-  # Compressed tmpfs root, configured in zram.nix. Includes /tmp.
+  # Compressed tmpfs root, includes /tmp.
   fileSystems."/" = {
     fsType        = "ext4";
     device        = "/dev/zram0";

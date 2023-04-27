@@ -701,6 +701,10 @@ in
 
         emacs-wrapped
       ] ++
+      # Btrfs utils
+      # [ pkgs.btrfs-progs
+      #   pkgs.compsize
+      # ] ++
       builtins.attrValues dev-pkgs ++
       builtins.attrValues my-fonts ++
       builtins.attrValues scripts;
