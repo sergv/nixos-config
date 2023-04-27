@@ -11,7 +11,6 @@ in
     [# Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./compressed-root.nix
-      # ./zram-root.nix
       # ./smaller-kernel.nix
     ];
 
