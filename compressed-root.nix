@@ -1,4 +1,4 @@
-{ self, config, lib, pkgs, pkgsStatic, ... }:
+{ self, config, lib, pkgs, ... }:
 let backing-store = "/dev/shm/compressed-root";
 in {
 
@@ -10,7 +10,7 @@ in {
 
       postDeviceCommands = ''
         dd if=/dev/zero of=/dev/shm/compressed-root bs=1M count=10240
-        ${pkgsStatic.btrfs-progs}/bin/mkfs.btrfs --force "${backing-store}"
+        ${pkgs.pkgsStatic.btrfs-progs}/bin/mkfs.btrfs --force "${backing-store}"
       '';
     };
   };
