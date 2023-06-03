@@ -16,8 +16,8 @@ let
   cabal-repo = pkgs.fetchFromGitHub {
     owner  = "sergv";
     repo   = "cabal";
-    rev    = "121f55e792222d71ad78d15beedf5ad672a0309a"; # "dev";
-    sha256 = "sha256-w0dwRNsbMGkX5FaI+0j6I+qLh7q/rkw8L22lYHqMmGI="; # pkgs.lib.fakeSha256;
+    rev    = "35b632cf8e2fd77e6a529f68fbf2572ab50780b5"; # "dev";
+    sha256 = "sha256-brfsgPkiGvxPmsmQEwzvlBZIoSJ3sEnpq+TnP5vetXI="; # pkgs.lib.fakeSha256;
   };
 
   doctest-repo = pkgs.fetchFromGitHub {
@@ -46,7 +46,7 @@ let
   # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
 
   # hpkgs = pkgs.haskell.packages.ghc961.override {
-  hpkgs = pkgs.haskell.packages.native-bignum.ghc961.override {
+  hpkgs = pkgs.haskell.packages.native-bignum.ghc962.override {
     overrides =
       _: old:
       builtins.mapAttrs makeHaskellPackageSmaller (
@@ -124,11 +124,11 @@ let
             }
           );
 
-          primitive = hlib.dontCheck (old.callHackage "primitive" "0.8.0.0" { });
-          tagged = old.callHackage "tagged" "0.8.7" { };
-          size-based = hlib.doJailbreak old.size-based;
-
-          syb = old.callHackage "syb" "0.7.2.3" { };
+          # primitive = hlib.dontCheck (old.callHackage "primitive" "0.8.0.0" {});
+          # tagged = old.callHackage "tagged" "0.8.7" {};
+          # size-based = hlib.doJailbreak old.size-based;
+          #
+          # syb = old.callHackage "syb" "0.7.2.3" {};
         }
       );
   };
@@ -141,10 +141,7 @@ let
         // {
           ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo { };
           SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" { };
-          # blaze-svg = old.callCabal2nix "blaze-svg" blaze-svg-repo {};
-          # JuicyPixels = old.callHackage "JuicyPixels" "3.3.8" {};
-          # ghc-events = old.callHackage "ghc-events" "0.19.0" {};
-          # vector = hlib.dontCheck (old.callHackage "vector" "0.13.0.0" {});
+          ghc-events = old.callHackage "ghc-events" "0.19.0.1" { };
         }
       );
   };
@@ -157,18 +154,25 @@ let
         // {
           eventlog2html           = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
           vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
-          statistics              = hlib.dontCheck old.statistics;
-
-          # ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
-          # SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" {};
 
           ghc-events = old.callHackage "ghc-events" "0.19.0.1" { };
         }
       );
   };
 
+  hpkgsProfiterole = hpkgs.override {
+    overrides =
+      _: old:
+      builtins.mapAttrs makeHaskellPackageSmaller (
+        old
+        // {
+          ghc-prof = hlib.doJailbreak old.ghc-prof;
+        }
+      );
+  };
+
   # pkgs.haskell.packages.ghc961
-  hpkgsCabal = hpkgs945.override {
+  hpkgsCabal = hpkgs.override {
     overrides =
       new: old:
       builtins.mapAttrs makeHaskellPackageSmaller (
@@ -190,18 +194,15 @@ let
             }
           );
 
-          # indexed-traversable = hlib.doJailbreak old.ghc-lib-parser;
-          # ghc-lib-parser = hlib.doJailbreak old.ghc-lib-parser;
-
           # ghc-lib-parser = hlib.markBroken old.ghc-lib-parser;
           # ghc-prof = hlib.doJailbreak old.ghc-prof;
 
           # process = hlib.dontCheck
           #   (old.callHackage "process" "1.6.15.0" {});
 
-          tar                 = hlib.doJailbreak old.tar;
-          ed25519             = hlib.doJailbreak old.ed25519;
-          indexed-traversable = hlib.doJailbreak old.indexed-traversable;
+          # tar                 = hlib.doJailbreak old.tar;
+          # ed25519             = hlib.doJailbreak old.ed25519;
+          # indexed-traversable = hlib.doJailbreak old.indexed-traversable;
 
           # ed25519 = #hlib.dontCheck
           #   (overrideCabal
@@ -338,21 +339,21 @@ let
 in
 {
 
-  ghc7103    = wrap-ghc-filter-all "7.10.3" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
-  ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
+  ghc7103 = wrap-ghc-filter-all "7.10.3" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  ghc802  = wrap-ghc-filter-hide-source-paths "8.0.2" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
 
-  ghc822     = wrap-ghc "8.2.2" pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
-  ghc844     = wrap-ghc "8.4.4" pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
-  ghc865     = wrap-ghc "8.6.5" pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+  ghc822  = wrap-ghc "8.2.2" pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  ghc844  = wrap-ghc "8.4.4" pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
 
-  ghc884     = wrap-ghc "8.8.4" pkgs.haskell.packages.ghc884.ghc;
-  ghc8107    = wrap-ghc "8.10.7" (disable-docs pkgs.haskell.packages.ghc8107.ghc);
-  # ghc902     = wrap-ghc "9.0.2" (smaller-ghc pkgs.haskell.packages.ghc902.ghc);
-  ghc927     = wrap-ghc "9.2.7" (smaller-ghc pkgs.haskell.packages.ghc927.ghc);
-  ghc945     = wrap-ghc "9.4.5" (smaller-ghc pkgs.haskell.packages.ghc945.ghc);
-  ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (
-    relocatable-static-libs-ghc (smaller-ghc pkgs.haskell.packages.ghc961.ghc)
-  );
+  ghc865  = wrap-ghc "8.6.5" pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+
+  ghc884  = wrap-ghc "8.8.4" pkgs.haskell.packages.ghc884.ghc;
+  ghc8107 = wrap-ghc "8.10.7" (disable-docs pkgs.haskell.packages.ghc8107.ghc);
+  # ghc902  = wrap-ghc "9.0.2" (smaller-ghc pkgs.haskell.packages.ghc902.ghc);
+  ghc927  = wrap-ghc "9.2.7" (smaller-ghc pkgs.haskell.packages.ghc927.ghc);
+  ghc945  = wrap-ghc "9.4.5" (smaller-ghc pkgs.haskell.packages.ghc945.ghc);
+
+  #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (smaller-ghc pkgs.haskell.packages.ghc961.ghc));
 
   ghc = hpkgs.ghc;
 
@@ -384,11 +385,11 @@ in
   cabal-install      = hpkgsCabal.cabal-install;
   doctest            = hpkgsDoctest.doctest;
   eventlog2html      = hpkgsEventlog2html.eventlog2html;
-  fast-tags          = hpkgs945.fast-tags;
+  fast-tags          = hpkgs.fast-tags;
   ghc-events-analyze = hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  hp2pretty          = hpkgs945.hp2pretty;
+  hp2pretty          = hpkgs.hp2pretty;
   pretty-show        = hpkgs.pretty-show;
-  profiterole        = hpkgs945.profiterole;
+  profiterole        = hpkgsProfiterole.profiterole;
   # threadscope      = threadscopePkgs.threadscope;
   universal-ctags    = pkgs.universal-ctags;
 
