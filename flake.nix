@@ -8,7 +8,7 @@
       # url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
       #url = "/home/sergey/nix/nixpkgs";
-      url = "nixpkgs/nixos-22.11";
+      url = "nixpkgs/nixos-23.05";
     };
 
     nixpkgs-20-03 = {
@@ -20,7 +20,8 @@
     };
 
     nixpkgs-unstable = {
-      url = "nixpkgs/nixos-unstable";
+      url = "nixpkgs/nixos-23.05";
+      # url = "nixpkgs/nixos-unstable";
     };
 
     # nixpkgs-fresh-ghc = {
@@ -154,25 +155,22 @@
                   ssh-overlay
                   # arch-native-overrlay
                 ];
-                # environment.systemPackages = with pkgs; [
-	              #  unstable.qutebrowser
-	              # ];
 	            })
 
             ./system.nix
 
             impermanence.nixosModule
 
-            # Enable Home Manager as NixOs module
-            home-manager.nixosModules.home-manager {
-              home-manager.useGlobalPkgs    = true;
-              home-manager.useUserPackages  = true;
-              home-manager.users.sergey     = import ./home.nix;
-              home-manager.extraSpecialArgs = home-manager-extra-args;
-              # home-manager.users.sergey = {
-              #   imports = [ ./home.nix ];
-              # };
-            }
+            # # Enable Home Manager as NixOs module
+            # home-manager.nixosModules.home-manager {
+            #   home-manager.useGlobalPkgs    = true;
+            #   home-manager.useUserPackages  = true;
+            #   home-manager.users.sergey     = import ./home.nix;
+            #   home-manager.extraSpecialArgs = home-manager-extra-args;
+            #   # home-manager.users.sergey = {
+            #   #   imports = [ ./home.nix ];
+            #   # };
+            # }
           ];
         };
       };
