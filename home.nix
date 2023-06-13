@@ -667,6 +667,7 @@ in
       );
     in
     [
+      pkgs.anki
       pkgs.ark
       (pkgs.aspellWithDicts (d: [
         d.en
