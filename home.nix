@@ -629,6 +629,7 @@ in
       });
     in
       [
+        pkgs.anki
         pkgs.ark
         (pkgs.aspellWithDicts (d: [d.en d.en-computers d.en-science d.ru d.uk]))
         pkgs.audacious
