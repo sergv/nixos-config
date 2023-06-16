@@ -222,9 +222,9 @@ in
       "diff"                = "diff --unified --recursive --ignore-tab-expansion --ignore-blank-lines";
       "diffw"               = "diff --unified --recursive --ignore-tab-expansion --ignore-space-change --ignore-blank-lines";
 
-      "youtube-dl-playlist" = "youtube-dl --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s'";
-      "youtube-dl-single"   = "youtube-dl --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(title)s.%(ext)s'";
-      "youtube-dl-audio"    = "youtube-dl --add-metadata -f 'bestaudio[ext=m4a]' --output '%(title)s.%(ext)s'";
+      "youtube-dl-playlist" = "yt-dlp --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s'";
+      "youtube-dl-single"   = "yt-dlp --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(title)s.%(ext)s'";
+      "youtube-dl-audio"    = "yt-dlp --add-metadata -f 'bestaudio[ext=m4a]' --output '%(title)s.%(ext)s'";
 
       "baobab-new"          = "nohup dbus-run-session baobab >/dev/null";
 
@@ -680,7 +680,7 @@ in
         pkgs.vorbis-tools
         pkgs.wget
         pkgs.xorg.xev
-        pkgs.youtube-dl
+        pkgs.yt-dlp
         pkgs.zip
         # pkgs.yasm
         pkgs.zstd
