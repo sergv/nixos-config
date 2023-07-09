@@ -684,7 +684,9 @@ in
       pkgs.google-chrome
       # pkgs.clang
       # pkgs.clang-tools
+      pkgs.cloc
       # pkgs.coq
+      pkgs.cpu-x
       pkgs.curl
       pkgs.dmidecode
       pkgs.ffmpeg
