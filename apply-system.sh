@@ -19,4 +19,5 @@ export TEMPDIR=/tmp/nix-daemon
 # nixos-rebuild build --flake .#home --verbose --keep-going "${@}"
 #nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
 #nixos-rebuild switch --flake .#home --verbose --keep-going "${@}"
+# strace -f -e execve nixos-rebuild boot --flake .#home --verbose --keep-going "${@}"
 nixos-rebuild boot --flake .#home --verbose --keep-going "${@}"
