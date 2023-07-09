@@ -304,10 +304,16 @@ in
     ];
   };
 
-  nixpkgs.config = {
-    allowUnfree = true; # For nvidia drivers.
-    # allowBroken = true;
-  };
+  nixpkgs =
+    let arch = import ./arch.nix;
+    in {
+      config = {
+        allowUnfree = true; # For nvidia drivers.
+        # allowBroken = true;
+        # inherit (arch) replaceStdenv;
+      };
+      inherit (arch) localSystem;
+    };
 
   # For running within a VM
   # virtualisation.virtualbox.guest.enable = true;
