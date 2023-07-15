@@ -28,6 +28,31 @@ let
       ;
   };
 
+  byar = import ./beyond-all-reason-launcher.nix {
+    inherit (pkgs)
+      lib
+      stdenv
+      fetchFromGitHub
+      buildNpmPackage
+      runCommand
+      nodejs
+      electron
+      butler
+      steam-run
+      jq
+      xorg
+      libcxx
+
+      gcc
+      cmake
+      curl
+      pkg-config
+      jsoncpp
+      boost
+      minizip
+      ;
+  };
+
   wm-sh = scripts.wm-sh;
 
   game-run-wrapper = pkgs.writeScriptBin "game-run" ''
@@ -730,6 +755,8 @@ in
       # pkgs.yasm
       pkgs.zstd
       # pkgs.z3
+
+      byar
 
       pkgs.cabextract
       pkgs.wineWowPackages.stagingFull
