@@ -66,7 +66,7 @@
 
         # Fix when upgrading 22.11 -> nixos-unstable circa 2023-04-11
         fcitx-overlay = _: _: {
-          fcitx = pkgs.fcitx5;
+          fcitx         = pkgs.fcitx5;
           fcitx-engines = pkgs.fcitx5;
         };
 
