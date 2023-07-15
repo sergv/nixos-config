@@ -288,7 +288,7 @@ in {
   ghc884     = wrap-ghc        "8.8.4"             pkgs.haskell.packages.ghc884.ghc;
   ghc8107    = wrap-ghc        "8.10.7"            (disable-docs pkgs.haskell.packages.ghc8107.ghc);
   ghc902     = wrap-ghc        "9.0.2"             (smaller-ghc pkgs.haskell.packages.ghc902.ghc);
-  ghc927     = wrap-ghc        "9.2.7"             (smaller-ghc pkgs.haskell.packages.ghc927.ghc);
+  ghc928     = wrap-ghc        "9.2.8"             (smaller-ghc pkgs.haskell.packages.ghc928.ghc);
   ghc945     = wrap-ghc        "9.4.5"             (smaller-ghc pkgs.haskell.packages.ghc945.ghc);
 
   #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (smaller-ghc pkgs.haskell.packages.ghc961.ghc));
