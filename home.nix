@@ -637,8 +637,8 @@ in
         pkgs.baobab
         pkgs.bridge-utils
         # pkgs.ccache
-        # pkgs.chromium
-        pkgs.google-chrome
+        pkgs.chromium
+        #pkgs.google-chrome
         # pkgs.clang
         # pkgs.clang-tools
         pkgs.cloc
