@@ -740,6 +740,7 @@ in
       pkgs.pinentry_qt
       pkgs.pmutils
       pkgs.pv
+      pkgs.qbittorrent
       pkgs.sshfs
       pkgs.tdesktop
       pkgs.thunderbird
