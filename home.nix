@@ -607,6 +607,7 @@ in
         ".config/plasmawindowedrc"
         ".config/powerdevilrc"
         ".config/powermanagementprofilesrc"
+        ".config/qBittorrent"
         ".config/spectaclerc"
         ".config/startkderc"
         ".config/systemmonitorrc"
@@ -618,6 +619,7 @@ in
         ".config/PCSX2"
 
         ".local/share/krunnerstaterc"
+        ".local/share/qBittorrent"
         ".local/share/user-places.xbel"
         ".local/share/user-places.xbel.bak"
         ".local/share/user-places.xbel.tbcache"
