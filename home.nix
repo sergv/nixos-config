@@ -80,7 +80,7 @@ let wmctrl-pkg = pkgs.wmctrl;
         }
     );
 
-    emacs-pkg = (pkgs.emacs.override (old: { nativeComp = false; })).overrideAttrs (old: {
+    emacs-pkg = (pkgs.emacs.override (old: { withNativeCompilation = false; })).overrideAttrs (old: {
       patches = (old.patches or []) ++ [
         ./patches/emacs-gc-block-increase.patch
       ];
