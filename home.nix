@@ -98,7 +98,7 @@ let
 
   emacs-pkg =
     (pkgs.emacs.override (old: {
-      nativeComp = false;
+      withNativeCompilation = false;
     })).overrideAttrs
       (old: {
         patches = (old.patches or [ ]) ++ [
