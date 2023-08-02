@@ -711,6 +711,7 @@ in
       #pkgs.google-chrome
       # pkgs.clang
       # pkgs.clang-tools
+      pkgs.clinfo
       pkgs.cloc
       # pkgs.coq
       pkgs.cpu-x
