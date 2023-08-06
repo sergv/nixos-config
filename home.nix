@@ -733,6 +733,7 @@ in
         wmctrl-pkg
 
         emacs-wrapped
+        pkgs.tree-sitter
       ] ++
       # Btrfs utils
       # [ pkgs.btrfs-progs
