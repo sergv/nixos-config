@@ -80,11 +80,20 @@ let wmctrl-pkg = pkgs.wmctrl;
         }
     );
 
-    emacs-pkg = (pkgs.emacs.override (old: { withNativeCompilation = false; })).overrideAttrs (old: {
-      patches = (old.patches or []) ++ [
-        ./patches/emacs-gc-block-increase.patch
-      ];
-      nativeComp = false;
+    emacs-pkg = (pkgs.emacs29.override (old: { withNativeCompilation = true; })).overrideAttrs (old: {
+      # patches = (old.patches or []) ++ [
+      #   ./patches/emacs-gc-block-increase.patch
+      # ];
+      withNativeCompilation = true;
+      withGTK3              = true;
+      withSQLite3           = true;
+      withTreeSitter        = true;
+      src                   = pkgs.fetchFromGitHub {
+        owner  = "sergv";
+        repo   = "emacs";
+        rev    = "c3668a1150878a3b7efb3134588c4b71668ee411";
+        sha256 = "sha256-c649OHG1gz4IooqyvRZLaTBpJk2wzRA6oNpxBfFN3/M="; #pkgs.lib.fakeSha256;
+      };
     });
 
     emacs-wrapped = pkgs.writeScriptBin "emacs" ''
