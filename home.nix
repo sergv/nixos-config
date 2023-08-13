@@ -48,37 +48,9 @@ let wmctrl-pkg = pkgs.wmctrl;
       exec ${pkgs.steam-run}/bin/steam-run "''${@}"
     '';
 
-    isabelle-icon = ./icons/isabelle.png;
-
-    isabelle-pkg = pkgs.isabelle.overrideAttrs (oldAttrs:
-      let newDesktopItem = pkgs.makeDesktopItem {
-            name        = "isabelle";
-            exec        = "isabelle jedit";
-            icon        = isabelle-icon;
-            desktopName = "Isabelle";
-            comment     = "A generic proof assistant";
-            categories  = ["Math"];
-          };
-      in
-        {
-          desktopItem = newDesktopItem;
-          installPhase =
-            builtins.replaceStrings
-              [ # "${oldAttrs.desktopItem}"
-                "cp \"$out/Isabelle${oldAttrs.version}/lib/icons/isabelle.xpm\" \"$out/share/icons/hicolor/isabelle/apps/\""
-                "cp -r \"${oldAttrs.desktopItem}/share/applications\" \"$out/share/applications\""
-                # "${oldAttrs.desktopItem}"
-              ]
-              [ # "${desktopItem}"
-                # ""
-                "ln -s \"${isabelle-icon}\" \"$out/share/icons/hicolor/isabelle/apps/isabelle.svg\""
-                "ln -s \"${newDesktopItem}/share/applications\" \"$out/share/applications\""
-                # "${newDesktopItem}"
-              ]
-              oldAttrs.installPhase;
-          # postInstall = builtins.replaceStrings [ "${oldAttrs.desktopItem}" ] [ "${newDesktopItem}" ] oldAttrs.postInstall;
-        }
-    );
+    isabelle-pkg = import ./isabelle/isabelle.nix {
+      inherit pkgs;
+    };
 
     emacs-pkg = (pkgs.emacs29.override (old: { withNativeCompilation = true; })).overrideAttrs (old: {
       # patches = (old.patches or []) ++ [
