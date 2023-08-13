@@ -102,7 +102,7 @@ let
   emacsDesktopItem = pkgs.lib.generators.toINI { } {
     "Desktop Entry" = {
       Type           = "Application";
-      Exec           = "${emacs-wrapped}/bin/emacs %u";
+      Exec           = "emacs %u";
       Terminal       = false;
       Name           = "Emacs";
       Icon           = "emacs";
