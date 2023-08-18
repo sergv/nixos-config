@@ -71,9 +71,9 @@ let wmctrl-pkg = pkgs.wmctrl;
     emacs-wrapped = pkgs.writeScriptBin "emacs" ''
       #!${pkgs.bash}/bin/bash
       if [[ ! -z "''${EMACS_ROOT+x}" ]]; then
-          dump_file="$EMACS_ROOT/emacs.dmp"
+          dump_file="$EMACS_ROOT/compiled/emacs.dmp"
       else
-          dump_file="$HOME/.emacs.d/emacs.dmp"
+          dump_file="$HOME/.emacs.d/compiled/emacs.dmp"
       fi
 
       if [[ ! -f "$dump_file" || ! -z "''${EMACS_FORCE_PRISTINE+x}" ]]; then
@@ -456,10 +456,14 @@ in
   xsession.enable = true;
 
   systemd.user.tmpfiles.rules = [
+    "d /tmp/emacs-cache     0755 sergey users - -"
     "d /tmp/cache           0755 sergey users - -"
     "d /home/sergey/.config -    -      -     - -"
     "d /home/sergey/.local  -    -      -     - -"
     "d /home/sergey/Desktop -    -      -     - -"
+
+    # Forcefully symlink, removing destination if it exists.
+    "L+ /home/sergey/.emacs.d/compiled - - - - /tmp/emacs-cache"
   ] ++ map
     (x:
       # Forcefully symlink, removing destination if it exists.
