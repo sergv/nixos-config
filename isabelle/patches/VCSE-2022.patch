@@ -1,0 +1,539 @@
+From e29452ff674e2cd1f6467ba1949dd2401657e90f Mon Sep 17 00:00:00 2001
+From: Mathias Fleury <Mathias.Fleury@ens-rennes.fr>
+Date: Thu, 27 Oct 2022 18:11:18 +0200
+Subject: [PATCH] import vsce
+
+---
+ lib/scripts/getsettings                     |   3 +
+ src/Tools/VSCode/etc/options                |   3 +
+ src/Tools/VSCode/src/dynamic_output.scala   |  96 +++++++++++--
+ src/Tools/VSCode/src/language_server.scala  | 141 +++++++++++++++++++-
+ src/Tools/VSCode/src/lsp.scala              | 131 +++++++++++++++++-
+ src/Tools/VSCode/src/vscode_resources.scala |   8 +-
+ 6 files changed, 369 insertions(+), 13 deletions(-)
+
+diff --git a/lib/scripts/getsettings b/lib/scripts/getsettings
+index 93011e90e7..652aab0769 100755
+--- a/lib/scripts/getsettings
++++ b/lib/scripts/getsettings
+@@ -76,6 +76,9 @@ then
+   ISABELLE_IDENTIFIER="$(cat "$ISABELLE_HOME/etc/ISABELLE_IDENTIFIER")"
+ fi
+ 
++ISABELLE_ID="Isabelle2022"
++ISABELLE_IDENTIFIER="Isabelle2022-vsce"
++
+ ISABELLE_NAME="${ISABELLE_IDENTIFIER:-Isabelle}"
+ 
+ 
+diff --git a/src/Tools/VSCode/etc/options b/src/Tools/VSCode/etc/options
+index 260c67a106..4604a4b193 100644
+--- a/src/Tools/VSCode/etc/options
++++ b/src/Tools/VSCode/etc/options
+@@ -29,3 +29,6 @@ option vscode_caret_perspective : int = 50
+ 
+ option vscode_caret_preview : bool = false
+   -- "dynamic preview of caret document node"
++
++option vscode_html_output : bool = true
++  -- "output and state panel in HMTL"
+diff --git a/src/Tools/VSCode/src/dynamic_output.scala b/src/Tools/VSCode/src/dynamic_output.scala
+index d12c22be7e..86500effe6 100644
+--- a/src/Tools/VSCode/src/dynamic_output.scala
++++ b/src/Tools/VSCode/src/dynamic_output.scala
+@@ -11,7 +11,7 @@ import isabelle._
+ 
+ 
+ object Dynamic_Output {
+-  sealed case class State(do_update: Boolean = true, output: List[XML.Tree] = Nil) {
++  sealed case class State(val server: vscode.Language_Server, do_update: Boolean = true, output: List[XML.Tree] = Nil) {
+     def handle_update(
+       resources: VSCode_Resources,
+       channel: Channel,
+@@ -28,7 +28,7 @@ object Dynamic_Output {
+                 case Some(command) =>
+                   copy(output =
+                     if (restriction.isEmpty || restriction.get.contains(command)) {
+-                      val output_state = resources.options.bool("editor_output_state")
++                      val output_state = true // resources.options.bool("editor_output_state")
+                       Rendering.output_messages(snapshot.command_results(command), output_state)
+                     } else output)
+               }
+@@ -36,6 +36,64 @@ object Dynamic_Output {
+             else this
+         }
+       if (st1.output != output) {
++        if(server.html_output) {
++          val node_context =
++            new Browser_Info.Node_Context {
++              override def make_ref(props: Properties.T, body: XML.Body): Option[XML.Elem] =
++                for {
++                  thy_file <- Position.Def_File.unapply(props)
++                  def_line <- Position.Def_Line.unapply(props)
++                  source <- resources.source_file(thy_file)
++                  uri = File.uri(Path.explode(source).absolute_file)
++                } yield HTML.link(uri.toString + "#" + def_line, body)
++            }
++          // using this to distinguish between VSCode and emacs is a hack
++          if (resources.options.bool("vscode_unicode_symbols")) {// if VSCode
++            val elements = Browser_Info.extra_elements.copy(entity = Markup.Elements.full)
++            val html = node_context.make_html(elements, Pretty.formatted(st1.output, margin = resources.get_message_margin()))
++            channel.write(LSP.Dynamic_Output(HTML.source(html).toString))
++          }
++          else {
++            // emacs. The HTML is very similar (and actually contains more informations).
++            val content =
++              cat_lines(
++                List(HTML.output(XML.elem("body", List(HTML.source(Pretty.formatted(st1.output, margin = resources.get_message_margin())))),
++                  hidden = false, structural = false)))
++            val encoded_content = Symbol.encode(content)
++            channel.write(LSP.Dynamic_Output(encoded_content))
++          }
++        } else {
++          channel.write(LSP.Dynamic_Output(resources.output_pretty_message(Pretty.separate(st1.output))))
++        }
++      }
++      st1
++    }
++
++    def force_update(
++      resources: VSCode_Resources, channel: Channel, restriction: Option[Set[Command]]): State =
++    {
++      val st1 =
++        resources.get_caret() match {
++          case None => copy(output = Nil)
++          case Some(caret) =>
++            val snapshot = caret.model.snapshot()
++            if (do_update && !snapshot.is_outdated) {
++              snapshot.current_command(caret.node_name, caret.offset) match {
++                case None => copy(output = Nil)
++                case Some(command) =>
++                  val text =
++                    if (!restriction.isDefined || restriction.get.contains(command)) {
++                      //server.resources.output_pretty_message(snapshot.command_results(command))
++                      val output_state = resources.options.bool("editor_output_state")
++                      Rendering.output_messages(snapshot.command_results(command), output_state)
++                    } else output
++                  copy(output = text)
++              }
++            }
++            else this
++        }
++
++      if(server.html_output) {
+         val node_context =
+           new Browser_Info.Node_Context {
+             override def make_ref(props: Properties.T, body: XML.Body): Option[XML.Elem] =
+@@ -46,24 +104,39 @@ object Dynamic_Output {
+                 uri = File.uri(Path.explode(source).absolute_file)
+               } yield HTML.link(uri.toString + "#" + def_line, body)
+           }
+-        val elements = Browser_Info.extra_elements.copy(entity = Markup.Elements.full)
+-        val html = node_context.make_html(elements, Pretty.separate(st1.output))
+-        channel.write(LSP.Dynamic_Output(HTML.source(html).toString))
++        // using this to distinguish between VSCode and emacs is a hack
++        if (resources.options.bool("vscode_unicode_symbols")) {// if VSCode
++          val elements = Browser_Info.extra_elements.copy(entity = Markup.Elements.full)
++          val html = node_context.make_html(elements, Pretty.formatted(st1.output, margin = resources.get_message_margin()))
++          channel.write(LSP.Dynamic_Output(HTML.source(html).toString))
++        }
++        else {
++          // emacs. The HTML is very similar (and actually contains more informations).
++          val content =
++            cat_lines(
++              List(HTML.output(XML.elem("body", List(HTML.source(Pretty.formatted(st1.output, margin = resources.get_message_margin())))),
++                hidden = false, structural = false)))
++          val encoded_content = Symbol.encode(content)
++          channel.write(LSP.Dynamic_Output(encoded_content))
++        }
++      } else {
++        channel.write(LSP.Dynamic_Output(resources.output_pretty_message(Pretty.separate(st1.output))))
+       }
+       st1
+-    }
+   }
+-
++  }
+   def apply(server: Language_Server): Dynamic_Output = new Dynamic_Output(server)
+-}
+ 
++}
+ 
+ class Dynamic_Output private(server: Language_Server) {
+-  private val state = Synchronized(Dynamic_Output.State())
++  private val state = Synchronized(Dynamic_Output.State(server))
+ 
+   private def handle_update(restriction: Option[Set[Command]]): Unit =
+     state.change(_.handle_update(server.resources, server.channel, restriction))
+ 
++  private def force_update(restriction: Option[Set[Command]]): Unit =
++  { state.change(_.force_update(server.resources, server.channel, restriction)) }
+ 
+   /* main */
+ 
+@@ -86,4 +159,9 @@ class Dynamic_Output private(server: Language_Server) {
+     server.session.commands_changed -= main
+     server.session.caret_focus -= main
+   }
++
++  def force_goal_reprint(): Unit =
++  {
++    force_update(None)
++  }
+ }
+diff --git a/src/Tools/VSCode/src/language_server.scala b/src/Tools/VSCode/src/language_server.scala
+index dada2b0cdf..02aab93816 100644
+--- a/src/Tools/VSCode/src/language_server.scala
++++ b/src/Tools/VSCode/src/language_server.scala
+@@ -119,6 +119,9 @@ class Language_Server(
+   def session: Session = session_.value getOrElse error("Server inactive")
+   def resources: VSCode_Resources = session.resources.asInstanceOf[VSCode_Resources]
+ 
++  val html_output: Boolean = options.bool("vscode_html_output")
++  log("html_output = " + html_output)
++
+   def rendering_offset(node_pos: Line.Node_Position): Option[(VSCode_Rendering, Text.Offset)] =
+     for {
+       model <- resources.get_model(new JFile(node_pos.name))
+@@ -197,6 +200,113 @@ class Language_Server(
+     resources.update_caret(caret)
+     delay_caret_update.invoke()
+     delay_input.invoke()
++
++  }
++
++
++  /* Isabelle symbols for Outline */
++
++    /* The following mapping is rather random */
++  val symbol_kind : Map[String, Int] =
++    Map(
++      // Text elements
++      "chapter" -> LSP.SymbolKind.String,
++      "section" -> LSP.SymbolKind.String,
++      "subsection" -> LSP.SymbolKind.String,
++      "subsubsection" -> LSP.SymbolKind.String,
++      "paragraph" -> LSP.SymbolKind.String,
++      "subparagraph" -> LSP.SymbolKind.String,
++
++      // structure
++      "context" -> LSP.SymbolKind.Namespace,
++      "locale" -> LSP.SymbolKind.Module,
++      "class" -> LSP.SymbolKind.Module,
++      "notepad" -> LSP.SymbolKind.Namespace,
++
++      // lemmas
++      "lemma" -> LSP.SymbolKind.Function,
++      "theorem" -> LSP.SymbolKind.Function,
++      "corollary" -> LSP.SymbolKind.Function,
++      "lemmas" -> LSP.SymbolKind.Function,
++
++      "declares" -> LSP.SymbolKind.Function,
++
++      // declarations
++      "datatype" -> LSP.SymbolKind.Struct,
++
++      "definition" -> LSP.SymbolKind.Constant,
++      "primrec" -> LSP.SymbolKind.Constant,
++      "fun" -> LSP.SymbolKind.Constant,
++      "primcorec" -> LSP.SymbolKind.Constant,
++      "corec" -> LSP.SymbolKind.Constant,
++      "abbreviation" -> LSP.SymbolKind.Constant,
++
++      // ML
++      "ML" -> LSP.SymbolKind.File,
++      "ML_val" -> LSP.SymbolKind.File,
++      "ML_file" -> LSP.SymbolKind.File,
++      "SML_file" -> LSP.SymbolKind.File
++    )
++
++  val symbol_kind_default = LSP.SymbolKind.Key
++
++  private def get_symbols(id: LSP.Id, file : JFile): JSON.T =
++  {
++
++    val file_content = resources.get_file_content(resources.node_name(file))
++    val model = resources.get_model(file)
++
++    (file_content, model) match {
++      case (Some(file_content), Some(model)) =>
++        val file_length = file_content.length
++
++        // TODO distinguish between SML and ML mode
++        val parsed =
++          if (model.is_theory){
++            val syntax = session.recent_syntax(model.node_name)
++            Document_Structure.parse_sections (syntax, resources.node_name(file), file_content)
++          }
++          else if (file.getName() == "ROOT" || file.getName() == "options"){
++            val syntax = session.recent_syntax(model.node_name)
++            Document_Structure.parse_sections (syntax, resources.node_name(file), file_content)
++          } else {
++            Document_Structure.parse_ml_sections(true, file_content)
++          }
++
++        def extract_symbols (offset: Text.Offset, doc_struct : List[Document_Structure.Document]) : (List[JSON.Object.T], Text.Offset) = {
++          doc_struct match {
++            case Nil => (Nil, offset)
++            case Document_Structure.Atom(length) :: doc =>
++              extract_symbols(offset + length, doc)
++            case Document_Structure.Block(name, text, body) :: doc =>
++              val (children, end_children_offset) = extract_symbols(offset, body)
++
++              val (symbols, end_offset) = extract_symbols(end_children_offset, doc)
++
++              val kind = symbol_kind getOrElse (name, symbol_kind_default)
++
++              // trailing whitespaces that are represented differently
++              val range = model.content.doc.range(Text.Range(offset, end_children_offset min file_length))
++
++              val selection_range = try{model.content.doc.range(Text.Range(offset, (offset + text.length) min file_length))}
++              catch {case e : Throwable =>
++                model.content.doc.range(Text.Range(offset, offset + text.length-1))
++              }
++
++              val label = text.split("\n")(0)
++              val beautified_label = Symbol.output(true, label)
++              val symbol = LSP.DocumentSymbol(beautified_label, None, kind, None, range, selection_range, children)
++
++              (symbol :: symbols, end_offset)
++          }
++        }
++
++        val symbols = try { LSP.DocumentSymbols(id, extract_symbols(0, parsed)._1) }
++           catch {case e : Throwable => LSP.DocumentSymbols(id, Nil) }
++        symbols
++
++      case _ => LSP.DocumentSymbols(id, Nil)
++    }
+   }
+ 
+ 
+@@ -416,6 +526,32 @@ class Language_Server(
+     channel.write(LSP.DocumentHighlights.reply(id, result))
+   }
+ 
++  /* progress reports */
++  def session_progress() : isabelle.JSON.T = {
++    val snapshot = session.snapshot()
++    val nodes = snapshot.version.nodes
++
++    var nodes_status1 : Map[isabelle.Document.Node.Name, isabelle.Document_Status.Node_Status] = Map.empty
++    for (name <- nodes.domain.iterator) {
++      if (resources.session_base.loaded_theory(name) ||
++        nodes(name).is_empty) ()
++      else {
++        val st = isabelle.Document_Status.Node_Status.make(snapshot.state, snapshot.version, name)
++        nodes_status1 = nodes_status1 + (name -> st)
++      }
++    }
++
++    val nodes_status2 =
++      nodes_status1 -- nodes_status1.keysIterator.filter(nodes.is_suppressed(_))
++
++    val sorted_nodes = nodes.topological_order.filter(nodes_status1.isDefinedAt(_))
++      .map{x => LSP.Progress_Node(x.path.implode, nodes_status1(x))}
++    log("## progress = " + sorted_nodes)
++
++
++    LSP.Progress_Nodes(sorted_nodes)
++  }
++
+ 
+   /* main loop */
+ 
+@@ -451,7 +587,10 @@ class Language_Server(
+           case LSP.State_Update(id) => State_Panel.update(id)
+           case LSP.State_Auto_Update(id, enabled) => State_Panel.auto_update(id, enabled)
+           case LSP.Preview_Request(file, column) => request_preview(file, column)
+-          case _ => if (!LSP.ResponseMessage.is_empty(json)) log("### IGNORED")
++          case LSP.Document_Symbols_Request(id, file) => channel.write(get_symbols(id, file))
++          case LSP.Progress_Node_Request(()) => channel.write(session_progress())
++          case LSP.Set_Message_Margin(size) => resources.update_margin(size); dynamic_output.force_goal_reprint()
++          case ignored => if (!LSP.ResponseMessage.is_empty(json)) log("### IGNORED: " + ignored)
+         }
+       }
+       catch { case exn: Throwable => channel.log_error_message(Exn.message(exn)) }
+diff --git a/src/Tools/VSCode/src/lsp.scala b/src/Tools/VSCode/src/lsp.scala
+index a29910af16..9bd9730686 100644
+--- a/src/Tools/VSCode/src/lsp.scala
++++ b/src/Tools/VSCode/src/lsp.scala
+@@ -150,7 +150,9 @@ object LSP {
+         ),
+         "hoverProvider" -> true,
+         "definitionProvider" -> true,
+-        "documentHighlightProvider" -> true)
++        "documentHighlightProvider" -> true,
++        "rangeFormatter" -> false,
++        "documentSymbolProvider" -> true)
+   }
+ 
+   object Initialized extends Notification0("initialized")
+@@ -441,7 +443,7 @@ object LSP {
+   ) {
+     def json: JSON.T =
+       Message.empty + ("range" -> Range(range)) + ("message" -> message) ++
+-      JSON.optional("severity" -> severity) ++
++      JSON.optional("severity" -> Some(severity.getOrElse(1))) ++
+       JSON.optional("code" -> code) ++
+       JSON.optional("source" -> source)
+   }
+@@ -573,4 +575,129 @@ object LSP {
+           "label" -> label,
+           "content" -> content))
+   }
++
++  /* Structure of the document */
++  object SymbolKind
++  {
++    val File = 1
++    val Module = 2
++    val Namespace = 3
++    val Package = 4
++    val Class = 5
++    val Method = 6
++    val Property = 7
++    val Field = 8
++    val Constructor = 9
++    val Enum = 10
++    val Interface = 11
++    val Function = 12
++    val Variable = 13
++    val Constant = 14
++    val String = 15
++    val Number = 16
++    val Boolean = 17
++    val Array = 18
++    val Object = 19
++    val Key = 20
++    val Null = 21
++    val EnumMember = 22
++    val Struct = 23
++    val Event = 24
++    val Operator = 25
++    val TypeParameter = 26
++  }
++
++  object DocumentSymbol
++  {
++    def apply(name : String, detail: Option[String] = None, kind: Int,
++      deprecated: Option[Boolean] = None, range: Line.Range, selectionRange: Line.Range,
++      children: List[JSON.T]): JSON.Object.T =
++    {
++
++      JSON.Object("name" -> name) ++
++      JSON.optional("detail" -> detail) ++
++      JSON.Object("kind" -> kind) ++
++      JSON.optional("deprecated" -> deprecated) ++
++      JSON.Object("range" -> Range(range),
++        "selectionRange" -> Range(selectionRange),
++        "children" -> children)
++    }
++  }
++
++  object DocumentSymbols
++  {
++    def apply(id: Id, symbols: List[JSON.Object.T]): JSON.T =
++    {
++      ResponseMessage(id, Some(symbols))
++    }
++  }
++
++  object Document_Symbols_Request
++  {
++    def unapply(json: JSON.T): Option[(Id, JFile)] =
++      json match {
++        case RequestMessage(id, "textDocument/documentSymbol", Some(params)) =>
++          for {
++            textdoc <- JSON.value(params, "textDocument")
++            uri <- JSON.string(textdoc, "uri")
++            if Url.is_wellformed_file(uri)
++          } yield (id, Url.absolute_file(uri))
++        case _ => None
++      }
++  }
++
++  /* Progress indication */
++  object Progress_Node
++  {
++    def apply(name : String, node_status: isabelle.Document_Status.Node_Status): JSON.Object.T =
++    {
++
++      node_status match {
++        case isabelle.Document_Status.Node_Status(is_suppressed, unprocessed, running, warned,
++          failed, finished, canceled, terminated, initialized, finalized, consolidated) =>
++          JSON.Object(
++            "name" -> name,
++            "unprocessed" -> unprocessed,
++            "running" -> running,
++            "warned" -> warned,
++            "failed" -> failed,
++            "finished" -> finished,
++            "initialized" -> initialized,
++            "consolidated" -> consolidated,
++            "canceled" -> canceled,
++            "terminated" -> terminated
++          )
++      }
++    }
++  }
++
++  object Progress_Nodes
++  {
++    def apply(nodes_status: List[JSON.Object.T]): JSON.T =
++    {
++       Notification("PIDE/progress", JSON.Object("nodes-status" -> nodes_status))
++    }
++  }
++
++  object Progress_Node_Request
++  {
++    def unapply(json: JSON.T): Option[Unit] =
++      for {
++        method <- JSON.string(json, "method")
++        if method == "PIDE/progress_request"
++      } yield ()
++  }
++
++
++  object Set_Message_Margin
++  {
++    def unapply(json: JSON.T): Option[Int] =
++      json match {
++        case Notification("PIDE/set_message_margin", Some(params)) =>
++          for {
++            value <- JSON.int(params, "value")
++          } yield (value)
++        case _ => None
++      }
++  }
+ }
+diff --git a/src/Tools/VSCode/src/vscode_resources.scala b/src/Tools/VSCode/src/vscode_resources.scala
+index b100b07466..437409ae9e 100644
+--- a/src/Tools/VSCode/src/vscode_resources.scala
++++ b/src/Tools/VSCode/src/vscode_resources.scala
+@@ -86,7 +86,7 @@ extends Resources(
+   def pide_extensions: Boolean = options.bool("vscode_pide_extensions")
+   def unicode_symbols: Boolean = options.bool("vscode_unicode_symbols")
+   def tooltip_margin: Int = options.int("vscode_tooltip_margin")
+-  def message_margin: Int = options.int("vscode_message_margin")
++  var message_margin: Int = options.int("vscode_message_margin")
+ 
+ 
+   /* document node name */
+@@ -338,6 +338,12 @@ extends Resources(
+   def output_pretty_tooltip(body: XML.Body): String = output_pretty(body, tooltip_margin)
+   def output_pretty_message(body: XML.Body): String = output_pretty(body, message_margin)
+ 
++  def update_margin(margin : Int) =
++    if (margin > 20)
++      message_margin = margin
++
++  def get_message_margin() : Int =
++    message_margin
+ 
+   /* caret handling */
+ 
+-- 
+2.40.1
+
