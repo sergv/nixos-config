@@ -16,6 +16,9 @@ pkgs.isabelle.overrideAttrs (old:
   in
     {
       desktopItem = newDesktopItem;
+      patches = (old.patches or []) ++ [
+        ./patches/VCSE-2022.patch
+      ];
       installPhase =
         builtins.replaceStrings
           [ # "${old.desktopItem}"
