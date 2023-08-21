@@ -65,7 +65,7 @@ let
   };
 
   emacs-pkg =
-    (pkgs.emacs29.override (old: {
+    (pkgs.emacs29.override (_: {
       withNativeCompilation = true;
     })).overrideAttrs
       (old: {
@@ -83,6 +83,19 @@ let
           sha256 = "sha256-c649OHG1gz4IooqyvRZLaTBpJk2wzRA6oNpxBfFN3/M="; # pkgs.lib.fakeSha256;
         };
       });
+
+  emacs-bytecode =
+    (emacs-pkg.override (_: {
+      withNativeCompilation = false;
+    })).overrideAttrs
+      (_: {
+        withNativeCompilation = false;
+      });
+
+  emacs-bytecode-wrapped = pkgs.runCommand "emacs-bytecode" { } ''
+    mkdir -p "$out/bin"
+    ln -s "${emacs-bytecode}/bin/emacs" "$out/bin/emacs-bytecode"
+  '';
 
   emacs-wrapped = pkgs.writeScriptBin "emacs" ''
     #!${pkgs.bash}/bin/bash
@@ -758,6 +771,7 @@ in
       wmctrl-pkg
 
       emacs-wrapped
+      emacs-bytecode-wrapped
       pkgs.tree-sitter
     ]
     ++
