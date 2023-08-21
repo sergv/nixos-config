@@ -96,15 +96,15 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     emacsDesktopItem = pkgs.lib.generators.toINI {} {
       "Desktop Entry" = {
-        Type = "Application";
-        Exec = "emacs %u";
-        Terminal = false;
-        Name = "Emacs";
-        Icon = "emacs";
-        Comment = "Edit text";
-        GenericName = "Text Editor";
-        MimeType = pkgs.lib.concatMapStrings (s: s + ";") emacsMimeTypes;
-        Categories = "Utility;TextEditor;";
+        Type           = "Application";
+        Exec           = "emacs %u";
+        Terminal       = false;
+        Name           = "Emacs";
+        Icon           = "emacs";
+        Comment        = "Edit text";
+        GenericName    = "Text Editor";
+        MimeType       = pkgs.lib.concatMapStrings (s: s + ";") emacsMimeTypes;
+        Categories     = "Utility;TextEditor;";
         StartupWMClass = "Emacs";
       };
     };
