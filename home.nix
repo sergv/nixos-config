@@ -105,6 +105,14 @@ let
         dump_file="$HOME/.emacs.d/compiled/emacs.dmp"
     fi
 
+    # For native compilation
+    export LIBRARY_PATH="${
+      pkgs.lib.makeLibraryPath [
+        pkgs.stdenv.cc.cc
+        pkgs.glibc
+      ]
+    }:${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc/${pkgs.stdenv.hostPlatform.config}/${pkgs.lib.getVersion pkgs.stdenv.cc.cc}:$LIBRARY_PATH"
+
     if [[ ! -f "$dump_file" || ! -z "''${EMACS_FORCE_PRISTINE+x}" ]]; then
       ${emacs-pkg}/bin/emacs "''${@}"
     else
