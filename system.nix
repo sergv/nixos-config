@@ -521,6 +521,14 @@ in
     };
   };
 
+  environment.plasma5.excludePackages = [
+    pkgs.plasma5Packages.kpeople
+    pkgs.plasma5Packages.kwallet
+    pkgs.plasma5Packages.kwallet-pam
+    pkgs.plasma5Packages.kwalletmanager
+    pkgs.plasma5Packages.milou
+  ];
+
   # Enable automounting in Thunar
   services.udisks2.enable = true;
 
