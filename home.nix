@@ -702,7 +702,6 @@ in
         pkgs.sshfs
         pkgs.tdesktop
         pkgs.thunderbird
-        pkgs.transmission-gtk
         pkgs.unzip
         pkgs.usbutils
         pkgs.vlc
