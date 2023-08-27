@@ -38,6 +38,7 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
   + interpelation of variable ~test~: ~"${test}"~
   + Escaping of interpolation: ~"x \${test} y"~ or ~''x ''${test} y''~
   + Newline: ~"x \n y"~ produces newline, ~''x \n y''~ produces backslash n verbatim, ~''x ''\n y''~ produces newline
++ Concatenation: ~+~
 - paths
   + ~./.~ denotes current directory
   + ~foo/bar~ denotes foo/bar under current directory, same as ~./foo/bar~
@@ -283,5 +284,14 @@ or similar tool, produce code to run at run-time — i.e. tools used to
 build the new derivation
 
 ** Clean up garbage
-~nix-collect-garbage -d~ - also removes old system & home config generations
+~sudo nix-collect-garbage -d~ - also removes old system & home config generations
 ~nix store optimise~
+
+** Tracking dependencies
+
+- echo *ghc* | xargs --max-args 1 echo | sort
+- nix-store -q --tree <STORE-PATH>
+- nix-store -q --referrers <STORE-PATH>
+- nix-store -q --referrers-closure <STORE-PATH>
+- nix-store --gc --print-roots
+- nix-store --query --roots <STORE-PATH>
