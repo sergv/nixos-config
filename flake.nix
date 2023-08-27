@@ -5,10 +5,10 @@
 
     nixpkgs-stable = {
       # # unstable
-      # url = "nixpkgs/nixos-unstable";
+      url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
       #url = "/home/sergey/nix/nixpkgs";
-      url = "nixpkgs/nixos-23.05";
+      # url = "nixpkgs/nixos-23.05";
     };
 
     nixpkgs-20-03 = {
@@ -20,8 +20,8 @@
     };
 
     nixpkgs-unstable = {
-      url = "nixpkgs/nixos-23.05";
-      # url = "nixpkgs/nixos-unstable";
+      # url = "nixpkgs/nixos-23.05";
+      url = "nixpkgs/nixos-unstable";
     };
 
     # nixpkgs-fresh-ghc = {
