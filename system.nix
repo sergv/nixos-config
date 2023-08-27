@@ -382,6 +382,8 @@ in
       allowed-users         = ["@wheel"];
       bash-prompt-prefix    = "[nix] ";
       experimental-features = ["nix-command" "flakes"];
+      # More at https://nixos.org/nix/manual/#conf-system-features.
+      system-features       = ["big-parallel" "gccarch-znver3" "gccarch-znver4"];
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixFlakes)
     #   "experimental-features = nix-command flakes";
