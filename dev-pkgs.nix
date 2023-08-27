@@ -15,8 +15,8 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     cabal-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "cabal";
-      rev    = "35b632cf8e2fd77e6a529f68fbf2572ab50780b5"; # "dev";
-      sha256 = "sha256-brfsgPkiGvxPmsmQEwzvlBZIoSJ3sEnpq+TnP5vetXI="; #pkgs.lib.fakeSha256;
+      rev    = "f7e76a29df9d30025023950d4db5738b4db804e6"; # "dev";
+      sha256 = "sha256-DJAYgJhwZTvq0zMu1Rh0/GGByfmUrgedDjx0a+tieaE="; #pkgs.lib.fakeSha256;
     };
 
     doctest-repo = pkgs.fetchFromGitHub {
@@ -111,6 +111,9 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
           ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
           SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" {};
           ghc-events = old.callHackage "ghc-events" "0.19.0.1" {};
+
+          # Disable tests which take around 1 hour!
+          statistics = hlib.dontCheck old.statistics;
         });
     };
 
@@ -121,6 +124,8 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
           vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
 
           ghc-events = old.callHackage "ghc-events" "0.19.0.1" {};
+          # Disable tests which take around 1 hour!
+          statistics = hlib.dontCheck old.statistics;
         });
     };
 
@@ -157,6 +162,11 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
             (cabal-repo + "/cabal-install")
             { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
             });
+
+          semaphore-compat = hlib.markUnbroken old.semaphore-compat;
+
+          # Disable tests which take around 1 hour!
+          statistics = hlib.dontCheck old.statistics;
 
           # ghc-lib-parser = hlib.markBroken old.ghc-lib-parser;
           # ghc-prof = hlib.doJailbreak old.ghc-prof;
