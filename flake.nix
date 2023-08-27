@@ -30,8 +30,8 @@
 
     home-manager = {
       # # unstable
-      url                    = "github:nix-community/home-manager/release-23.05";
-      # url                    = "github:nix-community/home-manager/master";
+      # url                    = "github:nix-community/home-manager/release-23.05";
+      url                    = "github:nix-community/home-manager/master";
       # url                    = "github:nix-community/home-manager/release-22.11";
       # Make home-manager use our version of nixpkgs
       inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -162,16 +162,16 @@
 
             impermanence.nixosModule
 
-            # # Enable Home Manager as NixOs module
-            # home-manager.nixosModules.home-manager {
-            #   home-manager.useGlobalPkgs    = true;
-            #   home-manager.useUserPackages  = true;
-            #   home-manager.users.sergey     = import ./home.nix;
-            #   home-manager.extraSpecialArgs = home-manager-extra-args;
-            #   # home-manager.users.sergey = {
-            #   #   imports = [ ./home.nix ];
-            #   # };
-            # }
+            # Enable Home Manager as NixOs module
+            home-manager.nixosModules.home-manager {
+              home-manager.useGlobalPkgs    = true;
+              home-manager.useUserPackages  = true;
+              home-manager.users.sergey     = import ./home.nix;
+              home-manager.extraSpecialArgs = home-manager-extra-args;
+              # home-manager.users.sergey = {
+              #   imports = [ ./home.nix ];
+              # };
+            }
           ];
         };
       };
