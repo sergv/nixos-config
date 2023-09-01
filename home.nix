@@ -709,7 +709,7 @@ in
       pkgs.baobab
       pkgs.bridge-utils
       # pkgs.ccache
-      pkgs.chromium
+      #pkgs.chromium
       #pkgs.google-chrome
       # pkgs.clang
       # pkgs.clang-tools
@@ -730,7 +730,7 @@ in
       pkgs.graphviz
       pkgs.htop
       pkgs.imagemagick7
-      pkgs.inkscape
+      #pkgs.inkscape
       pkgs.iotop
       pkgs.okular
       pkgs.libreoffice
@@ -761,7 +761,7 @@ in
       pkgs.zstd
       # pkgs.z3
 
-      byar
+      # byar
 
       pkgs.cabextract
       pkgs.wineWowPackages.stagingFull
@@ -771,7 +771,7 @@ in
 
       isabelle-pkg
 
-      pkgs.steam
+      #pkgs.steam
       game-run-wrapper
 
       tex-pkg
