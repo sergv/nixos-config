@@ -10,6 +10,8 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     t    = pkgs.lib.trivial;
     hlib = pkgs.haskell.lib;
 
+    hutils = import haskell/utils.nix { inherit pkgs; };
+
     # hpkgs = pkgs.haskell.packages.ghc924;
 
     cabal-repo = pkgs.fetchFromGitHub {
@@ -45,23 +47,13 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
 
     # hpkgs = pkgs.haskell.packages.ghc961.override {
-    hpkgs = pkgs.haskell.packages.native-bignum.ghc962.override {
-      overrides = _: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          ghc         = smaller-ghc(old.ghc);
-        });
-    };
+    hpkgs = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc962 ;
 
     # Doesn’t work but could be cool: static executables
     # hpkgs945 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
     # hpkgs945 = pkgs.haskell.packages.ghc945.override {
-    hpkgs945 = pkgs.haskell.packages.native-bignum.ghc945.override {
-      overrides = _: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          ghc = smaller-ghc(old.ghc);
-        });
-    };
+    hpkgs945 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc945;
 
     overrideCabal = revision: editedSha: pkg:
       hlib.overrideCabal pkg {
@@ -71,136 +63,110 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
 
     # hpkgsCabal-raw = pkgs.haskell.packages.ghc945.o
 
-    # Disable profiling and haddock
-    makeHaskellPackageSmaller = name: x:
-      if builtins.isNull x ||
-         builtins.elem
-           name
-           ["callCabal2nix" "callCabal2nixWithOptions" "haskellSrc2nix" "ghc" "mkDerivation" "buildHaskellPackages" "callHackage" "callHackageDirect" "callPackage" "hackage2nix"]
-      then x
-      else
-        # # If we missed something in the above check, uncomment this and see what’s being accessed
-        # builtins.trace { inherit name; type = builtins.typeOf x; }
-        hlib.dontHaddock
-          (hlib.disableLibraryProfiling
-            (hlib.disableExecutableProfiling x));
-
-    hpkgsDoctest = hpkgs.override {
-      overrides = _: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          doctest = (old.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
-            # buildInputs = [haskellPackages.GLFW-b];
-            configureFlags = oldAttrs.configureFlags ++ [
-              # cabal config passes RTS options to GHC so doctest will receive them too
-              # ‘cabal repl --with-ghc=doctest’
-              "--ghc-option=-rtsopts"
-            ];
-          });
-
-          # primitive = hlib.dontCheck (old.callHackage "primitive" "0.8.0.0" {});
-          # tagged = old.callHackage "tagged" "0.8.7" {};
-          # size-based = hlib.doJailbreak old.size-based;
-          #
-          # syb = old.callHackage "syb" "0.7.2.3" {};
+    hpkgsDoctest = hpkgs.extend (_: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+        doctest = (old.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
+          # buildInputs = [haskellPackages.GLFW-b];
+          configureFlags = oldAttrs.configureFlags ++ [
+            # cabal config passes RTS options to GHC so doctest will receive them too
+            # ‘cabal repl --with-ghc=doctest’
+            "--ghc-option=-rtsopts"
+          ];
         });
-    };
 
-   hpkgsGhcEvensAnalyze = hpkgs945.override {
-      overrides = _: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
-          SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" {};
-          ghc-events = old.callHackage "ghc-events" "0.19.0.1" {};
+        # primitive = hlib.dontCheck (old.callHackage "primitive" "0.8.0.0" {});
+        # tagged = old.callHackage "tagged" "0.8.7" {};
+        # size-based = hlib.doJailbreak old.size-based;
+        #
+        # syb = old.callHackage "syb" "0.7.2.3" {};
+      }));
 
-          # Disable tests which take around 1 hour!
-          statistics = hlib.dontCheck old.statistics;
-        });
-    };
+    hpkgsGhcEvensAnalyze = hpkgs945.extend (_: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+        ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
+        SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" {};
+        ghc-events = old.callHackage "ghc-events" "0.19.0.1" {};
 
-   hpkgsEventlog2html = hpkgs.override {
-      overrides = _: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          eventlog2html = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
-          vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
+        # Disable tests which take around 1 hour!
+        statistics = hlib.dontCheck old.statistics;
+      }));
 
-          ghc-events = old.callHackage "ghc-events" "0.19.0.1" {};
-          # Disable tests which take around 1 hour!
-          statistics = hlib.dontCheck old.statistics;
-        });
-    };
+    hpkgsEventlog2html = hpkgs.extend (_: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+        eventlog2html = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
+        vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
 
-   hpkgsProfiterole = hpkgs.override {
-      overrides = _: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          ghc-prof = hlib.doJailbreak old.ghc-prof;
-        });
-    };
+        ghc-events = old.callHackage "ghc-events" "0.19.0.1" {};
+        # Disable tests which take around 1 hour!
+        statistics = hlib.dontCheck old.statistics;
+      }));
+
+    hpkgsProfiterole = hpkgs.extend (_: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+        ghc-prof = hlib.doJailbreak old.ghc-prof;
+      }));
 
     # pkgs.haskell.packages.ghc961
-    hpkgsCabal = hpkgs.override {
-      overrides = new: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          ghc = smaller-ghc(old.ghc);
+    hpkgsCabal = hpkgs.extend (new: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+        ghc = hutils.smaller-ghc(old.ghc);
 
-          # builtins.mapAttrs (_name: value: hlib.doJailbreak value) old //
-          Cabal = old.callCabal2nix
-            "Cabal"
-            (cabal-repo + "/Cabal")
-            {};
-          Cabal-syntax = old.callCabal2nix
-            "Cabal-syntax"
-            (cabal-repo + "/Cabal-syntax")
-            {};
-          cabal-install-solver = hlib.doJailbreak (old.callCabal2nix
-            "cabal-install-solver"
-            (cabal-repo + "/cabal-install-solver")
-            {});
-          # hlib.dontCheck
-          # (old.callHackage "cabal-install-solver" "3.8.1.0" {});
-          cabal-install = hlib.doJailbreak (old.callCabal2nix
-            "cabal-install"
-            (cabal-repo + "/cabal-install")
-            { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
-            });
+        # builtins.mapAttrs (_name: value: hlib.doJailbreak value) old //
+        Cabal = old.callCabal2nix
+          "Cabal"
+          (cabal-repo + "/Cabal")
+          {};
+        Cabal-syntax = old.callCabal2nix
+          "Cabal-syntax"
+          (cabal-repo + "/Cabal-syntax")
+          {};
+        cabal-install-solver = hlib.doJailbreak (old.callCabal2nix
+          "cabal-install-solver"
+          (cabal-repo + "/cabal-install-solver")
+          {});
+        # hlib.dontCheck
+        # (old.callHackage "cabal-install-solver" "3.8.1.0" {});
+        cabal-install = hlib.doJailbreak (old.callCabal2nix
+          "cabal-install"
+          (cabal-repo + "/cabal-install")
+          { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
+          });
 
-          semaphore-compat = hlib.markUnbroken old.semaphore-compat;
+        semaphore-compat = hlib.markUnbroken old.semaphore-compat;
 
-          # Disable tests which take around 1 hour!
-          statistics = hlib.dontCheck old.statistics;
+        # Disable tests which take around 1 hour!
+        statistics = hlib.dontCheck old.statistics;
 
-          # ghc-lib-parser = hlib.markBroken old.ghc-lib-parser;
-          # ghc-prof = hlib.doJailbreak old.ghc-prof;
+        # ghc-lib-parser = hlib.markBroken old.ghc-lib-parser;
+        # ghc-prof = hlib.doJailbreak old.ghc-prof;
 
-          # process = hlib.dontCheck
-          #   (old.callHackage "process" "1.6.15.0" {});
+        # process = hlib.dontCheck
+        #   (old.callHackage "process" "1.6.15.0" {});
 
-          # tar = hlib.doJailbreak old.tar;
-          # ed25519 = hlib.doJailbreak old.ed25519;
-          # indexed-traversable = hlib.doJailbreak old.indexed-traversable;
+        # tar = hlib.doJailbreak old.tar;
+        # ed25519 = hlib.doJailbreak old.ed25519;
+        # indexed-traversable = hlib.doJailbreak old.indexed-traversable;
 
 
-          # ed25519 = #hlib.dontCheck
-          #   (overrideCabal
-          #     "7"
-          #     "sha256-PbBNfBi55oul7vP6fuygXh4kiVjdGCKQyOawEMge9z4="
-          #     #"sha256-JKx7Xz2fo8L3AmKzKfKnXyTn/YKfiMGJs4jvobzWfrI="
-          #     (old.callHackageDirect {
-          #       pkg = "ed25519";
-          #       ver = "0.0.5.0";
-          #       sha256 = "sha256-x/8O0KFlj2SDVDKp3IPIvqklmZHfBYKGwygbG48q5Ig=";
-          #     }
-          #       {}));
-        });
-    };
+        # ed25519 = #hlib.dontCheck
+        #   (overrideCabal
+        #     "7"
+        #     "sha256-PbBNfBi55oul7vP6fuygXh4kiVjdGCKQyOawEMge9z4="
+        #     #"sha256-JKx7Xz2fo8L3AmKzKfKnXyTn/YKfiMGJs4jvobzWfrI="
+        #     (old.callHackageDirect {
+        #       pkg = "ed25519";
+        #       ver = "0.0.5.0";
+        #       sha256 = "sha256-x/8O0KFlj2SDVDKp3IPIvqklmZHfBYKGwygbG48q5Ig=";
+        #     }
+        #       {}));
+      }));
 
     # pkgs.haskell.packages.ghc961
     # args.pkgs.haskellPackages
-    threadscopePkgs = pkgs.haskell.packages.ghc927.override {
-      overrides = new: old:
-        builtins.mapAttrs makeHaskellPackageSmaller (old // {
-          threadscope = hlib.doJailbreak old.threadscope;
-        });
-    };
+    threadscopePkgs = pkgs.haskell.packages.ghc928.extend (_: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+        threadscope = hlib.doJailbreak old.threadscope;
+      }));
 
     # nativeDeps = [
     #   pkgs.gmp
@@ -211,12 +177,6 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     disable-docs = ghc:
       ghc.override (oldAttrs: oldAttrs // {
         enableDocs = false;
-      });
-
-    smaller-ghc = ghc-pkg:
-      ghc-pkg.override (oldAttrs: oldAttrs // {
-        enableNativeBignum = true;
-        enableDocs         = false;
       });
 
     relocatable-static-libs-ghc = ghc-pkg:
@@ -287,21 +247,21 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
 
 in {
 
-  ghc7103    = wrap-ghc-filter-all               "7.10.3" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
-  ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
+  #ghc7103    = wrap-ghc-filter-all               "7.10.3" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  #ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
 
-  ghc822     = wrap-ghc        "8.2.2"             pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
-  ghc844     = wrap-ghc        "8.4.4"             pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
+  #ghc822     = wrap-ghc        "8.2.2"             pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  #ghc844     = wrap-ghc        "8.4.4"             pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
 
-  ghc865     = wrap-ghc        "8.6.5"             pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+  #ghc865     = wrap-ghc        "8.6.5"             pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
 
-  ghc884     = wrap-ghc        "8.8.4"             pkgs.haskell.packages.ghc884.ghc;
-  ghc8107    = wrap-ghc        "8.10.7"            (disable-docs pkgs.haskell.packages.ghc8107.ghc);
-  ghc902     = wrap-ghc        "9.0.2"             (smaller-ghc pkgs.haskell.packages.ghc902.ghc);
-  ghc928     = wrap-ghc        "9.2.8"             (smaller-ghc pkgs.haskell.packages.ghc928.ghc);
-  ghc945     = wrap-ghc        "9.4.5"             (smaller-ghc pkgs.haskell.packages.ghc945.ghc);
+  #ghc884     = wrap-ghc        "8.8.4"             pkgs.haskell.packages.ghc884.ghc;
+  #ghc8107    = wrap-ghc        "8.10.7"            (disable-docs pkgs.haskell.packages.ghc8107.ghc);
+  #ghc902     = wrap-ghc        "9.0.2"             (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
+  #ghc928     = wrap-ghc        "9.2.8"             (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
+  #ghc945     = wrap-ghc        "9.4.5"             (hutils.smaller-ghc pkgs.haskell.packages.ghc945.ghc);
 
-  #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (smaller-ghc pkgs.haskell.packages.ghc961.ghc));
+  #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
 
   ghc        = hpkgs.ghc;
 

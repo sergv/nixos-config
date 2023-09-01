@@ -16,8 +16,12 @@ fi
 export TMPDIR=/tmp/nix-daemon
 export TEMPDIR=/tmp/nix-daemon
 
+jobs="4"
+export NIX_BUILD_CORES="8"
+export NINJAFLAGS="-j8 -l8"
+
 # nixos-rebuild build --flake .#home --verbose --keep-going "${@}"
 #nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
 #nixos-rebuild switch --flake .#home --verbose --keep-going "${@}"
 # strace -f -e execve nixos-rebuild boot --flake .#home --verbose --keep-going "${@}"
-nixos-rebuild boot --flake .#home --verbose --keep-going "${@}"
+nixos-rebuild boot --flake .#home --verbose --keep-going --max-jobs "$jobs" "${@}"
