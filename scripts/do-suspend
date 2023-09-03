@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ "$EUID" != 0 ]] ; then
+  echo "This must be run as root!"
+  exit 1
+fi
+
+exec systemctl start systemd-suspend

@@ -751,7 +751,7 @@ in
       pkgs.p7zip
       pkgs.pavucontrol
       pkgs.pinentry_qt
-      pkgs.pmutils
+      # pkgs.pmutils
       pkgs.pv
       pkgs.qbittorrent
       pkgs.sshfs

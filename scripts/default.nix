@@ -17,6 +17,7 @@ let
 in
 {
   inherit reset-usb;
+  do-suspend = writePatchedScriptBin "do-suspend" [ ];
   reset-nixos-usb-network = writePatchedScriptBin "reset-nixos-usb-network" [ reset-usb ];
   tar7z = writePatchedScriptBin "tar7z" [
     pkgs.gnutar
