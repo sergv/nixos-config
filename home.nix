@@ -4,6 +4,7 @@
   pinned-pkgs,
   nixpkgs-stable,
   nixpkgs-unstable,
+  nur,
   system,
   ...
 }:
@@ -652,6 +653,13 @@ in
   #   videos            = "\$HOME/misc/videos";
   # };
 
+  programs.firefox = {
+    enable = true;
+    package = pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
+      extraNativeMessagingHosts = [ pkgs.nur.repos.wolfangaukang.vdhcoapp ];
+    };
+  };
+
   home.packages =
     let
       tex-pkg = (
@@ -723,7 +731,7 @@ in
       pkgs.file
       pkgs.findutils
       #pkgs.firefox
-      pkgs.firefox-esr
+      # pkgs.firefox-esr
       pkgs.gimp
       pkgs.glxinfo
       pkgs.gparted
@@ -760,6 +768,8 @@ in
       # pkgs.yasm
       pkgs.zstd
       # pkgs.z3
+
+      pkgs.nur.repos.wolfangaukang.vdhcoapp
 
       # byar
 
