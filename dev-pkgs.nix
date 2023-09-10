@@ -223,7 +223,7 @@ let
     );
 
   wrap-ghc =
-    version: pkg:
+    version: alias-version: pkg:
     pkgs.runCommand ("wrapped-ghc-" + version)
       {
         # buildInputs = [ pkgs.makeWrapper ];
@@ -231,12 +231,13 @@ let
       ''
         mkdir -p "$out/bin"
         for x in ghc ghci ghc-pkg haddock-ghc runghc; do
-          ln -s "${pkg}/bin/$x-${version}" "$out/bin/"
+          ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
+          ln -s "$out/bin/$x-${version}" "$out/bin/$x-${alias-version}"
         done
       '';
 
   wrap-ghc-filter-selected =
-    filtered-args: version: pkg:
+    filtered-args: version: alias-version: pkg:
     let
       wrapped-ghc = pkgs.writeShellScript ("filtering-ghc-" + version) ''
         args=("''${@}")
@@ -261,8 +262,10 @@ let
       ''
         mkdir -p "$out/bin"
         ln -s "${wrapped-ghc}" "$out/bin/ghc-${version}"
+        ln -s "$out/bin/ghc-${version}" "$out/bin/ghc-${alias-version}"
         for x in ghci ghc-pkg haddock-ghc runghc; do
-          ln -s "${pkg}/bin/$x-${version}" "$out/bin/"
+          ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
+          ln -s "$out/bin/$x-${version}"   "$out/bin/$x-${alias-version}"
         done
       '';
 
@@ -292,19 +295,23 @@ let
 in
 {
 
-  #ghc7103    = wrap-ghc-filter-all               "7.10.3" pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
-  #ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
+  ghc7103 =
+    wrap-ghc-filter-all "7.10.3" "7.10"
+      pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  ghc802 =
+    wrap-ghc-filter-hide-source-paths "8.0.2" "8.0"
+      pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
 
-  #ghc822     = wrap-ghc        "8.2.2"             pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
-  #ghc844     = wrap-ghc        "8.4.4"             pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
+  ghc822 = wrap-ghc "8.2.2" "8.2" pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  ghc844 = wrap-ghc "8.4.4" "8.4" pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
 
-  #ghc865     = wrap-ghc        "8.6.5"             pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+  ghc865 = wrap-ghc "8.6.5" "8.6" pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
 
-  #ghc884     = wrap-ghc        "8.8.4"             pkgs.haskell.packages.ghc884.ghc;
-  #ghc8107    = wrap-ghc        "8.10.7"            (disable-docs pkgs.haskell.packages.ghc8107.ghc);
-  #ghc902     = wrap-ghc        "9.0.2"             (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
-  #ghc928     = wrap-ghc        "9.2.8"             (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
-  #ghc945     = wrap-ghc        "9.4.5"             (hutils.smaller-ghc pkgs.haskell.packages.ghc945.ghc);
+  ghc884 = wrap-ghc "8.8.4" "8.8" pkgs.haskell.packages.ghc884.ghc;
+  ghc8107 = wrap-ghc "8.10.7" "8.10" (disable-docs pkgs.haskell.packages.ghc8107.ghc);
+  ghc902 = wrap-ghc "9.0.2" "9.0" (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
+  ghc928 = wrap-ghc "9.2.8" "9.2" (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
+  ghc946 = wrap-ghc "9.4.6" "9.4" (hutils.smaller-ghc pkgs.haskell.packages.ghc946.ghc);
 
   #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
 
