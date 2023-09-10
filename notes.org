@@ -274,7 +274,7 @@ flake ~ project file
 
 NUR - like AUR, Nix User Repository
 
-* FAQ
+* Cookbook/FAQ
 ** ~buildInputs~ vs ~nativeBuildInputs~
 *** ~buildInputs~
 Programs and libraries used by the new derivation at run-time
@@ -295,3 +295,7 @@ build the new derivation
 - nix-store -q --referrers-closure <STORE-PATH>
 - nix-store --gc --print-roots
 - nix-store --query --roots <STORE-PATH>
+
+** ~nix show-derivation~
+For current development shell: ~nix show-derivation .#devShells.x86_64-linux.default~
+Sometimes without ~default~: ~nix derivation show .#devShell.x86_64-linux~
