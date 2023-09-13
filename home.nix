@@ -747,6 +747,7 @@ in
       pkgs.lzop
       pkgs.mc
       pkgs.mplayer
+      pkgs.nix-index
       pkgs.oxygen-icons5
       pkgs.p7zip
       pkgs.pavucontrol
