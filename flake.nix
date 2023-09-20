@@ -196,6 +196,19 @@
               builtins.abort "Override of ‘openxr’ is useless now";
         };
 
+        pkgs-pristine = import nixpkgs-unstable {
+          inherit system;
+          config = {
+            allowBroken                    = true;
+            allowUnfree                    = true;
+            # virtualbox.enableExtensionPack = true;
+          };
+          overlays = [
+            fcitx-overlay
+            ssh-overlay
+          ];
+        };
+
         pkgs = import nixpkgs-unstable {
           inherit system;
           config = {
@@ -243,6 +256,7 @@
 
         home-manager-extra-args = {
           # inherit nixpkgs-fresh-ghc system;
+          inherit pkgs-pristine;
           inherit nixpkgs-stable nixpkgs-unstable system;
           pinned-pkgs = {
             nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };
@@ -299,7 +313,7 @@
       # Home configs for user
       homeManagerConfigurations = {
         sergey = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
+          inherit pkgs pkgs-pristine;
           modules = [
             ./home.nix
           ];

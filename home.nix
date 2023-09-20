@@ -1,5 +1,6 @@
 { config
 , pkgs
+, pkgs-pristine
 , pinned-pkgs
 , nixpkgs-stable
 , nixpkgs-unstable
@@ -670,7 +671,7 @@ in
         pkgs.baobab
         pkgs.bridge-utils
         # pkgs.ccache
-        #pkgs.chromium
+        pkgs-pristine.chromium
         #pkgs.google-chrome
         # pkgs.clang
         # pkgs.clang-tools
