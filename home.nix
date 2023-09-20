@@ -92,6 +92,7 @@ let
     })).overrideAttrs
       (_: {
         withNativeCompilation = false;
+        withTreeSitter = true;
       });
 
   emacs-bytecode-wrapped = pkgs.runCommand "emacs-bytecode" { } ''
