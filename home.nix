@@ -72,6 +72,7 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     emacs-bytecode = (emacs-pkg.override (_: { withNativeCompilation = false; })).overrideAttrs (_: {
       withNativeCompilation = false;
+      withTreeSitter        = true;
     });
 
     emacs-bytecode-wrapped =
