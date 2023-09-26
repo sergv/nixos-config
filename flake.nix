@@ -68,9 +68,9 @@
         hutils = import haskell/utils.nix { pkgs = nixpkgs-unstable.legacyPackages."${system}"; };
 
         # Fix when upgrading 22.11 -> nixos-unstable circa 2023-04-11
-        fcitx-overlay = _: _: {
-          fcitx         = pkgs.fcitx5;
-          fcitx-engines = pkgs.fcitx5;
+        fcitx-overlay = _: old: {
+          fcitx         = old.fcitx5;
+          fcitx-engines = old.fcitx5;
         };
 
         # In configuration.nix
@@ -189,7 +189,7 @@
             then
               old.openexr_3.overrideAttrs (_: {
                 version = "3.1.11";
-                src = pkgs.fetchFromGitHub {
+                src = old.fetchFromGitHub {
                   owner = "AcademySoftwareFoundation";
                   repo = "openexr";
                   rev = "v3.1.11";
@@ -213,8 +213,11 @@
           ];
         };
 
+        arch = import ./arch.nix;
+
         pkgs = import nixpkgs-unstable {
-          inherit system;
+          # inherit system;
+          inherit (arch) localSystem;
           config = {
             allowBroken                    = true;
             allowUnfree                    = true;
