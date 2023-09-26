@@ -202,6 +202,7 @@ in
         ".config/transmission"
         ".config/vlc"
         ".config/xfce4"
+        ".config/VirtualBox"
         ".config/Xilinx"
 
         ".local/share/direnv"
@@ -315,12 +316,12 @@ in
       inherit (arch) localSystem;
     };
 
-  # # For running within a VM
-  # # virtualisation.virtualbox.guest.enable = true;
-  # virtualisation.virtualbox.host = {
-  #   enable              = true;
-  #   enableExtensionPack = true;
-  # };
+  # For running within a VM
+  # virtualisation.virtualbox.guest.enable = true;
+  virtualisation.virtualbox.host = {
+    enable              = true;
+    enableExtensionPack = true;
+  };
 
   hardware = {
     bluetooth.enable  = false;
