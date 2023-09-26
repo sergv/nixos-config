@@ -1,0 +1,20 @@
+--- a/src/VBox/Devices/PC/ipxe/Makefile.kmk	2023-09-22 12:31:10.465112117 +0100
++++ b/src/VBox/Devices/PC/ipxe/Makefile.kmk	2023-09-22 12:31:53.328755669 +0100
+@@ -48,7 +48,7 @@
+ if1of ($(KBUILD_TARGET), darwin os2 solaris win)
+  $$(iPxeBiosBin_0_OUTDIR)/iPxeBiosBin.c: $(PATH_SUB_CURRENT)/iPxeBiosBin.rom $(VBOX_BIN2C) | $$(dir $$@)
+ 	$(call MSG_TOOL,bin2c,iPxeBiosBin,$<,$@)
+-	$(QUIET)$(VBOX_BIN2C) -min 32 -max 56 -mask 0x1ff -export NetBiosBinary $< $@
++	$(QUIET)$(VBOX_BIN2C) -min 32 -max 58 -mask 0x1ff -export NetBiosBinary $< $@
+ 
+ else
+  iPxeBiosBin_CLEAN    += \
+@@ -58,7 +58,7 @@
+ 
+  $$(iPxeBiosBin_0_OUTDIR)/iPxeBiosBin.c: $$(iPxeBiosBin_0_OUTDIR)/iPxeBiosBin.rom $(VBOX_BIN2C)
+ 	$(call MSG_TOOL,bin2c,iPxeBiosBin,$<,$@)
+-	$(QUIET)$(VBOX_BIN2C) -min 32 -max 56 -export NetBiosBinary $< $@
++	$(QUIET)$(VBOX_BIN2C) -min 32 -max 58 -export NetBiosBinary $< $@
+ 
+ 
+  $$(iPxeBiosBin_0_OUTDIR)/iPxeBiosBin.rom: \

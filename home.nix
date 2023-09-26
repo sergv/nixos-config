@@ -475,6 +475,7 @@ in
   systemd.user.tmpfiles.rules = [
     "d /tmp/emacs-cache     0755 sergey users - -"
     "d /tmp/cache           0755 sergey users - -"
+    "d /tmp/windows-shared  0755 sergey users - -"
     "d /home/sergey/.config -    -      -     - -"
     "d /home/sergey/.local  -    -      -     - -"
     "d /home/sergey/Desktop -    -      -     - -"
