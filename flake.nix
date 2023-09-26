@@ -160,6 +160,10 @@
         # Fixes for building with -march=znver3
         zen3-march-overlay = _: old: {
 
+          virtualbox = old.virtualbox.overrideAttrs (old2: {
+            patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
+          });
+
           libreoffice = old.libreoffice.override (old2: {
             unwrapped = old2.unwrapped.overrideAttrs (_: {
               doCheck = false;
