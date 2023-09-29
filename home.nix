@@ -711,6 +711,7 @@ in
         # pkgs.pmutils
         pkgs.pv
         pkgs.qbittorrent
+        pkgs.smartmontools
         pkgs.sshfs
         pkgs.tdesktop
         pkgs.thunderbird
