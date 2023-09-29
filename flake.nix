@@ -127,6 +127,7 @@
 
         haskell-disable-checks-overlay = _: old: {
           haskellPackages = old.haskellPackages.extend (_: old2: {
+            cryptonite              = old.haskell.lib.dontCheck old2.cryptonite;
             crypton                 = old.haskell.lib.dontCheck old2.crypton;
             # x509-validation         = old.haskell.lib.dontCheck old2.x509-validation;
             crypton-x509-validation = old.haskell.lib.dontCheck old2.crypton-x509-validation;
