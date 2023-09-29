@@ -704,6 +704,7 @@ in
         pkgs.mc
         pkgs.mplayer
         pkgs.nix-index
+        pkgs.nyx
         pkgs.oxygen-icons5
         pkgs.p7zip
         pkgs.pavucontrol
