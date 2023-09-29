@@ -299,3 +299,13 @@ build the new derivation
 ** ~nix show-derivation~
 For current development shell: ~nix show-derivation .#devShells.x86_64-linux.default~
 Sometimes without ~default~: ~nix derivation show .#devShell.x86_64-linux~
+
+** error: getting status of ‘/nix/store/***’: No such file or directory
+~nix build --repair~, probably of whole nixos system derivation
+
+** DANGEROUS: manually remove store file
+#+BEGIN_EXAMPLE
+sudo mount /nix/store -o remount,rw
+sudo rm -f /nix/store/.../my-file
+sergey@home:~$ sudo mount /nix/store -o remount,ro
+#+END_EXAMPLE
