@@ -249,7 +249,6 @@ in
       "youtube-dl-audio"    = "yt-dlp --add-metadata -f 'bestaudio[ext=m4a]' --output '%(title)s.%(ext)s'";
 
       "baobab-new"          = "nohup dbus-run-session baobab >/dev/null";
-
     };
     sessionVariables = {
       "HIE_BIOS_CACHE_DIR"        = "/tmp/dist/hie-bios";
