@@ -284,7 +284,6 @@ in
       # pkgs.python36Packages.jupyter_client
       # pkgs.python36Packages.matplotlib
       # pkgs.python36Packages.sympy
-      pkgs.redshift
       pkgs.sudo
       pkgs.strace
       pkgs.vim
