@@ -18,6 +18,7 @@ in
 {
   inherit reset-usb;
   do-suspend = writePatchedScriptBin "do-suspend" [ ];
+  git-commit-on-date = writePatchedScriptBin "git-commit-on-date" [ pkgs.git ];
   reset-nixos-usb-network = writePatchedScriptBin "reset-nixos-usb-network" [ reset-usb ];
   tar7z = writePatchedScriptBin "tar7z" [
     pkgs.gnutar
