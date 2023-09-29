@@ -54,17 +54,14 @@ in
     "/nix" = {
       depends = [ "/" ];
       device = "/dev/disk/by-label/nixos-root";
-      fsType = "f2fs";
-      # https://wiki.archlinux.org/title/F2FS
+      fsType = "ext4";
       options = [
+        "errors=remount-ro"
         "noatime"
         "nodiratime"
         "lazytime"
-        "compress_algorithm=zstd:6"
-        "compress_chksum"
-        "atgc"
-        "gc_merge"
         "x-gvfs-hide"
+        "discard"
       ];
     };
     "/permanent" = {
