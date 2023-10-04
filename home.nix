@@ -788,6 +788,7 @@ in
 
       isabelle-pkg
 
+      pkgs.pcsx2
       #pkgs.steam
       game-run-wrapper
 
