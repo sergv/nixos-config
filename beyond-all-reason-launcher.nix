@@ -27,20 +27,25 @@
 # patching.
 
 let
-  version = "1.2124.0"; # 1.1861.0
+  version = "1.2470.0"; #"1.2124.0"; # 1.1861.0
   srcs = {
     # Contains the configuration for the launcher.
     byar-chobby = fetchFromGitHub {
-      owner = "beyond-all-reason";
-      repo = "BYAR-Chobby";
-      rev = "v${version}";
-      sha256 = "sha256-+bp3hu+YPGaDypNTUK3EY2h0BpphLiskkADvRc5+yxA="; # lib.fakeSha256; #"sha256-YnOW63Z8A/W89TeeMDJcVKjA1ErATvPHzm26wQdWH2I=";
+      owner  = "beyond-all-reason";
+      repo   = "BYAR-Chobby";
+      rev    = "v${version}";
+      sha256 = "sha256-evIoYuw+1Ma98oBYQ6wSKXSpyt45/wODUP4YSHvI37w="; # lib.fakeSha256;
     };
+      # fetchzip {
+      # url  = "https://github.com/beyond-all-reason/BYAR-Chobby/archive/refs/tags/v${version}.zip";
+      # hash = lib.fakeSha256;
+    # };
+
     spring-launcher = fetchFromGitHub {
-      owner = "beyond-all-reason";
-      repo = "spring-launcher";
-      rev = "c625661330bfdc6e3a6757e4a65e6d5402f1d00a"; # "439a9b7b7d835691267ad13586d0efc763d39b60";
-      sha256 = "sha256-qZP4Y94XFQxJEK3gvd5MSwm6TV6laMdJnKbH4YDp7VI="; # lib.fakeSha256; #"sha256-26bDjlbh2lppMC6+6pyqdaSNbVrwKPj4ckMK0LZleQY=";
+      owner  = "beyond-all-reason";
+      repo   = "spring-launcher";
+      rev    = "2c6e0a63d317b5fc5f92ee39742e1f8a55c41976"; # "c625661330bfdc6e3a6757e4a65e6d5402f1d00a"; # "439a9b7b7d835691267ad13586d0efc763d39b60";
+      sha256 = "sha256-YhZqckkIs4SHlCgJkSHTHRyI2Bc3mRMZN9+Wwx70lzM="; # lib.fakeSha256;
     };
   };
 
@@ -86,10 +91,12 @@ let
     mv launcher $out
   '';
 
+  # If building this fails or stucks, try building with NIX_BUILD_CORES=1 instead.
+  # Downloading npm dependencies with multiple cores is prone to hanging.
   nodeModules = buildNpmPackage {
     inherit src version;
     pname = "byar-launcher-package";
-    npmDepsHash = "sha256-CKBdeIGplXSM/OP9+igmLWR/FC2xnwAAhbYwlTp8ZSY="; # "sha256-cCUtkycZ0bpLwcCfBjf+rTeoMHN7jIxcYCtyrB4rC8A=";
+    npmDepsHash = "sha256-dbURtLbgprljQaxurnAscydGHt3ORtd18lktVeY+iQU="; #"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # "sha256-CKBdeIGplXSM/OP9+igmLWR/FC2xnwAAhbYwlTp8ZSY="; # "sha256-cCUtkycZ0bpLwcCfBjf+rTeoMHN7jIxcYCtyrB4rC8A=";
     npmFlags = [ "--legacy-peer-deps" ];
     dontNpmBuild = true;
     passthru = {
@@ -110,8 +117,8 @@ let
     src = fetchFromGitHub {
       owner = "beyond-all-reason";
       repo = "pr-downloader";
-      rev = "d3ad0156fe1c9123b32f966c00ed3825e62ae15d"; #"79b605d013a0c5a92090b3892e8e0c0aeccac2a8";
-      sha256 = "sha256-ckDt8cG9fktej3A5xSDZmenn6u1N6pWayqnsLrQVeno=" ; #lib.fakeSha256; #"sha256-noroFiv2wAUCgI1ne2sP0PVBxIf20D+m5oa5+pk2OXQ=";
+      rev = "4e30e3e776c47b81e790fffcb2b62f81437e0c24"; # "d3ad0156fe1c9123b32f966c00ed3825e62ae15d"; #"79b605d013a0c5a92090b3892e8e0c0aeccac2a8";
+      sha256 = "sha256-nHFGhgiWBPJUQe120TQn52FoPDA50U5EW3PKeh/OLVs="; # lib.fakeSha256; # "sha256-ckDt8cG9fktej3A5xSDZmenn6u1N6pWayqnsLrQVeno="; #"sha256-noroFiv2wAUCgI1ne2sP0PVBxIf20D+m5oa5+pk2OXQ=";
       fetchSubmodules = true;
     };
     buildInputs = [
