@@ -38,7 +38,7 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
   + interpelation of variable ~test~: ~"${test}"~
   + Escaping of interpolation: ~"x \${test} y"~ or ~''x ''${test} y''~
   + Newline: ~"x \n y"~ produces newline, ~''x \n y''~ produces backslash n verbatim, ~''x ''\n y''~ produces newline
-+ Concatenation: ~+~
+  + Concatenation: ~+~
 - paths
   + ~./.~ denotes current directory
   + ~foo/bar~ denotes foo/bar under current directory, same as ~./foo/bar~
