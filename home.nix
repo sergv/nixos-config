@@ -714,6 +714,7 @@ in
         pkgs.qbittorrent
         pkgs.smartmontools
         pkgs.sshfs
+        pkgs.telegram-desktop
         pkgs.tdesktop
         pkgs.thunderbird
         pkgs.unzip
