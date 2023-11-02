@@ -709,7 +709,7 @@ in
         pkgs.oxygen-icons5
         pkgs.p7zip
         pkgs.pavucontrol
-        pkgs.pinentry_qt
+        pkgs.pinentry-qt
         # pkgs.pmutils
         pkgs.pv
         pkgs.qbittorrent

@@ -107,20 +107,22 @@
               ghc92         = hutils.smaller-ghc old.haskell.compiler.ghc92;
               ghc928        = hutils.smaller-ghc old.haskell.compiler.ghc928;
               ghc94         = hutils.smaller-ghc old.haskell.compiler.ghc94;
-              ghc945        = hutils.smaller-ghc old.haskell.compiler.ghc945;
-              ghc946        = hutils.smaller-ghc old.haskell.compiler.ghc946;
+              ghc947        = hutils.smaller-ghc old.haskell.compiler.ghc947;
               ghc96         = hutils.smaller-ghc old.haskell.compiler.ghc96;
-              ghc962        = hutils.smaller-ghc old.haskell.compiler.ghc962;
+              ghc963        = hutils.smaller-ghc old.haskell.compiler.ghc963;
+              ghc98         = hutils.smaller-ghc old.haskell.compiler.ghc98;
+              ghc981        = hutils.smaller-ghc old.haskell.compiler.ghc981;
             };
 
             packages = old.haskell.packages // {
               ghc92         = hutils.smaller-hpkgs old.haskell.packages.ghc92;
               ghc928        = hutils.smaller-hpkgs old.haskell.packages.ghc928;
               ghc94         = hutils.smaller-hpkgs old.haskell.packages.ghc94;
-              ghc945        = hutils.smaller-hpkgs old.haskell.packages.ghc945;
-              ghc946        = hutils.smaller-hpkgs old.haskell.packages.ghc946;
+              ghc947        = hutils.smaller-hpkgs old.haskell.packages.ghc947;
               ghc96         = hutils.smaller-hpkgs old.haskell.packages.ghc96;
-              ghc962        = hutils.smaller-hpkgs old.haskell.packages.ghc962;
+              ghc963        = hutils.smaller-hpkgs old.haskell.packages.ghc963;
+              ghc98         = hutils.smaller-hpkgs old.haskell.packages.ghc98;
+              ghc981        = hutils.smaller-hpkgs old.haskell.packages.ghc981;
             };
           };
         };
@@ -171,7 +173,7 @@
             });
           });
 
-          python310 = old.python310.override {
+          python311 = old.python311.override {
             packageOverrides = _: old2: {
               pandas = old2.pandas.overrideAttrs (old-pandas-attrs: {
                 doCheck        = false;
@@ -183,22 +185,7 @@
           # To avoid infinite recursion
           cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
             (old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix"
-              old.haskell.packages.ghc962.cabal2nix);
-
-          openexr_3 =
-            if old.openexr_3.version == "3.1.10"
-            then
-              old.openexr_3.overrideAttrs (_: {
-                version = "3.1.11";
-                src = old.fetchFromGitHub {
-                  owner = "AcademySoftwareFoundation";
-                  repo = "openexr";
-                  rev = "v3.1.11";
-                  sha256 = "sha256-xW/BmMtEYHiLk8kLZFXYE809jL/uAnCzkINugqJ8Iig="; #pkgs.lib.fakeSha256;
-                };
-              })
-            else
-              builtins.abort "Override of ‘openxr’ is useless now";
+              old.haskell.packages.ghc963.cabal2nix);
         };
 
         pkgs-pristine = import nixpkgs-unstable {
