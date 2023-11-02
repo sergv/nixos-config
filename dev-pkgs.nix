@@ -48,13 +48,13 @@ let
   # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
 
   # hpkgs = pkgs.haskell.packages.ghc961.override {
-  hpkgs = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc962;
+  hpkgs = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc963;
 
   # Doesn’t work but could be cool: static executables
-  # hpkgs945 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
+  # hpkgs947 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
-  # hpkgs945 = pkgs.haskell.packages.ghc945.override {
-  hpkgs945 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc945;
+  # hpkgs947 = pkgs.haskell.packages.ghc945.override {
+  hpkgs947 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc947;
 
   overrideCabal =
     revision: editedSha: pkg:
@@ -92,7 +92,7 @@ let
     )
   );
 
-  hpkgsGhcEvensAnalyze = hpkgs945.extend (
+  hpkgsGhcEvensAnalyze = hpkgs947.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -223,7 +223,16 @@ let
     );
 
   wrap-ghc =
-    version: alias-version: pkg:
+    version: alias-versions: pkg:
+    let
+      f =
+        alias-version:
+        assert (builtins.isString alias-version || builtins.isNull alias-version);
+        let
+          suffix = if builtins.isNull alias-version then "" else "-${alias-version}";
+        in
+        ''ln -s "$out/bin/$x-${version}" "$out/bin/$x${suffix}"'';
+    in
     pkgs.runCommand ("wrapped-ghc-" + version)
       {
         # buildInputs = [ pkgs.makeWrapper ];
@@ -232,7 +241,12 @@ let
         mkdir -p "$out/bin"
         for x in ghc ghci ghc-pkg haddock-ghc runghc; do
           ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
-          ln -s "$out/bin/$x-${version}" "$out/bin/$x-${alias-version}"
+          ${
+            if builtins.isList alias-versions then
+              builtins.concatStringsSep "\n" (builtins.map f alias-versions)
+            else
+              f alias-versions
+          }
         done
       '';
 
@@ -311,11 +325,12 @@ in
   ghc8107 = wrap-ghc "8.10.7" "8.10" (disable-docs pkgs.haskell.packages.ghc8107.ghc);
   ghc902 = wrap-ghc "9.0.2" "9.0" (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
   ghc928 = wrap-ghc "9.2.8" "9.2" (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
-  ghc946 = wrap-ghc "9.4.6" "9.4" (hutils.smaller-ghc pkgs.haskell.packages.ghc946.ghc);
+  ghc947 = wrap-ghc "9.4.7" "9.4" (hutils.smaller-ghc pkgs.haskell.packages.ghc947.ghc);
+
+  ghc963 = wrap-ghc "9.6.3" "9.6" (hutils.smaller-ghc pkgs.haskell.packages.ghc963.ghc);
+  ghc981 = wrap-ghc "9.8.1" [ "9.8" null ] (hutils.smaller-ghc pkgs.haskell.packages.ghc981.ghc);
 
   #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
-
-  ghc = hpkgs.ghc;
 
   # callPackage = newScope {
   #   haskellLib = haskellLibUncomposable.compose;
