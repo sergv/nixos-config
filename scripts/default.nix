@@ -12,7 +12,7 @@ let writePatchedScriptBin = name: buildInputs:
     reset-usb = writePatchedScriptBin "reset-usb" [];
 in {
   inherit reset-usb;
-  do-suspend              = writePatchedScriptBin "do-suspend"              [];
+  pm-suspend              = writePatchedScriptBin "pm-suspend"              [];
   git-commit-on-date      = writePatchedScriptBin "git-commit-on-date"      [ pkgs.git ];
   reset-nixos-usb-network = writePatchedScriptBin "reset-nixos-usb-network" [ reset-usb ];
   tar7z                   = writePatchedScriptBin "tar7z"                   [ pkgs.gnutar pkgs.p7zip ];
