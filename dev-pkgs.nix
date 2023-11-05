@@ -17,8 +17,8 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     cabal-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "cabal";
-      rev    = "f7e76a29df9d30025023950d4db5738b4db804e6"; # "dev";
-      sha256 = "sha256-DJAYgJhwZTvq0zMu1Rh0/GGByfmUrgedDjx0a+tieaE="; #pkgs.lib.fakeSha256;
+      rev    = "82a44364c5a37fa9ef88ab445615f055b9d74ee0"; # "dev";
+      sha256 = "sha256-UY58qAkoPJU88EM6hTJg9aQdyZa+E0+JSnuIA87CBeQ="; # pkgs.lib.fakeSha256;
     };
 
     doctest-repo = pkgs.fetchFromGitHub {
