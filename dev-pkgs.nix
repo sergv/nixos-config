@@ -301,6 +301,8 @@ in {
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
+  alex               = hpkgs.alex;
+  happy              = hpkgs.happy;
   cabal-install      = hpkgsCabal.cabal-install;
   doctest            = hpkgsDoctest.doctest;
   eventlog2html      = hpkgsEventlog2html.eventlog2html;
