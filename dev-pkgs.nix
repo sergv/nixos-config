@@ -48,13 +48,14 @@ let
   # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
 
   # hpkgs = pkgs.haskell.packages.ghc961.override {
-  hpkgs = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc963;
 
   # Doesn’t work but could be cool: static executables
   # hpkgs947 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
   # hpkgs947 = pkgs.haskell.packages.ghc945.override {
   hpkgs947 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc947;
+  hpkgs963 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc963;
+  hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
   overrideCabal =
     revision: editedSha: pkg:
@@ -65,7 +66,7 @@ let
 
   # hpkgsCabal-raw = pkgs.haskell.packages.ghc945.o
 
-  hpkgsDoctest = hpkgs.extend (
+  hpkgsDoctest = hpkgs963.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -107,7 +108,7 @@ let
     )
   );
 
-  hpkgsEventlog2html = hpkgs.extend (
+  hpkgsEventlog2html = hpkgs963.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -122,7 +123,7 @@ let
     )
   );
 
-  hpkgsProfiterole = hpkgs.extend (
+  hpkgsProfiterole = hpkgs963.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -133,7 +134,7 @@ let
   );
 
   # pkgs.haskell.packages.ghc961
-  hpkgsCabal = hpkgs.extend (
+  hpkgsCabal = hpkgs963.extend (
     new: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -357,15 +358,15 @@ in
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  alex               = hpkgs.alex;
-  happy              = hpkgs.happy;
+  alex               = hpkgs963.alex;
+  happy              = hpkgs963.happy;
   cabal-install      = hpkgsCabal.cabal-install;
   doctest            = hpkgsDoctest.doctest;
   eventlog2html      = hpkgsEventlog2html.eventlog2html;
-  fast-tags          = hpkgs.fast-tags;
+  fast-tags          = hpkgs963.fast-tags;
   ghc-events-analyze = hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  hp2pretty          = hpkgs.hp2pretty;
-  pretty-show        = hpkgs.pretty-show;
+  hp2pretty          = hpkgs963.hp2pretty;
+  pretty-show        = hpkgs981.pretty-show;
   profiterole        = hpkgsProfiterole.profiterole;
   # threadscope      = threadscopePkgs.threadscope;
   universal-ctags    = pkgs.universal-ctags;
