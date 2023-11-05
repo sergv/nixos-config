@@ -47,13 +47,14 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
 
     # hpkgs = pkgs.haskell.packages.ghc961.override {
-    hpkgs = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc963;
 
     # Doesn’t work but could be cool: static executables
     # hpkgs947 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
     # hpkgs947 = pkgs.haskell.packages.ghc945.override {
     hpkgs947 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc947;
+    hpkgs963 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc963;
+    hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
     overrideCabal = revision: editedSha: pkg:
       hlib.overrideCabal pkg {
@@ -63,7 +64,7 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
 
     # hpkgsCabal-raw = pkgs.haskell.packages.ghc945.o
 
-    hpkgsDoctest = hpkgs.extend (_: old:
+    hpkgsDoctest = hpkgs963.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         doctest = (old.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
           # buildInputs = [haskellPackages.GLFW-b];
@@ -91,7 +92,7 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
         statistics = hlib.dontCheck old.statistics;
       }));
 
-    hpkgsEventlog2html = hpkgs.extend (_: old:
+    hpkgsEventlog2html = hpkgs963.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         eventlog2html = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
         vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
@@ -101,13 +102,13 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
         statistics = hlib.dontCheck old.statistics;
       }));
 
-    hpkgsProfiterole = hpkgs.extend (_: old:
+    hpkgsProfiterole = hpkgs963.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         ghc-prof = hlib.doJailbreak old.ghc-prof;
       }));
 
     # pkgs.haskell.packages.ghc961
-    hpkgsCabal = hpkgs.extend (new: old:
+    hpkgsCabal = hpkgs963.extend (new: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         ghc = hutils.smaller-ghc(old.ghc);
 
@@ -301,15 +302,15 @@ in {
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  alex               = hpkgs.alex;
-  happy              = hpkgs.happy;
+  alex               = hpkgs963.alex;
+  happy              = hpkgs963.happy;
   cabal-install      = hpkgsCabal.cabal-install;
   doctest            = hpkgsDoctest.doctest;
   eventlog2html      = hpkgsEventlog2html.eventlog2html;
-  fast-tags          = hpkgs.fast-tags;
+  fast-tags          = hpkgs963.fast-tags;
   ghc-events-analyze = hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  hp2pretty          = hpkgs.hp2pretty;
-  pretty-show        = hpkgs.pretty-show;
+  hp2pretty          = hpkgs963.hp2pretty;
+  pretty-show        = hpkgs981.pretty-show;
   profiterole        = hpkgsProfiterole.profiterole;
   # threadscope        = threadscopePkgs.threadscope;
   universal-ctags    = pkgs.universal-ctags;
