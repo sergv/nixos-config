@@ -357,6 +357,8 @@ in
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
+  alex               = hpkgs.alex;
+  happy              = hpkgs.happy;
   cabal-install      = hpkgsCabal.cabal-install;
   doctest            = hpkgsDoctest.doctest;
   eventlog2html      = hpkgsEventlog2html.eventlog2html;
@@ -369,7 +371,7 @@ in
   universal-ctags    = pkgs.universal-ctags;
 
   gcc                = pkgs.gcc;
-  # clang              = pkgs.clang_13;
+  # clang            = pkgs.clang_13;
   llvm               = pkgs.llvm_13;
   lld                = pkgs.lld_13;
 
