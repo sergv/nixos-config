@@ -20,8 +20,13 @@ jobs="4"
 export NIX_BUILD_CORES="8"
 export NINJAFLAGS="-j8 -l8"
 
+command="$1"
+shift
+
+nixos-rebuild "${command}" --flake .#home --verbose --keep-going "${@}"
+
 # nixos-rebuild build --flake .#home --verbose --keep-going "${@}"
-#nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
+# nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
 #nixos-rebuild switch --flake .#home --verbose --keep-going "${@}"
 # strace -f -e execve nixos-rebuild boot --flake .#home --verbose --keep-going "${@}"
-nixos-rebuild boot --flake .#home --verbose --keep-going --max-jobs "$jobs" "${@}"
+#nixos-rebuild boot --flake .#home --verbose --keep-going --max-jobs "$jobs" "${@}"
