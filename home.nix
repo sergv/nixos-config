@@ -734,6 +734,8 @@ in
 
         # byar
 
+        # pkgs.vmware-workstation
+
         pkgs.cabextract
         pkgs.wineWowPackages.stagingFull
         pkgs.winetricks
