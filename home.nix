@@ -683,7 +683,7 @@ in
         pkgs.cpu-x
         pkgs.curl
         pkgs.dmidecode
-        pkgs.ffmpeg
+        pkgs.ffmpeg-full
         pkgs.file
         pkgs.findutils
         #pkgs.firefox
