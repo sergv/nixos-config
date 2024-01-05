@@ -592,9 +592,6 @@ in
         ".local/share/user-places.xbel"
         ".local/share/user-places.xbel.bak"
         ".local/share/user-places.xbel.tbcache"
-
-        ".steam"
-        ".local/share/Steam"
     ];
 
   dconf.settings = {
@@ -745,7 +742,6 @@ in
         isabelle-pkg
 
         pkgs.pcsx2
-        #pkgs.steam
         game-run-wrapper
 
         tex-pkg
