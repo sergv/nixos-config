@@ -493,7 +493,7 @@ in
 
         # Supreme Commander FAF
         # ".gapforever"
-        # ".faforever"
+        ".faforever"
 
         ".bash_history"
         ".rtorrent.rc"
