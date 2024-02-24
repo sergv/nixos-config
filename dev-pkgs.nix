@@ -71,17 +71,19 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        doctest = (old.callCabal2nix "doctest" doctest-repo { }).overrideAttrs (
-          oldAttrs:
-          oldAttrs
-          // {
-            # buildInputs = [haskellPackages.GLFW-b];
-            configureFlags = oldAttrs.configureFlags ++ [
-              # cabal config passes RTS options to GHC so doctest will receive them too
-              # ‘cabal repl --with-ghc=doctest’
-              "--ghc-option=-rtsopts"
-            ];
-          }
+        doctest = hlib.justStaticExecutables (
+          (old.callCabal2nix "doctest" doctest-repo { }).overrideAttrs (
+            oldAttrs:
+            oldAttrs
+            // {
+              # buildInputs = [haskellPackages.GLFW-b];
+              configureFlags = oldAttrs.configureFlags ++ [
+                # cabal config passes RTS options to GHC so doctest will receive them too
+                # ‘cabal repl --with-ghc=doctest’
+                "--ghc-option=-rtsopts"
+              ];
+            }
+          )
         );
 
         # primitive = hlib.dontCheck (old.callHackage "primitive" "0.8.0.0" {});
@@ -98,7 +100,9 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo { };
+        ghc-events-analyze = hlib.justStaticExecutables (
+          old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo { }
+        );
         SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" { };
         ghc-events = old.callHackage "ghc-events" "0.19.0.1" { };
 
@@ -113,7 +117,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        eventlog2html           = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
+        eventlog2html           = hlib.justStaticExecutables (hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html));
         vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
 
         ghc-events              = old.callHackage "ghc-events" "0.19.0.1" { };
@@ -128,6 +132,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
+        profiterole = hlib.justStaticExecutables old.profiterole;
         ghc-prof = hlib.doJailbreak old.ghc-prof;
       }
     )
@@ -149,10 +154,12 @@ let
         );
         # hlib.dontCheck
         # (old.callHackage "cabal-install-solver" "3.8.1.0" {});
-        cabal-install        = hlib.doJailbreak (
-          old.callCabal2nix "cabal-install" (cabal-repo + "/cabal-install") {
-            inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
-          }
+        cabal-install        = hlib.justStaticExecutables (
+          hlib.doJailbreak (
+            old.callCabal2nix "cabal-install" (cabal-repo + "/cabal-install") {
+              inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
+            }
+          )
         );
 
         semaphore-compat = hlib.markUnbroken old.semaphore-compat;
@@ -192,7 +199,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        threadscope = hlib.doJailbreak old.threadscope;
+        threadscope = hlib.justStaticExecutables (hlib.doJailbreak old.threadscope);
       }
     )
   );
