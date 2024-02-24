@@ -223,6 +223,35 @@ let
       }
     );
 
+  # So that I won’t need to litter everywhere with those pesky trivial flake.nix & flak.lock files
+  # that only enable zlib. Locks also require regular maintenance, which is unbearable.
+  bakedInNativeDeps = [ pkgs.zlib ];
+
+  wrap-cabal =
+    pkg:
+    pkgs.runCommand ("wrapped-cabal")
+      {
+        # Will require at runtime both libraries and headers (development files) so we’re
+        # taking both.
+        buildInputs = pkgs.lib.lists.concatMap (
+          x:
+          if builtins.hasAttr "dev" x then
+            [
+              x
+              x.dev
+            ]
+          else
+            [ x ]
+        ) bakedInNativeDeps;
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+      }
+      ''
+        mkdir -p "$out/bin"
+        makeWrapper "${pkg}/bin/cabal" "$out/bin/cabal" --suffix "PKG_CONFIG_PATH" ":" "${
+          pkgs.lib.makeSearchPathOutput "dev" "lib/pkgconfig" bakedInNativeDeps
+        }"
+      '';
+
   wrap-ghc =
     version: alias-versions: pkg:
     let
@@ -236,11 +265,13 @@ let
     in
     pkgs.runCommand ("wrapped-ghc-" + version)
       {
-        # buildInputs = [ pkgs.makeWrapper ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
       }
+      # ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
       ''
         mkdir -p "$out/bin"
         for x in ghc ghci ghc-pkg haddock-ghc runghc; do
+          # makeWrapper "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}" --suffix "LD_LIBRARY_PATH" ":" "${pkgs.lib.makeLibraryPath bakedInNativeDeps}"
           ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
           ${
             if builtins.isList alias-versions then
@@ -251,7 +282,7 @@ let
         done
       '';
 
-  wrap-ghc-filter-selected =
+  wrap-ghc-filter-selected-args =
     filtered-args: version: alias-version: pkg:
     let
       wrapped-ghc = pkgs.writeShellScript ("filtering-ghc-" + version) ''
@@ -284,11 +315,11 @@ let
         done
       '';
 
-  wrap-ghc-filter-hide-source-paths = wrap-ghc-filter-selected [
+  wrap-ghc-filter-hide-source-paths = wrap-ghc-filter-selected-args [
     "-fhide-source-paths"
   ];
 
-  wrap-ghc-filter-all = wrap-ghc-filter-selected [
+  wrap-ghc-filter-all = wrap-ghc-filter-selected-args [
     "-fhide-source-paths"
     "-fprint-potential-instances"
     "-fprint-expanded-synonyms"
@@ -360,7 +391,7 @@ in
 
   alex               = hpkgs963.alex;
   happy              = hpkgs963.happy;
-  cabal-install      = hpkgsCabal.cabal-install;
+  cabal-install      = wrap-cabal hpkgsCabal.cabal-install;
   doctest            = hpkgsDoctest.doctest;
   eventlog2html      = hpkgsEventlog2html.eventlog2html;
   fast-tags          = hpkgs963.fast-tags;
