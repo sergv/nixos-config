@@ -720,6 +720,7 @@ in
         pkgs.usbutils
         pkgs.vlc
         pkgs.vorbis-tools
+        pkgs.vuze
         pkgs.wget
         pkgs.xorg.xev
         pkgs.yt-dlp
