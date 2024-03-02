@@ -205,6 +205,7 @@ in
         ".config/Xilinx"
 
         ".local/share/direnv"
+        ".local/share/docker"
         ".local/share/3909"
         ".local/share/Anki"
         ".local/share/Anki2"
@@ -316,9 +317,21 @@ in
 
   # For running within a VM
   # virtualisation.virtualbox.guest.enable = true;
-  virtualisation.virtualbox.host = {
-    enable              = true;
-    enableExtensionPack = true;
+  virtualisation = {
+    docker = {
+      # storageDriver = "overlay2";
+      rootless = {
+        enable            = true;
+        setSocketVariable = true;
+        daemon.settings   = {
+          storage-driver = "overlay2";
+        };
+      };
+    }; #.enable = true;
+    virtualbox.host = {
+      enable              = true;
+      enableExtensionPack = true;
+    };
   };
 
   hardware = {
