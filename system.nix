@@ -410,8 +410,11 @@ in
   };
 
   hardware = {
-    bluetooth.enable  = false;
-    pulseaudio.enable = true;
+    bluetooth.enable = false;
+    pulseaudio       = {
+      enable       = true;
+      support32Bit = true;
+    };
 
     opengl            = {
       enable          = true;
