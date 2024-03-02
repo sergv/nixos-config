@@ -336,7 +336,10 @@ in
 
   hardware = {
     bluetooth.enable  = false;
-    pulseaudio.enable = true;
+    pulseaudio = {
+      enable       = true;
+      support32Bit = true;
+    };
 
     opengl = {
       enable          = true;
