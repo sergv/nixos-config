@@ -733,7 +733,7 @@ in
     # File limit is for better for steam proton games.
     # Timeout is for starting jobs that hang for any reason.
     extraConfig = ''
-      DefaultLimitNOFILE=1048576
+      DefaultLimitNOFILE=10485760
       DefaultTimeoutStopSec=10s
     '';
   };
