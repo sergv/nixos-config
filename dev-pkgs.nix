@@ -71,19 +71,17 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        doctest = hlib.justStaticExecutables (
-          (old.callCabal2nix "doctest" doctest-repo { }).overrideAttrs (
-            oldAttrs:
-            oldAttrs
-            // {
-              # buildInputs = [haskellPackages.GLFW-b];
-              configureFlags = oldAttrs.configureFlags ++ [
-                # cabal config passes RTS options to GHC so doctest will receive them too
-                # ‘cabal repl --with-ghc=doctest’
-                "--ghc-option=-rtsopts"
-              ];
-            }
-          )
+        doctest = (old.callCabal2nix "doctest" doctest-repo { }).overrideAttrs (
+          oldAttrs:
+          oldAttrs
+          // {
+            # buildInputs = [haskellPackages.GLFW-b];
+            configureFlags = oldAttrs.configureFlags ++ [
+              # cabal config passes RTS options to GHC so doctest will receive them too
+              # ‘cabal repl --with-ghc=doctest’
+              "--ghc-option=-rtsopts"
+            ];
+          }
         );
 
         # primitive = hlib.dontCheck (old.callHackage "primitive" "0.8.0.0" {});
@@ -100,9 +98,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        ghc-events-analyze = hlib.justStaticExecutables (
-          old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo { }
-        );
+        ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo { };
         SVGFonts = old.callHackage "SVGFonts" "1.7.0.1" { };
         ghc-events = old.callHackage "ghc-events" "0.19.0.1" { };
 
@@ -117,7 +113,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        eventlog2html           = hlib.justStaticExecutables (hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html));
+        eventlog2html           = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
         vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
 
         ghc-events              = old.callHackage "ghc-events" "0.19.0.1" { };
@@ -132,7 +128,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        profiterole = hlib.justStaticExecutables old.profiterole;
+        profiterole = old.profiterole;
         ghc-prof = hlib.doJailbreak old.ghc-prof;
       }
     )
@@ -154,12 +150,10 @@ let
         );
         # hlib.dontCheck
         # (old.callHackage "cabal-install-solver" "3.8.1.0" {});
-        cabal-install        = hlib.justStaticExecutables (
-          hlib.doJailbreak (
-            old.callCabal2nix "cabal-install" (cabal-repo + "/cabal-install") {
-              inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
-            }
-          )
+        cabal-install        = hlib.doJailbreak (
+          old.callCabal2nix "cabal-install" (cabal-repo + "/cabal-install") {
+            inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
+          }
         );
 
         semaphore-compat = hlib.markUnbroken old.semaphore-compat;
@@ -199,7 +193,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        threadscope = hlib.justStaticExecutables (hlib.doJailbreak old.threadscope);
+        threadscope = hlib.doJailbreak old.threadscope;
       }
     )
   );
@@ -396,16 +390,16 @@ in
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  alex               = hpkgs963.alex;
-  happy              = hpkgs963.happy;
-  cabal-install      = wrap-cabal hpkgsCabal.cabal-install;
-  doctest            = hpkgsDoctest.doctest;
-  eventlog2html      = hpkgsEventlog2html.eventlog2html;
-  fast-tags          = hpkgs963.fast-tags;
-  ghc-events-analyze = hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  hp2pretty          = hpkgs963.hp2pretty;
-  pretty-show        = hpkgs981.pretty-show;
-  profiterole        = hpkgsProfiterole.profiterole;
+  alex               = hlib.justStaticExecutables hpkgs963.alex;
+  happy              = hlib.justStaticExecutables hpkgs963.happy;
+  cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
+  doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
+  eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
+  fast-tags          = hlib.justStaticExecutables hpkgs963.fast-tags;
+  ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
+  hp2pretty          = hlib.justStaticExecutables hpkgs963.hp2pretty;
+  pretty-show        = hlib.justStaticExecutables hpkgs981.pretty-show;
+  profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
   # threadscope      = threadscopePkgs.threadscope;
   universal-ctags    = pkgs.universal-ctags;
 
