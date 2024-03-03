@@ -19,6 +19,10 @@
       url = "nixpkgs/nixos-20.09";
     };
 
+    nixpkgs-23-11 = {
+      url = "nixpkgs/nixos-23.11";
+    };
+
     nixpkgs-unstable = {
       # url = "nixpkgs/nixos-23.05";
       url = "nixpkgs/nixos-unstable";
@@ -57,6 +61,7 @@
       nixpkgs-stable,
       nixpkgs-20-03,
       nixpkgs-20-09,
+      nixpkgs-23-11,
       nixpkgs-unstable,
       # , nixpkgs-fresh-ghc
       nur,
@@ -117,8 +122,10 @@
             ghc928 = hutils.smaller-ghc old.haskell.compiler.ghc928;
             ghc94 = hutils.smaller-ghc old.haskell.compiler.ghc94;
             ghc947 = hutils.smaller-ghc old.haskell.compiler.ghc947;
+            ghc948 = hutils.smaller-ghc old.haskell.compiler.ghc948;
             ghc96 = hutils.smaller-ghc old.haskell.compiler.ghc96;
             ghc963 = hutils.smaller-ghc old.haskell.compiler.ghc963;
+            ghc964 = hutils.smaller-ghc old.haskell.compiler.ghc964;
             ghc98 = hutils.smaller-ghc old.haskell.compiler.ghc98;
             ghc981 = hutils.smaller-ghc old.haskell.compiler.ghc981;
           };
@@ -128,8 +135,10 @@
             ghc928 = hutils.smaller-hpkgs old.haskell.packages.ghc928;
             ghc94 = hutils.smaller-hpkgs old.haskell.packages.ghc94;
             ghc947 = hutils.smaller-hpkgs old.haskell.packages.ghc947;
+            ghc948 = hutils.smaller-hpkgs old.haskell.packages.ghc948;
             ghc96 = hutils.smaller-hpkgs old.haskell.packages.ghc96;
             ghc963 = hutils.smaller-hpkgs old.haskell.packages.ghc963;
+            ghc964 = hutils.smaller-hpkgs old.haskell.packages.ghc964;
             ghc98 = hutils.smaller-hpkgs old.haskell.packages.ghc98;
             ghc981 = hutils.smaller-hpkgs old.haskell.packages.ghc981;
           };
@@ -155,29 +164,56 @@
             #   };
             # };
 
-            ghc94 = old.haskell.packages.ghc94.extend (
-              _: old2: {
-                x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
-              }
-            );
+            # ghc94 = old.haskell.packages.ghc94.extend (_: old2: {
+            #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
+            # });
 
-            ghc946 = old.haskell.packages.ghc946.extend (
-              _: old2: {
-                x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
-              }
-            );
-
-            ghc962 = old.haskell.packages.ghc962.extend (
-              _: old2: {
-                x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
-              }
-            );
+            # ghc947 = old.haskell.packages.ghc947.extend (_: old2: {
+            #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
+            # });
+            #
+            # ghc964 = old.haskell.packages.ghc964.extend (_: old2: {
+            #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
+            # });
           };
         };
       };
 
       # Fixes for building with -march=znver3
-      zen3-march-overlay = _: old: {
+      zen4-march-overlay = _: old: {
+
+        libvorbis = old.libvorbis.override (_: {
+
+          # GCC 13.2 leads to segfault during testing. If we ignore tests
+          # then other package’s tests will segfault, libvorbis is somehow not
+          # functional with GCC 13.2.
+          stdenv = old.clangStdenv; # old.overrideCC old.stdenv old.gcc12;
+
+          # Disable -march and -mtune for a package.
+          # stdenv = old.stdenv.override (old2: old2 // {
+          #   hostPlatform   = old2.hostPlatform // {
+          #     gcc = {};
+          #   };
+          #   buildPlatform  = old2.buildPlatform // {
+          #     gcc = {};
+          #   };
+          #   targetPlatform = old2.targetPlatform // {
+          #     gcc = {};
+          #   };
+          # });
+        });
+
+        # libvorbis = old.libvorbis.overrideAttrs (_: {
+        #   # doCheck = false;
+        # });
+
+        gsl = old.gsl.overrideAttrs (_: {
+          doCheck = false;
+        });
+
+        tzdata = old.tzdata.overrideAttrs (_: {
+          doCheck = false;
+        });
 
         virtualbox = old.virtualbox.overrideAttrs (old2: {
           patches = (old2.patches or [ ]) ++ [ patches/vitrualbox-fix-bin2c-with-march.patch ];
@@ -200,7 +236,7 @@
 
         # To avoid infinite recursion
         cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables (
-          old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix" old.haskell.packages.ghc963.cabal2nix
+          old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix" old.haskell.packages.ghc964.cabal2nix
         );
       };
 
@@ -219,6 +255,26 @@
 
       arch = import ./arch.nix;
 
+      # # Packages withou -march override for when
+      # pkgs-default = import nixpkgs-unstable {
+      #   # inherit system;
+      #   inherit (arch) localSystem;
+      #   config = {
+      #     allowBroken                    = true;
+      #     allowUnfree                    = true;
+      #     # virtualbox.enableExtensionPack = true;
+      #   };
+      #   overlays = [
+      #     fcitx-overlay
+      #     ssh-overlay
+      #     smaller-haskell-overlay
+      #     haskell-disable-checks-overlay
+      #     zen4-march-overlay
+      #
+      #     # arch-native-overlay
+      #   ];
+      # };
+
       pkgs = import nixpkgs-unstable {
         # inherit system;
         inherit (arch) localSystem;
@@ -232,7 +288,7 @@
           ssh-overlay
           smaller-haskell-overlay
           haskell-disable-checks-overlay
-          zen3-march-overlay
+          zen4-march-overlay
 
           # arch-native-overlay
         ];
@@ -274,6 +330,7 @@
           nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
           nixpkgs-20-03 = import nixpkgs-20-03 { inherit system; };
           nixpkgs-20-09 = import nixpkgs-20-09 { inherit system; };
+          nixpkgs-23-11 = import nixpkgs-23-11 { inherit system; };
         };
       };
 
@@ -301,7 +358,7 @@
                   ssh-overlay
                   smaller-haskell-overlay
                   haskell-disable-checks-overlay
-                  zen3-march-overlay
+                  zen4-march-overlay
                   # arch-native-overlay
                 ];
               }
