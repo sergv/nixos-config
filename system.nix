@@ -11,7 +11,7 @@ in
     [# Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./compressed-root.nix
-      # ./smaller-kernel.nix
+      ./kernel.nix
     ];
 
   # For booting see https://nixos.wiki/wiki/Bootloader
@@ -22,6 +22,11 @@ in
   boot.loader.systemd-boot.enable      = true;
   boot.loader.efi.canTouchEfiVariables = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
+
+  boot.kernelParams = [
+    "mitigations=off"
+    "preempt=full"
+  ];
 
   boot.kernel.sysctl = {
     # Allow ‘perf’ without root.
