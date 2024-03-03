@@ -49,11 +49,10 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
     # hpkgs = pkgs.haskell.packages.ghc961.override {
 
     # Doesn’t work but could be cool: static executables
-    # hpkgs947 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
+    # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
-    # hpkgs947 = pkgs.haskell.packages.ghc945.override {
-    hpkgs947 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc947;
-    hpkgs963 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc963;
+    hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
+    hpkgs964 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc964;
     hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
     overrideCabal = revision: editedSha: pkg:
@@ -64,7 +63,7 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
 
     # hpkgsCabal-raw = pkgs.haskell.packages.ghc945.o
 
-    hpkgsDoctest = hpkgs963.extend (_: old:
+    hpkgsDoctest = hpkgs964.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         doctest = (old.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
           # buildInputs = [haskellPackages.GLFW-b];
@@ -82,7 +81,7 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
         # syb = old.callHackage "syb" "0.7.2.3" {};
       }));
 
-    hpkgsGhcEvensAnalyze = hpkgs947.extend (_: old:
+    hpkgsGhcEvensAnalyze = hpkgs948.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
         SVGFonts           = old.callHackage "SVGFonts" "1.7.0.1" {};
@@ -92,7 +91,7 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
         statistics = hlib.dontCheck old.statistics;
       }));
 
-    hpkgsEventlog2html = hpkgs963.extend (_: old:
+    hpkgsEventlog2html = hpkgs964.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         eventlog2html = hlib.doJailbreak (hlib.unmarkBroken old.eventlog2html);
         vector-binary-instances = hlib.doJailbreak old.vector-binary-instances;
@@ -102,14 +101,14 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
         statistics = hlib.dontCheck old.statistics;
       }));
 
-    hpkgsProfiterole = hpkgs963.extend (_: old:
+    hpkgsProfiterole = hpkgs964.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         profiterole = old.profiterole;
         ghc-prof    = hlib.doJailbreak old.ghc-prof;
       }));
 
     # pkgs.haskell.packages.ghc961
-    hpkgsCabal = hpkgs963.extend (new: old:
+    hpkgsCabal = hpkgs964.extend (new: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         ghc = hutils.smaller-ghc(old.ghc);
 
@@ -285,13 +284,14 @@ in {
 
   ghc865     = wrap-ghc                          "8.6.5"  "8.6"        pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
 
-  ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pkgs.haskell.packages.ghc884.ghc;
+  ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
+
   ghc8107    = wrap-ghc                          "8.10.7" "8.10"       (disable-docs pkgs.haskell.packages.ghc8107.ghc);
   ghc902     = wrap-ghc                          "9.0.2"  "9.0"        (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
   ghc928     = wrap-ghc                          "9.2.8"  "9.2"        (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
-  ghc947     = wrap-ghc                          "9.4.7"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc947.ghc);
+  ghc948     = wrap-ghc                          "9.4.8"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc948.ghc);
 
-  ghc963     = wrap-ghc                          "9.6.3"  "9.6"        (hutils.smaller-ghc pkgs.haskell.packages.ghc963.ghc);
+  ghc964     = wrap-ghc                          "9.6.4"  "9.6"        (hutils.smaller-ghc pkgs.haskell.packages.ghc964.ghc);
   ghc981     = wrap-ghc                          "9.8.1"  ["9.8" null] (hutils.smaller-ghc pkgs.haskell.packages.ghc981.ghc);
 
   #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
@@ -321,14 +321,14 @@ in {
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  alex               = hlib.justStaticExecutables hpkgs963.alex;
-  happy              = hlib.justStaticExecutables hpkgs963.happy;
+  alex               = hlib.justStaticExecutables hpkgs964.alex;
+  happy              = hlib.justStaticExecutables hpkgs964.happy;
   cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
   doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
   eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
-  fast-tags          = hlib.justStaticExecutables hpkgs963.fast-tags;
+  fast-tags          = hlib.justStaticExecutables hpkgs964.fast-tags;
   ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  hp2pretty          = hlib.justStaticExecutables hpkgs963.hp2pretty;
+  hp2pretty          = hlib.justStaticExecutables hpkgs964.hp2pretty;
   pretty-show        = hlib.justStaticExecutables hpkgs981.pretty-show;
   profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
   # threadscope        = threadscopePkgs.threadscope;

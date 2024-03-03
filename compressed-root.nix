@@ -19,7 +19,7 @@ in {
   fileSystems."/" = {
     fsType        = "btrfs";
     device        = "${backing-store}";
-    options       = ["noatime" "nodiratime" "lazytime" "compress=zstd:8" # "noautodefrag"
+    options       = ["noatime" "nodiratime" "lazytime" "compress-force=zstd:15" # "noautodefrag"
                     ];
   };
 }
