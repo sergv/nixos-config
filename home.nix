@@ -620,7 +620,7 @@ in
   programs.firefox = {
     enable = true;
     package = pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
-      extraNativeMessagingHosts = [ pkgs.nur.repos.wolfangaukang.vdhcoapp ];
+      nativeMessagingHosts = [ pkgs.nur.repos.wolfangaukang.vdhcoapp ];
     };
   };
 
@@ -671,6 +671,8 @@ in
         pkgs.baobab
         pkgs.bridge-utils
         # pkgs.ccache
+        # Take from pristine so that it will be picked up from cache. Building chromium
+        # is almost impossible.
         pkgs-pristine.chromium
         #pkgs.google-chrome
         # pkgs.clang
