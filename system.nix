@@ -486,7 +486,7 @@ in
 
   services.locate = {
     enable    = true;
-    locate    = pkgs.mlocate;
+    package   = pkgs.mlocate;
     interval  = "daily";
     # Silence warning.
     localuser = null;
@@ -522,11 +522,13 @@ in
     # # So that Xorg's config will be present in /etc
     # exportConfiguration = false;
 
-    layout     = "us,ru";
-    xkbModel   = "pc105";
-    xkbVariant = "dvorak,";
-    # terminate:ctrl_alt_bksp
-    xkbOptions = "grp:shifts_toggle,caps:escape";
+    xkb = {
+      layout  = "us,ru";
+      model   = "pc105";
+      variant = "dvorak,";
+      # terminate:ctrl_alt_bksp
+      options = "grp:shifts_toggle,caps:escape";
+    };
 
     # Touchpad
     # synaptics  = {
