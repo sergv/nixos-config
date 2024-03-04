@@ -50,6 +50,18 @@ let wmctrl-pkg = pkgs.wmctrl;
       exec ${pkgs.steam-run}/bin/steam-run "''${@}"
     '';
 
+    qbittorrent-pkg = (pkgs.qbittorrent.override {
+      webuiSupport  = false;
+      trackerSearch = false;
+    }).overrideAttrs(old: {
+
+      postInstall = old.postInstall +
+        ''
+          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=1.5 \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
+        '';
+      # postInstall = builtins.replaceStrings [ "${old.desktopItem}" ] [ "${newDesktopItem}" ] old.postInstall;
+    });
+
     isabelle-pkg = import ./isabelle/isabelle.nix {
       inherit pkgs;
     };
@@ -712,7 +724,6 @@ in
         pkgs.pinentry-qt
         # pkgs.pmutils
         pkgs.pv
-        pkgs.qbittorrent
         pkgs.smartmontools
         pkgs.sshfs
         pkgs.telegram-desktop
@@ -730,6 +741,8 @@ in
         # pkgs.yasm
         pkgs.zstd
         # pkgs.z3
+
+        qbittorrent-pkg
 
         pkgs.nur.repos.wolfangaukang.vdhcoapp
 
