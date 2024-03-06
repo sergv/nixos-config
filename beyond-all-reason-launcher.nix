@@ -5,7 +5,6 @@
 , runCommand
 , nodejs
 , electron
-, butler
 , steam-run
 , jq
 , xorg
@@ -27,14 +26,14 @@
 # patching.
 
 let
-  version = "1.2470.0"; #"1.2124.0"; # 1.1861.0
+  version = "1.2988.0"; # "1.2470.0"; #"1.2124.0"; # 1.1861.0
   srcs = {
     # Contains the configuration for the launcher.
     byar-chobby = fetchFromGitHub {
       owner  = "beyond-all-reason";
       repo   = "BYAR-Chobby";
       rev    = "v${version}";
-      sha256 = "sha256-evIoYuw+1Ma98oBYQ6wSKXSpyt45/wODUP4YSHvI37w="; # lib.fakeSha256;
+      sha256 = "sha256-mqopt/ciIqr4lNHU8RzsZM/Eawt4hs24CmQ5Fszz+tA="; # lib.fakeSha256;
     };
       # fetchzip {
       # url  = "https://github.com/beyond-all-reason/BYAR-Chobby/archive/refs/tags/v${version}.zip";
@@ -44,8 +43,8 @@ let
     spring-launcher = fetchFromGitHub {
       owner  = "beyond-all-reason";
       repo   = "spring-launcher";
-      rev    = "2c6e0a63d317b5fc5f92ee39742e1f8a55c41976"; # "c625661330bfdc6e3a6757e4a65e6d5402f1d00a"; # "439a9b7b7d835691267ad13586d0efc763d39b60";
-      sha256 = "sha256-YhZqckkIs4SHlCgJkSHTHRyI2Bc3mRMZN9+Wwx70lzM="; # lib.fakeSha256;
+      rev    = "2c0a6e17b50ab04ea592c53963c571e5ccb071ba"; # "2c6e0a63d317b5fc5f92ee39742e1f8a55c41976"; # "c625661330bfdc6e3a6757e4a65e6d5402f1d00a"; # "439a9b7b7d835691267ad13586d0efc763d39b60";
+      sha256 = "sha256-JfZQaFp81A9o69cJOc6YPop1pLP2sZvfiMjZCFd6+H4="; #lib.fakeSha256;
     };
   };
 
@@ -54,11 +53,12 @@ let
     {
       buildInputs = [ nodejs jq ];
     } ''
-    cp -r ${srcs.byar-chobby} BYAR-Chobby
-    cp -r ${srcs.spring-launcher} launcher
+    cp -rv ${srcs.byar-chobby} BYAR-Chobby
+    cp -rv ${srcs.spring-launcher} launcher
     chmod -R +w *
 
     echo --- Patch launcher with dist_cfg
+    echo cp -r BYAR-Chobby/dist_cfg/* launcher/src/
     cp -r BYAR-Chobby/dist_cfg/* launcher/src/
     for dir in bin files build; do
       mkdir -p launcher/$dir
@@ -96,7 +96,8 @@ let
   nodeModules = buildNpmPackage {
     inherit src version;
     pname = "byar-launcher-package";
-    npmDepsHash = "sha256-dbURtLbgprljQaxurnAscydGHt3ORtd18lktVeY+iQU="; #"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # "sha256-CKBdeIGplXSM/OP9+igmLWR/FC2xnwAAhbYwlTp8ZSY="; # "sha256-cCUtkycZ0bpLwcCfBjf+rTeoMHN7jIxcYCtyrB4rC8A=";
+    npmDepsHash = "sha256-ls0YEWJp+cS+5sCnNciam+SYGSeTukZ3En8taGDv0K4="; #"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; #"sha256-dbURtLbgprljQaxurnAscydGHt3ORtd18lktVeY+iQU="; #"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # "sha256-CKBdeIGplXSM/OP9+igmLWR/FC2xnwAAhbYwlTp8ZSY="; # "sha256-cCUtkycZ0bpLwcCfBjf+rTeoMHN7jIxcYCtyrB4rC8A=";
+    forceGitDeps = true;
     npmFlags = [ "--legacy-peer-deps" ];
     dontNpmBuild = true;
     passthru = {
@@ -115,10 +116,10 @@ let
     pname = "pr-downloader";
     version = "master";
     src = fetchFromGitHub {
-      owner = "beyond-all-reason";
-      repo = "pr-downloader";
-      rev = "4e30e3e776c47b81e790fffcb2b62f81437e0c24"; # "d3ad0156fe1c9123b32f966c00ed3825e62ae15d"; #"79b605d013a0c5a92090b3892e8e0c0aeccac2a8";
-      sha256 = "sha256-nHFGhgiWBPJUQe120TQn52FoPDA50U5EW3PKeh/OLVs="; # lib.fakeSha256; # "sha256-ckDt8cG9fktej3A5xSDZmenn6u1N6pWayqnsLrQVeno="; #"sha256-noroFiv2wAUCgI1ne2sP0PVBxIf20D+m5oa5+pk2OXQ=";
+      owner           = "beyond-all-reason";
+      repo            = "pr-downloader";
+      rev             = "185d0bb6a07e4cec56236d18f03d4cfe033e10f1"; #"4e30e3e776c47b81e790fffcb2b62f81437e0c24"; # "d3ad0156fe1c9123b32f966c00ed3825e62ae15d"; #"79b605d013a0c5a92090b3892e8e0c0aeccac2a8";
+      sha256          = "sha256-8sdYEVLmmY5wLzq3whbOQ2jefPSCaYuU85+lp9M01PI="; #lib.fakeSha256; # "sha256-ckDt8cG9fktej3A5xSDZmenn6u1N6pWayqnsLrQVeno="; #"sha256-noroFiv2wAUCgI1ne2sP0PVBxIf20D+m5oa5+pk2OXQ=";
       fetchSubmodules = true;
     };
     buildInputs = [
@@ -146,9 +147,6 @@ stdenv.mkDerivation {
     chmod -R +w $out/lib/dist
 
     cp -r ${nodeModules} $out/lib/dist/node_modules
-
-    rm $out/lib/dist/bin/butler/linux/butler
-    ln -s ${butler}/bin/butler $out/lib/dist/bin/butler/linux/butler
 
     rm $out/lib/dist/bin/pr-downloader
     ln -s ${pr-downloader}/bin/pr-downloader $out/lib/dist/bin/pr-downloader
