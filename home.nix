@@ -20,7 +20,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     };
 
     byar = import ./beyond-all-reason-launcher.nix {
-      inherit (pkgs)
+      inherit (pkgs-pristine)
         lib
         stdenv
         fetchFromGitHub
@@ -28,7 +28,7 @@ let wmctrl-pkg = pkgs.wmctrl;
         runCommand
         nodejs
         electron
-        butler
+        # butler
         steam-run
         jq
         xorg
