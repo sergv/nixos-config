@@ -31,7 +31,7 @@ let
   };
 
   byar = import ./beyond-all-reason-launcher.nix {
-    inherit (pkgs)
+    inherit (pkgs-pristine)
       lib
       stdenv
       fetchFromGitHub
@@ -39,7 +39,7 @@ let
       runCommand
       nodejs
       electron
-      butler
+      # butler
       steam-run
       jq
       xorg
