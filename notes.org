@@ -253,7 +253,15 @@ Can be checked out when something fails to build
 - [ ] Add [[https://github.com/nix-community/rnix-lsp][nix lsp]] to Emacs
 - [x] Turn root into a tmpfs
 
-* Cookbook
+
+* Flakes
+flake ~ project file
+
+~nix build .#~ - build flake (~#~) in current directory (~.~)
+
+NUR - like AUR, Nix User Repository
+
+* Cookbook/FAQ
 ** Dummy hash function
 ~pkgs.lib.fakeHash~
 ~pkgs.lib.fakeSha256~
@@ -267,14 +275,6 @@ There is also an stdenv adapter that will build static binaries:
 $ nix-build '<nixpkgs>' -A pkgsStatic.hello
 #+END_EXAMPLE
 
-* Flakes
-flake ~ project file
-
-~nix build .#~ - build flake (~#~) in current directory (~.~)
-
-NUR - like AUR, Nix User Repository
-
-* Cookbook/FAQ
 ** ~buildInputs~ vs ~nativeBuildInputs~
 *** ~buildInputs~
 Programs and libraries used by the new derivation at run-time
