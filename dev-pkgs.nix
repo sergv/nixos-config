@@ -274,6 +274,38 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
           done
         '';
 
+    disableAllHardening = x: x.overrideAttrs (old: {
+      hardeningDisable = ["all"];
+    });
+
+    ghc982 =
+      let old-ghc = pkgs.haskell.compiler.ghc981;
+          version = "9.8.2";
+          rev     = "f3225ed4b3f3c4309f9342c5e40643eeb0cc45da";
+          ghcSrc = pkgs.fetchgit {
+            url    = "https://gitlab.haskell.org/ghc/ghc.git";
+            sha256 = "sha256-EhZSGnr12aWkye9v5Jsm91vbMi/EDzRAPs8/W2aKTZ8="; #pkgs.lib.fakeSha256;
+            inherit rev;
+          };
+      in
+        disableAllHardening (hutils.smaller-ghc ((old-ghc.override (old: old // {
+          hadrian = old-ghc.hadrian.override (old2: old2 // {
+            inherit ghcSrc;
+            ghcVersion = version;
+          });
+          inherit ghcSrc;
+        }
+        )).overrideAttrs (old: {
+          inherit version;
+          preConfigure = builtins.replaceStrings [ old-ghc.version ] [ "${version}" ] old.preConfigure +
+            # Do this if taking sources from git directly.
+            ''
+              echo ${version} > VERSION
+              echo ${rev} > GIT_COMMIT_ID
+              ./boot
+            '';
+        })));
+
 in {
 
   ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
@@ -292,7 +324,7 @@ in {
   ghc948     = wrap-ghc                          "9.4.8"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc948.ghc);
 
   ghc964     = wrap-ghc                          "9.6.4"  "9.6"        (hutils.smaller-ghc pkgs.haskell.packages.ghc964.ghc);
-  ghc981     = wrap-ghc                          "9.8.1"  ["9.8" null] (hutils.smaller-ghc pkgs.haskell.packages.ghc981.ghc);
+  ghc982     = wrap-ghc                          "9.8.2"  ["9.8" null] ghc982;
 
   #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
 
