@@ -31,7 +31,7 @@ in
       "noatime"
       "nodiratime"
       "lazytime"
-      "compress-force=zstd:15" # "noautodefrag"
+      "compress-force=zstd:8" # "noautodefrag"
     ];
   };
 }
