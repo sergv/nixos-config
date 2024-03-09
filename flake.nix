@@ -70,7 +70,9 @@
     }:
     let system = "x86_64-linux";
 
-        hutils = import haskell/utils.nix { pkgs = nixpkgs-unstable.legacyPackages."${system}"; };
+        hutils = import haskell/utils.nix {
+          pkgs = nixpkgs-unstable.legacyPackages."${system}";
+        };
 
         # Fix when upgrading 22.11 -> nixos-unstable circa 2023-04-11
         fcitx-overlay = _: old: {
@@ -92,7 +94,7 @@
         # };
 
         smaller-haskell-overlay = new: old: {
-          haskellPackages                = (hutils.smaller-hpkgs old.haskellPackages).extend (_: old2: {
+          haskellPackages                = hutils.fixedExtend (hutils.smaller-hpkgs old.haskellPackages) (_: old2: {
             # Make everything smaller at the core by altering arguments to mkDerivation.
             # This is hacky but is needed because Isabelle’s naproche dependency cannot
             # be coerced to not do e.g. profiling by standard Haskell infrastructure
@@ -106,7 +108,7 @@
               # enableSharedLibraries     = false;
             });
           });
-
+          
           haskell = old.haskell // {
             compiler = old.haskell.compiler // {
               ghc92         = hutils.smaller-ghc old.haskell.compiler.ghc92;
@@ -120,7 +122,7 @@
               ghc98         = hutils.smaller-ghc old.haskell.compiler.ghc98;
               ghc981        = hutils.smaller-ghc old.haskell.compiler.ghc981;
             };
-
+          
             packages = old.haskell.packages // {
               ghc92         = hutils.smaller-hpkgs old.haskell.packages.ghc92;
               ghc928        = hutils.smaller-hpkgs old.haskell.packages.ghc928;
@@ -136,14 +138,17 @@
           };
         };
 
+        # Tests of these packages fail, presumable because of -march.
+        disable-problematic-haskell-crypto-pkgs-checks = old: _: old2: {
+          cryptonite              = old.haskell.lib.dontCheck old2.cryptonite;
+          crypton                 = old.haskell.lib.dontCheck old2.crypton;
+          # x509-validation         = old.haskell.lib.dontCheck old2.x509-validation;
+          crypton-x509-validation = old.haskell.lib.dontCheck old2.crypton-x509-validation;
+          tls                     = old.haskell.lib.dontCheck old2.tls;
+        };
+
         haskell-disable-checks-overlay = _: old: {
-          haskellPackages = old.haskellPackages.extend (_: old2: {
-            cryptonite              = old.haskell.lib.dontCheck old2.cryptonite;
-            crypton                 = old.haskell.lib.dontCheck old2.crypton;
-            # x509-validation         = old.haskell.lib.dontCheck old2.x509-validation;
-            crypton-x509-validation = old.haskell.lib.dontCheck old2.crypton-x509-validation;
-            tls                     = old.haskell.lib.dontCheck old2.tls;
-          });
+          haskellPackages = hutils.fixedExtend old.haskellPackages (disable-problematic-haskell-crypto-pkgs-checks old);
           haskell = old.haskell // {
             packages = old.haskell.packages // {
               # Doesn’t work: overwrites changes made by ‘smaller-haskell-overlay’.
@@ -152,82 +157,116 @@
               #     x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
               #   };
               # };
-
-              # ghc94 = old.haskell.packages.ghc94.extend (_: old2: {
+          
+              # ghc94 = hutils.fixedExtend old.haskell.packages.ghc94 (_: old2: {
               #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
               # });
-
-              # ghc947 = old.haskell.packages.ghc947.extend (_: old2: {
+          
+              # ghc947 = hutils.fixedExtend old.haskell.packages.ghc947 (_: old2: {
               #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
               # });
-              #
-              # ghc964 = old.haskell.packages.ghc964.extend (_: old2: {
-              #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
-              # });
+          
+              ghc964 = hutils.fixedExtend old.haskell.packages.ghc964 (disable-problematic-haskell-crypto-pkgs-checks old);
             };
           };
         };
 
-
         # Fixes for building with -march=znver3
         zen4-march-overlay = _: old: {
 
-          libvorbis = old.libvorbis.override (_: {
+          # # llvmPackages_15 = old.llvmPackages_15.extend (_: old2: {
+          # #   libllvm = old2.libllvm.override (_: {
+          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+          # #     stdenv = old.clangStdenv;
+          # #   });
+          # #   llvm = old2.llvm.override (_: {
+          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+          # #     stdenv = old.clangStdenv;
+          # #   });
+          # # });
+          # #
+          # # # llvmPackages_16 = old.llvmPackages_16.override {
+          # # #   stdenv = old.clangStdenv;
+          # # # };
+          # #
+          # # llvmPackages_16 = old.llvmPackages_16.extend (_: old2: {
+          # #   libllvm = old2.libllvm.override (_: {
+          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+          # #     stdenv = old.clangStdenv;
+          # #   });
+          # #   llvm = old2.llvm.override (_: {
+          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+          # #     stdenv = old.clangStdenv;
+          # #   });
+          # # });
+          # #
+          # # llvmPackages_17 = old.llvmPackages_17.extend (_: old2: {
+          # #   libllvm = old2.libllvm.override (_: {
+          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+          # #     stdenv = old.clangStdenv;
+          # #   });
+          # #   llvm = old2.llvm.override (_: {
+          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+          # #     stdenv = old.clangStdenv;
+          # #   });
+          # # });
 
-            # GCC 13.2 leads to segfault during testing. If we ignore tests
-            # then other package’s tests will segfault, libvorbis is somehow not
-            # functional with GCC 13.2.
-            stdenv = old.clangStdenv; #old.overrideCC old.stdenv old.gcc12;
+          # # libvorbis = old.libvorbis.override (_: {
+          # #
+          # #   # GCC 13.2 leads to segfault during testing. If we ignore tests
+          # #   # then other package’s tests will segfault, libvorbis is somehow not
+          # #   # functional with GCC 13.2.
+          # #   stdenv = old.clangStdenv; #old.overrideCC old.stdenv old.gcc12;
+          # #
+          # #   # Disable -march and -mtune for a package.
+          # #   # stdenv = old.stdenv.override (old2: old2 // {
+          # #   #   hostPlatform   = old2.hostPlatform // {
+          # #   #     gcc = {};
+          # #   #   };
+          # #   #   buildPlatform  = old2.buildPlatform // {
+          # #   #     gcc = {};
+          # #   #   };
+          # #   #   targetPlatform = old2.targetPlatform // {
+          # #   #     gcc = {};
+          # #   #   };
+          # #   # });
+          # # });
 
-            # Disable -march and -mtune for a package.
-            # stdenv = old.stdenv.override (old2: old2 // {
-            #   hostPlatform   = old2.hostPlatform // {
-            #     gcc = {};
-            #   };
-            #   buildPlatform  = old2.buildPlatform // {
-            #     gcc = {};
-            #   };
-            #   targetPlatform = old2.targetPlatform // {
-            #     gcc = {};
-            #   };
-            # });
-          });
+          # # libvorbis = old.libvorbis.overrideAttrs (_: {
+          # #   # doCheck = false;
+          # # });
 
-          # libvorbis = old.libvorbis.overrideAttrs (_: {
-          #   # doCheck = false;
+          # gsl = old.gsl.overrideAttrs (_: {
+          #   doCheck = false;
           # });
 
-          gsl = old.gsl.overrideAttrs (_: {
-            doCheck = false;
-          });
+          # tzdata = old.tzdata.overrideAttrs (_: {
+          #   doCheck = false;
+          # });
 
-          tzdata = old.tzdata.overrideAttrs (_: {
-            doCheck = false;
-          });
+          # virtualbox = old.virtualbox.overrideAttrs (old2: {
+          #   patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
+          # });
 
-          virtualbox = old.virtualbox.overrideAttrs (old2: {
-            patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
-          });
+          # libreoffice = old.libreoffice.override (old2: {
+          #   unwrapped = old2.unwrapped.overrideAttrs (_: {
+          #     doCheck = false;
+          #   });
+          # });
 
-          libreoffice = old.libreoffice.override (old2: {
-            unwrapped = old2.unwrapped.overrideAttrs (_: {
-              doCheck = false;
-            });
-          });
+          # python311 = old.python311.override {
+          #   packageOverrides = _: old2: {
+          #     pandas = old2.pandas.overrideAttrs (old-pandas-attrs: {
+          #       doCheck        = false;
+          #       doInstallCheck = false;
+          #     });
+          #   };
+          # };
 
-          python311 = old.python311.override {
-            packageOverrides = _: old2: {
-              pandas = old2.pandas.overrideAttrs (old-pandas-attrs: {
-                doCheck        = false;
-                doInstallCheck = false;
-              });
-            };
-          };
-
-          # To avoid infinite recursion
-          cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
-            (old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix"
-              old.haskell.packages.ghc964.cabal2nix);
+          # # To avoid infinite recursion
+          # cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
+          #   (old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix"
+          #     old.haskell.packages.ghc964.cabal2nix);
         };
 
         pkgs-pristine = import nixpkgs-unstable {
@@ -245,33 +284,14 @@
 
         arch = import ./arch.nix;
 
-        # # Packages withou -march override for when
-        # pkgs-default = import nixpkgs-unstable {
-        #   # inherit system;
-        #   inherit (arch) localSystem;
-        #   config = {
-        #     allowBroken                    = true;
-        #     allowUnfree                    = true;
-        #     # virtualbox.enableExtensionPack = true;
-        #   };
-        #   overlays = [
-        #     fcitx-overlay
-        #     ssh-overlay
-        #     smaller-haskell-overlay
-        #     haskell-disable-checks-overlay
-        #     zen4-march-overlay
-        #
-        #     # arch-native-overlay
-        #   ];
-        # };
-
         pkgs = import nixpkgs-unstable {
           # inherit system;
           inherit (arch) localSystem;
           config = {
             allowBroken                    = true;
-            allowUnfree                    = true;
+            allowUnfree                    = true; # For nvidia drivers.
             # virtualbox.enableExtensionPack = true;
+            #inherit (arch) replaceStdenv;
           };
           overlays = [
             fcitx-overlay
@@ -330,6 +350,7 @@
       nixosConfigurations = {
         home = nixpkgs-unstable.lib.nixosSystem {
           inherit system;
+          inherit pkgs;
           modules = [
             ({ config, pkgs, ... }:
               let
@@ -341,11 +362,12 @@
                 nixpkgs.overlays = [
                   nur.overlay
                   overlay-unstable
-                  fcitx-overlay
-                  ssh-overlay
-                  smaller-haskell-overlay
-                  haskell-disable-checks-overlay
-                  zen4-march-overlay
+                  # fcitx-overlay
+                  # ssh-overlay
+                  # smaller-haskell-overlay
+                  # haskell-disable-checks-overlay
+                  # zen4-march-overlay
+
                   # arch-native-overlay
                 ];
 	            })
@@ -355,7 +377,9 @@
             impermanence.nixosModule
 
             # Enable Home Manager as NixOs module
-            home-manager.nixosModules.home-manager {
+            home-manager.nixosModules.home-manager
+
+            {
               home-manager.useGlobalPkgs    = true;
               home-manager.useUserPackages  = true;
               home-manager.users.sergey     = import ./home.nix;

@@ -11,7 +11,7 @@ in
     [# Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./compressed-root.nix
-      ./kernel.nix
+      #./kernel.nix
     ];
 
   # For booting see https://nixos.wiki/wiki/Bootloader
@@ -308,17 +308,6 @@ in
       # pkgs.networkmanagerapplet
     ];
   };
-
-  nixpkgs =
-    let arch = import ./arch.nix;
-    in {
-      config = {
-        allowUnfree = true; # For nvidia drivers.
-        # allowBroken = true;
-        # inherit (arch) replaceStdenv;
-      };
-      inherit (arch) localSystem;
-    };
 
   # For running within a VM
   # virtualisation.virtualbox.guest.enable = true;
