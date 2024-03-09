@@ -3,12 +3,12 @@ args @
   # , nixpkgs-stable
   , nixpkgs-unstable
   , system
-  # , pkgs
+  , pkgs
   , ...
   }:
-let pkgs = nixpkgs-unstable.legacyPackages."${system}";
-    t    = pkgs.lib.trivial;
-    hlib = pkgs.haskell.lib;
+let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
+    t             = pkgs.lib.trivial;
+    hlib          = pkgs.haskell.lib;
 
     hutils = import haskell/utils.nix { inherit pkgs; };
 
@@ -308,68 +308,68 @@ let pkgs = nixpkgs-unstable.legacyPackages."${system}";
 
 in {
 
-  ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
-  ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
-
-  ghc822     = wrap-ghc                          "8.2.2"  "8.2"        pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
-  ghc844     = wrap-ghc                          "8.4.4"  "8.4"        pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
-
-  ghc865     = wrap-ghc                          "8.6.5"  "8.6"        pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
-
-  ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
-
-  ghc8107    = wrap-ghc                          "8.10.7" "8.10"       (disable-docs pkgs.haskell.packages.ghc8107.ghc);
-  ghc902     = wrap-ghc                          "9.0.2"  "9.0"        (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
-  ghc928     = wrap-ghc                          "9.2.8"  "9.2"        (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
-  ghc948     = wrap-ghc                          "9.4.8"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc948.ghc);
-
-  ghc964     = wrap-ghc                          "9.6.4"  "9.6"        (hutils.smaller-ghc pkgs.haskell.packages.ghc964.ghc);
-  ghc982     = wrap-ghc                          "9.8.2"  ["9.8" null] ghc982;
-
-  #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
-
-  # callPackage = newScope {
-  #   haskellLib = haskellLibUncomposable.compose;
-  #   overrides = pkgs.haskell.packageOverrides;
-  # };
-
-  # ghc961  = wrap-ghc "9.6.0.20230111" (import ./ghc-9.6.1-alpha1.nix {
-  #   inherit (pkgs)
-  #     lib
-  #     stdenv
-  #     fetchurl
-  #     perl
-  #     gcc
-  #     ncurses5
-  #     ncurses6
-  #     gmp
-  #     libiconv
-  #     numactl
-  #     libffi
-  #     llvmPackages
-  #     coreutils
-  #     targetPackages;
+  # # ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  # # ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
+  # #
+  # # ghc822     = wrap-ghc                          "8.2.2"  "8.2"        pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  # # ghc844     = wrap-ghc                          "8.4.4"  "8.4"        pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
+  # #
+  # # ghc865     = wrap-ghc                          "8.6.5"  "8.6"        pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+  # #
+  # # ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
+  # #
+  # # ghc8107    = wrap-ghc                          "8.10.7" "8.10"       (disable-docs pkgs.haskell.packages.ghc8107.ghc);
+  # # ghc902     = wrap-ghc                          "9.0.2"  "9.0"        (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
+  # # ghc928     = wrap-ghc                          "9.2.8"  "9.2"        (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
+  # # ghc948     = wrap-ghc                          "9.4.8"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc948.ghc);
   #
-  #   # llvmPackages = pkgs.llvmPackages_13;
-  # });
-
-  alex               = hlib.justStaticExecutables hpkgs964.alex;
-  happy              = hlib.justStaticExecutables hpkgs964.happy;
-  cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
-  doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
-  eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
-  fast-tags          = hlib.justStaticExecutables hpkgs964.fast-tags;
-  ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  hp2pretty          = hlib.justStaticExecutables hpkgs964.hp2pretty;
-  pretty-show        = hlib.justStaticExecutables hpkgs981.pretty-show;
-  profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
-  # threadscope        = threadscopePkgs.threadscope;
+  # ghc964     = wrap-ghc                          "9.6.4"  "9.6"        (hutils.smaller-ghc pkgs.haskell.packages.ghc964.ghc);
+  # ghc982     = wrap-ghc                          "9.8.2"  ["9.8" null] ghc982;
+  #
+  # #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
+  #
+  # # callPackage = newScope {
+  # #   haskellLib = haskellLibUncomposable.compose;
+  # #   overrides = pkgs.haskell.packageOverrides;
+  # # };
+  #
+  # # ghc961  = wrap-ghc "9.6.0.20230111" (import ./ghc-9.6.1-alpha1.nix {
+  # #   inherit (pkgs)
+  # #     lib
+  # #     stdenv
+  # #     fetchurl
+  # #     perl
+  # #     gcc
+  # #     ncurses5
+  # #     ncurses6
+  # #     gmp
+  # #     libiconv
+  # #     numactl
+  # #     libffi
+  # #     llvmPackages
+  # #     coreutils
+  # #     targetPackages;
+  # #
+  # #   # llvmPackages = pkgs.llvmPackages_13;
+  # # });
+  #
+  # alex               = hlib.justStaticExecutables hpkgs964.alex;
+  # happy              = hlib.justStaticExecutables hpkgs964.happy;
+  # cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
+  # doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
+  # eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
+  # fast-tags          = hlib.justStaticExecutables hpkgs964.fast-tags;
+  # ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
+  # hp2pretty          = hlib.justStaticExecutables hpkgs964.hp2pretty;
+  # pretty-show        = hlib.justStaticExecutables hpkgs981.pretty-show;
+  # profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
+  # # threadscope        = threadscopePkgs.threadscope;
   universal-ctags    = pkgs.universal-ctags;
 
   gcc   = pkgs.gcc;
-  # clang = pkgs.clang_13;
-  llvm  = pkgs.llvm_13;
-  lld   = pkgs.lld_13;
+  # # clang = pkgs.clang_15;
+  # llvm  = pkgs.llvm_15;
+  # lld   = pkgs.lld_15;
 
   cmake      = pkgs.cmake;
   gnumake    = pkgs.gnumake;

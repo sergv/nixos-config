@@ -26,6 +26,14 @@
         SCHED_DEBUG            = lib.mkForce lib.kernel.no;
         SCHEDSTATS             = lib.mkForce lib.kernel.no;
 
+        FB_CARILLO_RANCH        = lib.mkForce lib.kernel.no;
+        #FB_3DFX                 = lib.mkForce lib.kernel.no;
+        FB_3DFX_ACCEL           = lib.mkForce lib.kernel.no;
+        #FB_3DFX_I2C             = lib.mkForce lib.kernel.no;
+        BACKLIGHT_CARILLO_RANCH = lib.mkForce lib.kernel.no;
+        MLXSW_SPECTRUM          = lib.mkForce lib.kernel.no;
+        MLX_PLATFORM            = lib.mkForce lib.kernel.no;
+
         # # # HOTPLUG_CPU = lib.mkForce lib.kernel.no;
         # # CPU_SUP_HYGON = lib.mkForce lib.kernel.no;
         # # CPU_SUP_CENTAUR = lib.mkForce lib.kernel.no;
