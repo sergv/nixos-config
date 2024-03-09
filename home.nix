@@ -24,10 +24,13 @@ let
     inherit
       pkgs
       pinned-pkgs
-      nixpkgs-stable
-      nixpkgs-unstable
       system
-      ;
+      nixpkgs-unstable
+      ; # nixpkgs-stable
+  };
+
+  cuda-pkgs = import ./cuda-pkgs.nix {
+    inherit pkgs;
   };
 
   byar = import ./beyond-all-reason-launcher.nix {
@@ -814,7 +817,7 @@ in
       wmctrl-pkg
 
       emacs-wrapped
-      emacs-bytecode-wrapped
+      #emacs-bytecode-wrapped
       pkgs.tree-sitter
     ]
     ++
@@ -823,6 +826,7 @@ in
       #   pkgs.compsize
       # ] ++
       builtins.attrValues dev-pkgs
+    ++ builtins.attrValues cuda-pkgs
     ++ builtins.attrValues my-fonts
     ++ builtins.attrValues scripts;
 
