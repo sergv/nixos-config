@@ -211,7 +211,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             in ''ln -s "$out/bin/$x-${version}" "$out/bin/$x${suffix}"'';
       in
         pkgs.runCommand ("wrapped-ghc-" + version) {
-          nativeBuildInputs = [ pkgs.makeWrapper ];
+          nativeBuildInputs = [];
         }
           # ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
           ''
@@ -316,6 +316,28 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             '';
         })));
 
+    filter-bin = name: keep-these: pkg:
+      assert (builtins.isList keep-these);
+      let f = { source, dest, aliases }:
+            assert builtins.isString source;
+            assert builtins.isString dest;
+            assert builtins.isList aliases && builtins.all builtins.isString aliases;
+            ''
+              if [[ ! -e "${pkg}/bin/${source}" ]]; then
+                 echo "Source file '${source}' does not exist within package ${pkg}" >&2
+                 exit 1
+              fi
+              ln -s "${pkg}/bin/${source}" "$out/bin/${dest}"
+              ${builtins.concatStringsSep "\n" (builtins.map (a: ''ln -s "$out/bin/${dest}" "$out/bin/${a}"'') aliases)}
+            '';
+      in
+        pkgs.runCommand ("filtered-" + name) {
+          nativeBuildInputs = [];
+        }
+          ''
+            mkdir -p "$out/bin"
+            ${builtins.concatStringsSep "\n" (builtins.map f keep-these)}
+          '';
 in {
 
   # ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
@@ -377,15 +399,17 @@ in {
   universal-ctags    = pkgs.universal-ctags;
 
   gcc   = pkgs.gcc;
+  # Conflicts with gcc regarding ld.gold
   # clang = pkgs.clang_15;
   llvm  = pkgs.llvm_15;
-  lld   = pkgs.lld_15;
+  # bintools = pkgs.llvmPackages_15.bintools;
+  # lld   = pkgs.lld_15;
+  lld = filter-bin "llvmPackages_15.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_15.bintools;
 
   cmake      = pkgs.cmake;
   gnumake    = pkgs.gnumake;
   gdb        = pkgs.gdb;
   patchelf   = pkgs.patchelf;
   pkg-config = pkgs.pkg-config;
-
-  diffutils = pkgs.diffutils;
+  diffutils  = pkgs.diffutils;
 }
