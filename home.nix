@@ -769,7 +769,7 @@ in
         wmctrl-pkg
 
         emacs-wrapped
-        #emacs-bytecode-wrapped
+        emacs-bytecode-wrapped
         pkgs.tree-sitter
       ] ++
       # Btrfs utils
