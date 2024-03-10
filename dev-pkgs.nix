@@ -340,22 +340,22 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           '';
 in {
 
-  # ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
-  # ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
-  #
-  # ghc822     = wrap-ghc                          "8.2.2"  "8.2"        pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
-  # ghc844     = wrap-ghc                          "8.4.4"  "8.4"        pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
-  #
-  # ghc865     = wrap-ghc                          "8.6.5"  "8.6"        pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
-  #
-  # ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
-  #
-  # ghc8107    = wrap-ghc                          "8.10.7" "8.10"       (disable-docs pkgs.haskell.packages.ghc8107.ghc);
-  # ghc902     = wrap-ghc                          "9.0.2"  "9.0"        (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
-  # ghc928     = wrap-ghc                          "9.2.8"  "9.2"        (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
-  # ghc948     = wrap-ghc                          "9.4.8"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc948.ghc);
+  ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
 
-  ghc964     = wrap-ghc                          "9.6.4"  "9.6"        (hutils.smaller-ghc pkgs.haskell.compiler.native-bignum.ghc964);
+  ghc822     = wrap-ghc                          "8.2.2"  "8.2"        pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  ghc844     = wrap-ghc                          "8.4.4"  "8.4"        pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
+
+  ghc865     = wrap-ghc                          "8.6.5"  "8.6"        pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+
+  ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
+
+  ghc8107    = wrap-ghc                          "8.10.7" "8.10"       pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc8107.ghc;
+  # ghc902     = wrap-ghc                          "9.0.2"  "9.0"        (hutils.smaller-ghc pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc902.ghc);
+  ghc928     = wrap-ghc                          "9.2.8"  "9.2"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc928.ghc;
+  ghc948     = wrap-ghc                          "9.4.8"  "9.4"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc948.ghc;
+
+  ghc964     = wrap-ghc                          "9.6.4"  "9.6"        pkgs.haskell.compiler.native-bignum.ghc964;
   ghc982     = wrap-ghc                          "9.8.2"  ["9.8" null] ghc982;
 
   #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
