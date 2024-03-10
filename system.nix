@@ -11,7 +11,7 @@ in
     [# Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./compressed-root.nix
-      #./kernel.nix
+      ./kernel.nix
     ];
 
   # For booting see https://nixos.wiki/wiki/Bootloader
