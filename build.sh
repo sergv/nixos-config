@@ -10,7 +10,7 @@ set -u
 # propagate errors from all parts of pipes
 set -o pipefail
 
-nix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result "${@}"
+nix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j4 --keep-going "${@}"
 
 # exec ./apply-system.sh build "${@}"
 
