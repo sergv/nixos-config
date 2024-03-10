@@ -17,8 +17,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     cabal-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "cabal";
-      rev    = "72937b1cfca807e0047f92e11fb2ab2061aed2fb"; # "dev";
-      sha256 = "sha256-EpA1Rt8++OLhi3zKc+xlsf+NhH9fML4A2pUDPs8MNiM="; #pkgs.lib.fakeSha256;
+      rev    = "92e0164fea866130a28457c279ab8e82860ea90f"; # "dev";
+      sha256 = "sha256-NDrJA5qJ+bwRIuvWSV+JXYn99LvbVQ6IeK2ZP2DO99A="; #pkgs.lib.fakeSha256;
     };
 
     doctest-repo = pkgs.fetchFromGitHub {
@@ -53,7 +53,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
     # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
     hpkgs964 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc964;
-    hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
+    # hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
     overrideCabal = revision: editedSha: pkg:
       hlib.overrideCabal pkg {
@@ -83,7 +83,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
     hpkgsGhcEvensAnalyze = hpkgs964.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
-        ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
+        ghc-events-analyze = hlib.doJailbreak (old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {});
         SVGFonts           = old.callHackage "SVGFonts" "1.7.0.1" {};
         ghc-events         = old.callHackage "ghc-events" "0.19.0.1" {};
 
@@ -121,6 +121,10 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           "Cabal-syntax"
           (cabal-repo + "/Cabal-syntax")
           {};
+        Cabal-tests = old.callCabal2nix
+          "Cabal-tests"
+          (cabal-repo + "/Cabal-tests")
+          {};
         cabal-install-solver = hlib.doJailbreak (old.callCabal2nix
           "cabal-install-solver"
           (cabal-repo + "/cabal-install-solver")
@@ -130,7 +134,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         cabal-install = hlib.doJailbreak (old.callCabal2nix
           "cabal-install"
           (cabal-repo + "/cabal-install")
-          { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff;
+          { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff Cabal-tests;
           });
 
         semaphore-compat = hlib.markUnbroken old.semaphore-compat;
@@ -359,18 +363,18 @@ in {
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  # alex               = hlib.justStaticExecutables hpkgs964.alex;
-  # happy              = hlib.justStaticExecutables hpkgs964.happy;
-  # cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
-  # doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
-  # eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
-  # fast-tags          = hlib.justStaticExecutables hpkgs964.fast-tags;
-  # ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  # hp2pretty          = hlib.justStaticExecutables hpkgs964.hp2pretty;
-  # pretty-show        = hlib.justStaticExecutables hpkgs981.pretty-show;
-  # profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
-  # # threadscope        = threadscopePkgs.threadscope;
-  # universal-ctags    = pkgs.universal-ctags;
+  alex               = hlib.justStaticExecutables hpkgs964.alex;
+  happy              = hlib.justStaticExecutables hpkgs964.happy;
+  cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
+  doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
+  eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
+  fast-tags          = hlib.justStaticExecutables hpkgs964.fast-tags;
+  ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
+  hp2pretty          = hlib.justStaticExecutables hpkgs964.hp2pretty;
+  pretty-show        = hlib.justStaticExecutables hpkgs964.pretty-show;
+  profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
+  # threadscope        = threadscopePkgs.threadscope;
+  universal-ctags    = pkgs.universal-ctags;
 
   gcc   = pkgs.gcc;
   # clang = pkgs.clang_15;
