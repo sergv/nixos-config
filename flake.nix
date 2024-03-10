@@ -297,7 +297,7 @@
 
           # To avoid infinite recursion
           cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
-            (old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix"
+            (old.haskell.packages.native-bignum.ghc964.generateOptparseApplicativeCompletions ["cabal2nix"]
               old.haskell.packages.native-bignum.ghc964.cabal2nix);
         };
 
