@@ -5,7 +5,7 @@
     system        = "x86_64-linux";
   };
 
-  replaceStdenv = { pkgs }: pkgs.stdenv;
+  # replaceStdenv = { pkgs }: pkgs.stdenv;
     # pkgs.gcc12Stdenv;
     #
     # pkgs.clangStdenv;
