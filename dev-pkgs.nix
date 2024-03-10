@@ -51,7 +51,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     # Doesn’t work but could be cool: static executables
     # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
-    hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
+    # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
     hpkgs964 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc964;
     hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
@@ -81,7 +81,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         # syb = old.callHackage "syb" "0.7.2.3" {};
       }));
 
-    hpkgsGhcEvensAnalyze = hpkgs948.extend (_: old:
+    hpkgsGhcEvensAnalyze = hpkgs964.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         ghc-events-analyze = old.callCabal2nix "ghc-events-analyze" ghc-events-analyze-repo {};
         SVGFonts           = old.callHackage "SVGFonts" "1.7.0.1" {};
@@ -147,7 +147,6 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         # tar = hlib.doJailbreak old.tar;
         # ed25519 = hlib.doJailbreak old.ed25519;
         # indexed-traversable = hlib.doJailbreak old.indexed-traversable;
-
 
         # ed25519 = #hlib.dontCheck
         #   (overrideCabal
@@ -287,12 +286,19 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             sha256 = "sha256-EhZSGnr12aWkye9v5Jsm91vbMi/EDzRAPs8/W2aKTZ8="; #pkgs.lib.fakeSha256;
             inherit rev;
           };
+          buildPkgs = pkgs.haskell.packages.native-bignum.ghc964;
+          ghc'      = (old-ghc.override (old: old // {
+            bootPkgs = buildPkgs;
+            inherit ghcSrc;
+          }
+          ));
       in
-        disableAllHardening (hutils.smaller-ghc ((old-ghc.override (old: old // {
-          hadrian = old-ghc.hadrian.override (old2: old2 // {
+        disableAllHardening (hutils.smaller-ghc ((ghc'.override (old: old // {
+          bootPkgs = buildPkgs;
+          hadrian  = hlib.doJailbreak (ghc'.hadrian.override (old2: old2 // {
             inherit ghcSrc;
             ghcVersion = version;
-          });
+          }));
           inherit ghcSrc;
         }
         )).overrideAttrs (old: {
@@ -308,51 +314,51 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
 in {
 
-  # # ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
-  # # ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
-  # #
-  # # ghc822     = wrap-ghc                          "8.2.2"  "8.2"        pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
-  # # ghc844     = wrap-ghc                          "8.4.4"  "8.4"        pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
-  # #
-  # # ghc865     = wrap-ghc                          "8.6.5"  "8.6"        pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
-  # #
-  # # ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
-  # #
-  # # ghc8107    = wrap-ghc                          "8.10.7" "8.10"       (disable-docs pkgs.haskell.packages.ghc8107.ghc);
-  # # ghc902     = wrap-ghc                          "9.0.2"  "9.0"        (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
-  # # ghc928     = wrap-ghc                          "9.2.8"  "9.2"        (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
-  # # ghc948     = wrap-ghc                          "9.4.8"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc948.ghc);
+  # ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"       pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  # ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
   #
-  # ghc964     = wrap-ghc                          "9.6.4"  "9.6"        (hutils.smaller-ghc pkgs.haskell.packages.ghc964.ghc);
-  # ghc982     = wrap-ghc                          "9.8.2"  ["9.8" null] ghc982;
+  # ghc822     = wrap-ghc                          "8.2.2"  "8.2"        pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  # ghc844     = wrap-ghc                          "8.4.4"  "8.4"        pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
   #
-  # #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
+  # ghc865     = wrap-ghc                          "8.6.5"  "8.6"        pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
   #
-  # # callPackage = newScope {
-  # #   haskellLib = haskellLibUncomposable.compose;
-  # #   overrides = pkgs.haskell.packageOverrides;
-  # # };
+  # ghc884     = wrap-ghc                          "8.8.4"  "8.8"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
   #
-  # # ghc961  = wrap-ghc "9.6.0.20230111" (import ./ghc-9.6.1-alpha1.nix {
-  # #   inherit (pkgs)
-  # #     lib
-  # #     stdenv
-  # #     fetchurl
-  # #     perl
-  # #     gcc
-  # #     ncurses5
-  # #     ncurses6
-  # #     gmp
-  # #     libiconv
-  # #     numactl
-  # #     libffi
-  # #     llvmPackages
-  # #     coreutils
-  # #     targetPackages;
-  # #
-  # #   # llvmPackages = pkgs.llvmPackages_13;
-  # # });
+  # ghc8107    = wrap-ghc                          "8.10.7" "8.10"       (disable-docs pkgs.haskell.packages.ghc8107.ghc);
+  # ghc902     = wrap-ghc                          "9.0.2"  "9.0"        (hutils.smaller-ghc pkgs.haskell.packages.ghc902.ghc);
+  # ghc928     = wrap-ghc                          "9.2.8"  "9.2"        (hutils.smaller-ghc pkgs.haskell.packages.ghc928.ghc);
+  # ghc948     = wrap-ghc                          "9.4.8"  "9.4"        (hutils.smaller-ghc pkgs.haskell.packages.ghc948.ghc);
+
+  ghc964     = wrap-ghc                          "9.6.4"  "9.6"        (hutils.smaller-ghc pkgs.haskell.compiler.native-bignum.ghc964);
+  ghc982     = wrap-ghc                          "9.8.2"  ["9.8" null] ghc982;
+
+  #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
+
+  # callPackage = newScope {
+  #   haskellLib = haskellLibUncomposable.compose;
+  #   overrides = pkgs.haskell.packageOverrides;
+  # };
+
+  # ghc961  = wrap-ghc "9.6.0.20230111" (import ./ghc-9.6.1-alpha1.nix {
+  #   inherit (pkgs)
+  #     lib
+  #     stdenv
+  #     fetchurl
+  #     perl
+  #     gcc
+  #     ncurses5
+  #     ncurses6
+  #     gmp
+  #     libiconv
+  #     numactl
+  #     libffi
+  #     llvmPackages
+  #     coreutils
+  #     targetPackages;
   #
+  #   # llvmPackages = pkgs.llvmPackages_13;
+  # });
+
   # alex               = hlib.justStaticExecutables hpkgs964.alex;
   # happy              = hlib.justStaticExecutables hpkgs964.happy;
   # cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
@@ -364,12 +370,12 @@ in {
   # pretty-show        = hlib.justStaticExecutables hpkgs981.pretty-show;
   # profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
   # # threadscope        = threadscopePkgs.threadscope;
-  universal-ctags    = pkgs.universal-ctags;
+  # universal-ctags    = pkgs.universal-ctags;
 
   gcc   = pkgs.gcc;
-  # # clang = pkgs.clang_15;
-  # llvm  = pkgs.llvm_15;
-  # lld   = pkgs.lld_15;
+  # clang = pkgs.clang_15;
+  llvm  = pkgs.llvm_15;
+  lld   = pkgs.lld_15;
 
   cmake      = pkgs.cmake;
   gnumake    = pkgs.gnumake;

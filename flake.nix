@@ -94,7 +94,7 @@
         # };
 
         smaller-haskell-overlay = new: old: {
-          haskellPackages                = hutils.fixedExtend (hutils.smaller-hpkgs old.haskellPackages) (_: old2: {
+          haskellPackages                = hutils.fixedExtend (hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc964) (_: old2: {
             # Make everything smaller at the core by altering arguments to mkDerivation.
             # This is hacky but is needed because Isabelle’s naproche dependency cannot
             # be coerced to not do e.g. profiling by standard Haskell infrastructure
@@ -108,21 +108,34 @@
               # enableSharedLibraries     = false;
             });
           });
-          
+
           haskell = old.haskell // {
             compiler = old.haskell.compiler // {
-              ghc92         = hutils.smaller-ghc old.haskell.compiler.ghc92;
-              ghc928        = hutils.smaller-ghc old.haskell.compiler.ghc928;
-              ghc94         = hutils.smaller-ghc old.haskell.compiler.ghc94;
-              ghc947        = hutils.smaller-ghc old.haskell.compiler.ghc947;
-              ghc948        = hutils.smaller-ghc old.haskell.compiler.ghc948;
+              ghc92         = builtins.abort "GHC 9.2 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc92;
+              ghc928        = builtins.abort "GHC 9.2.8 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc928;
+              ghc94         = builtins.abort "GHC 9.4 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc94;
+              ghc947        = builtins.abort "GHC 9.4.7 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc947;
+              ghc948        = builtins.abort "GHC 9.4.8 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc948;
               ghc96         = hutils.smaller-ghc old.haskell.compiler.ghc96;
               ghc963        = hutils.smaller-ghc old.haskell.compiler.ghc963;
               ghc964        = hutils.smaller-ghc old.haskell.compiler.ghc964;
               ghc98         = hutils.smaller-ghc old.haskell.compiler.ghc98;
               ghc981        = hutils.smaller-ghc old.haskell.compiler.ghc981;
+
+              native-bignum = old.haskell.compiler.native-bignum // {
+                ghc92         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc92;
+                ghc928        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc928;
+                ghc94         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc94;
+                ghc947        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc947;
+                ghc948        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc948;
+                ghc96         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc96;
+                ghc963        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc963;
+                ghc964        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc964;
+                ghc98         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc98;
+                ghc981        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc981;
+              };
             };
-          
+
             packages = old.haskell.packages // {
               ghc92         = hutils.smaller-hpkgs old.haskell.packages.ghc92;
               ghc928        = hutils.smaller-hpkgs old.haskell.packages.ghc928;
@@ -134,12 +147,25 @@
               ghc964        = hutils.smaller-hpkgs old.haskell.packages.ghc964;
               ghc98         = hutils.smaller-hpkgs old.haskell.packages.ghc98;
               ghc981        = hutils.smaller-hpkgs old.haskell.packages.ghc981;
+
+              native-bignum = old.haskell.packages.native-bignum // {
+                ghc92         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc92;
+                ghc928        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc928;
+                ghc94         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc94;
+                ghc947        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc947;
+                ghc948        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc948;
+                ghc96         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc96;
+                ghc963        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc963;
+                ghc964        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc964;
+                ghc98         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc98;
+                ghc981        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc981;
+              };
             };
           };
         };
 
         # Tests of these packages fail, presumable because of -march.
-        disable-problematic-haskell-crypto-pkgs-checks = old: _: old2: {
+        disable-problematic-haskell-crypto-pkgs-checks = old: old2: {
           cryptonite              = old.haskell.lib.dontCheck old2.cryptonite;
           crypton                 = old.haskell.lib.dontCheck old2.crypton;
           # x509-validation         = old.haskell.lib.dontCheck old2.x509-validation;
@@ -147,8 +173,14 @@
           tls                     = old.haskell.lib.dontCheck old2.tls;
         };
 
+        temporarily-disable-problematic-haskell-pkgs-checks = old: old2: {
+          # Fails on GHC 9.6.4, should work on others
+          unicode-data = old.haskell.lib.dontCheck old2.unicode-data;
+        };
+
         haskell-disable-checks-overlay = _: old: {
-          haskellPackages = hutils.fixedExtend old.haskellPackages (disable-problematic-haskell-crypto-pkgs-checks old);
+          haskellPackages = hutils.fixedExtend old.haskellPackages
+            (_: old2: temporarily-disable-problematic-haskell-pkgs-checks old old2 // disable-problematic-haskell-crypto-pkgs-checks old old2);
           haskell = old.haskell // {
             packages = old.haskell.packages // {
               # Doesn’t work: overwrites changes made by ‘smaller-haskell-overlay’.
@@ -157,16 +189,16 @@
               #     x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
               #   };
               # };
-          
+
               # ghc94 = hutils.fixedExtend old.haskell.packages.ghc94 (_: old2: {
               #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
               # });
-          
+
               # ghc947 = hutils.fixedExtend old.haskell.packages.ghc947 (_: old2: {
               #   x509-validation = old.haskell.lib.dontCheck old2.x509-validation;
               # });
-          
-              ghc964 = hutils.fixedExtend old.haskell.packages.ghc964 (disable-problematic-haskell-crypto-pkgs-checks old);
+
+              ghc964 = hutils.fixedExtend old.haskell.packages.ghc964 (_: old2: temporarily-disable-problematic-haskell-pkgs-checks old old2 // disable-problematic-haskell-crypto-pkgs-checks old old2);
             };
           };
         };
@@ -263,10 +295,10 @@
           #   };
           # };
 
-          # # To avoid infinite recursion
-          # cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
-          #   (old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix"
-          #     old.haskell.packages.ghc964.cabal2nix);
+          # To avoid infinite recursion
+          cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
+            (old.haskell.lib.generateOptparseApplicativeCompletion "cabal2nix"
+              old.haskell.packages.native-bignum.ghc964.cabal2nix);
         };
 
         pkgs-pristine = import nixpkgs-unstable {

@@ -1,6 +1,16 @@
 { pkgs
 }:
-pkgs.isabelle.overrideAttrs (old:
+let naproche = pkgs.naproche.overrideAttrs (old: {
+      src = pkgs.fetchFromGitHub {
+        owner  = "naproche";
+        repo   = "naproche";
+        rev    = "d7f514b575db99f84ffb70cfbba22bd9078bba96";
+        sha256 = "sha256-BAKD2zj5+E2y2uHiGJ/mshD6PSrAAp2ucR/r+ZSLBMk="; #pkgs.lib.fakeSha256;
+      };
+      doCheck = false;
+    });
+in
+(pkgs.isabelle.override (old: old // { inherit naproche; })).overrideAttrs (old:
   let isabelle-icon = ./icons/isabelle.png;
       getExt = x: pkgs.lib.lists.last (pkgs.lib.strings.splitString "." x);
       newDesktopItem = pkgs.makeDesktopItem {
