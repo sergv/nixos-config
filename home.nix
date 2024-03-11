@@ -746,6 +746,10 @@ in
         pkgs.zstd
         # pkgs.z3
 
+        pkgs.fahclient
+        pkgs.fahviewer
+        pkgs.fahcontrol
+
         qbittorrent-pkg
 
         pkgs.nur.repos.wolfangaukang.vdhcoapp
