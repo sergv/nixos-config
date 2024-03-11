@@ -795,8 +795,6 @@ in
       # pkgs.z3
 
       pkgs.fahclient
-      pkgs.fahviewer
-      pkgs.fahcontrol
 
       qbittorrent-pkg
 
