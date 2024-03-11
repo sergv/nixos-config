@@ -295,15 +295,6 @@
           #   };
           # };
 
-          python2 = old.python2.override {
-            packageOverrides = _: old2: {
-              # For folding at home
-              wcwidth = old2.wcwidth.overrideAttrs (old-pandas-attrs: {
-                disabled = null;
-              });
-            };
-          };
-
           # To avoid infinite recursion
           cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
             (old.haskell.packages.native-bignum.ghc964.generateOptparseApplicativeCompletions ["cabal2nix"]
@@ -333,10 +324,6 @@
             allowUnfree                    = true; # For nvidia drivers.
             # virtualbox.enableExtensionPack = true;
             #inherit (arch) replaceStdenv;
-            permittedInsecurePackages = [
-              "python-2.7.18.7-env"
-              "python-2.7.18.7"
-            ];
           };
           overlays = [
             fcitx-overlay
