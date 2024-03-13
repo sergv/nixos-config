@@ -57,7 +57,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     qbittorrent-pkg = (pkgs.qbittorrent.override {
       webuiSupport  = false;
       trackerSearch = false;
-    }).overrideAttrs(old: {
+    }).overrideAttrs (old: {
 
       postInstall = old.postInstall +
         ''
@@ -65,6 +65,11 @@ let wmctrl-pkg = pkgs.wmctrl;
         '';
       # postInstall = builtins.replaceStrings [ "${old.desktopItem}" ] [ "${newDesktopItem}" ] old.postInstall;
     });
+
+    fahclient-pkg = import ./fahclient.nix {
+      inherit (pkgs)
+        lib buildFHSEnv fetchFromGitHub ocl-icd openssl scons stdenv re2 libevent git;
+    };
 
     isabelle-pkg = import ./isabelle/isabelle.nix {
       inherit pkgs;
@@ -746,7 +751,7 @@ in
         pkgs.zstd
         # pkgs.z3
 
-        pkgs.fahclient
+        fahclient-pkg
 
         qbittorrent-pkg
 
