@@ -78,6 +78,21 @@ let
         # postInstall = builtins.replaceStrings [ "${old.desktopItem}" ] [ "${newDesktopItem}" ] old.postInstall;
       });
 
+  fahclient-pkg = import ./fahclient.nix {
+    inherit (pkgs)
+      lib
+      buildFHSEnv
+      fetchFromGitHub
+      ocl-icd
+      openssl
+      scons
+      stdenv
+      re2
+      libevent
+      git
+      ;
+  };
+
   isabelle-pkg = import ./isabelle/isabelle.nix {
     inherit pkgs;
   };
@@ -794,7 +809,7 @@ in
       pkgs.zstd
       # pkgs.z3
 
-      pkgs.fahclient
+      fahclient-pkg
 
       qbittorrent-pkg
 
