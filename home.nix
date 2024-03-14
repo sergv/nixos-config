@@ -91,6 +91,10 @@ let
       libevent
       git
       ;
+    extraPkgs = [
+      pkgs.expat
+      pkgs.zlib
+    ];
   };
 
   isabelle-pkg = import ./isabelle/isabelle.nix {
