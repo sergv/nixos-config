@@ -785,7 +785,6 @@ in
       pkgs.lzip
       pkgs.lzop
       pkgs.mc
-      pkgs.mindustry
       pkgs.mplayer
       pkgs.nix-index
       pkgs.nyx
