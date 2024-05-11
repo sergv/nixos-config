@@ -503,6 +503,7 @@ in
   hp2pretty = hlib.justStaticExecutables hpkgs964.hp2pretty;
   pretty-show = hlib.justStaticExecutables hpkgs964.pretty-show;
   profiterole = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
+  # hspec-discover     = hlib.justStaticExecutables hpkgs964.hspec-discover;
   # threadscope        = threadscopePkgs.threadscope;
   universal-ctags = pkgs.universal-ctags;
 
