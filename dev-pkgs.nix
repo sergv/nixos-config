@@ -395,16 +395,17 @@ in {
   hp2pretty          = hlib.justStaticExecutables hpkgs964.hp2pretty;
   pretty-show        = hlib.justStaticExecutables hpkgs964.pretty-show;
   profiterole        = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
+  # hspec-discover     = hlib.justStaticExecutables hpkgs964.hspec-discover;
   # threadscope        = threadscopePkgs.threadscope;
   universal-ctags    = pkgs.universal-ctags;
 
-  gcc   = pkgs.gcc;
+  gcc  = pkgs.gcc;
   # Conflicts with gcc regarding ld.gold
   # clang = pkgs.clang_15;
-  llvm  = pkgs.llvm_15;
+  llvm = pkgs.llvm_15;
   # bintools = pkgs.llvmPackages_15.bintools;
   # lld   = pkgs.lld_15;
-  lld = filter-bin "llvmPackages_15.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_15.bintools;
+  lld  = filter-bin "llvmPackages_15.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_15.bintools;
 
   cmake      = pkgs.cmake;
   gnumake    = pkgs.gnumake;
