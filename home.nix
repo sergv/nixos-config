@@ -88,8 +88,8 @@ let wmctrl-pkg = pkgs.wmctrl;
       src                   = pkgs.fetchFromGitHub {
         owner  = "sergv";
         repo   = "emacs";
-        rev    = "34216be20c9ae95d3c780455c5bf81348d0e61fa";
-        sha256 = "sha256-czPEomyyViQ7S50W6XY2Foci4zn9nRdyHFfJ/+Hy+yI="; # pkgs.lib.fakeSha256;
+        rev    = "4a6f60ec8cfe89031d31b87b7cb58508d81622fe";
+        sha256 = "sha256-ByQz24gDdYNYZENiUzbkMWOhUbOezVssHRFbBheVEdQ="; # pkgs.lib.fakeSha256;
       };
     });
 
