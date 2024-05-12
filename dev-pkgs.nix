@@ -18,8 +18,8 @@ let
   cabal-repo = pkgs.fetchFromGitHub {
     owner  = "sergv";
     repo   = "cabal";
-    rev    = "92e0164fea866130a28457c279ab8e82860ea90f"; # "dev";
-    sha256 = "sha256-NDrJA5qJ+bwRIuvWSV+JXYn99LvbVQ6IeK2ZP2DO99A="; # pkgs.lib.fakeSha256;
+    rev    = "c0a21d0c4e451d662e337d3ec28a6ac77b0058f9"; # "dev";
+    sha256 = "sha256-vx8s2cMm30+3UjWKNUXtgi7xyRLMlSXF1QisVC5QBOA="; # pkgs.lib.fakeSha256;
   };
 
   doctest-repo = pkgs.fetchFromGitHub {
@@ -144,7 +144,15 @@ let
         ghc = hutils.smaller-ghc (old.ghc);
 
         # builtins.mapAttrs (_name: value: hlib.doJailbreak value) old //
-        Cabal                = old.callCabal2nix "Cabal" (cabal-repo + "/Cabal") { };
+        Cabal = old.callCabal2nix "Cabal" (cabal-repo + "/Cabal") { };
+        # Cabal-described = old.callCabal2nix
+        #   "Cabal-described"
+        #   (cabal-repo + "/Cabal-described")
+        #   {};
+        # Cabal-hooks = old.callCabal2nix
+        #   "Cabal-hooks"
+        #   (cabal-repo + "/Cabal-hooks")
+        #   {};
         Cabal-syntax         = old.callCabal2nix "Cabal-syntax" (cabal-repo + "/Cabal-syntax") { };
         Cabal-tests          = old.callCabal2nix "Cabal-tests" (cabal-repo + "/Cabal-tests") { };
         cabal-install-solver = hlib.doJailbreak (
@@ -162,6 +170,15 @@ let
               ;
           }
         );
+
+        hackage-security = # old.callHackage "hackage-security" "0.6.2.6" {};
+          (
+            old.callHackageDirect {
+              pkg = "hackage-security";
+              ver = "0.6.2.6";
+              sha256 = "sha256-B61sYNOJXszHBA4JWFP5UZBp3UcJk9ufnGE3Li5rQNI="; # pkgs.lib.fakeSha256;
+            } { }
+          );
 
         semaphore-compat = hlib.markUnbroken old.semaphore-compat;
 
