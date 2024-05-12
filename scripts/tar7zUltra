@@ -9,7 +9,7 @@ target="${1%%/}"
 target="${target/%.7z}"
 target="${target/%.tar}.tar.7z"
 
-opts="-mfb=256 -md=256m -ms=on -mx=9 -bt -m0=lzma2 -mmt=2" # -m0c=256m -mmt1"
+opts="-mfb=256 -md=1024m -ms=on -mx=9 -bt -m0=lzma2 -mmt=2" # -m0c=256m -mmt1"
 
 if [[ ! (-e "$target") ]]; then
     if [[ "${#@}" -lt 2 ]]; then
