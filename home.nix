@@ -709,6 +709,8 @@ in
             amsmath
             ulem
             hyperref
+            cm-super
+            type1cm
 
             arydshln
             fontawesome5
