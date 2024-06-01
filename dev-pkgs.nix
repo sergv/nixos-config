@@ -52,7 +52,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
     # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
-    hpkgs964 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc964;
+    hpkgs964 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc965;
     # hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
     overrideCabal = revision: editedSha: pkg:
@@ -306,7 +306,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             sha256 = "sha256-EhZSGnr12aWkye9v5Jsm91vbMi/EDzRAPs8/W2aKTZ8="; #pkgs.lib.fakeSha256;
             inherit rev;
           };
-          buildPkgs = pkgs.haskell.packages.native-bignum.ghc964;
+          buildPkgs = pkgs.haskell.packages.native-bignum.ghc965;
           ghc'      = (old-ghc.override (old: old // {
             bootPkgs = buildPkgs;
             inherit ghcSrc;
@@ -380,7 +380,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             sha256 = "sha256-GxLntQzaqbb0rPNMIN2GxkQANbWFyiwNfEMUcCiD/bw="; # pkgs.lib.fakeSha256;
             inherit rev;
           };
-          buildPkgs = pkgs.haskell.packages.native-bignum.ghc964;
+          buildPkgs = pkgs.haskell.packages.native-bignum.ghc965;
           ghc'      = (old-ghc.override (old: old // {
             bootPkgs = buildPkgs;
             inherit ghcSrc;
@@ -455,7 +455,7 @@ in {
   ghc928     = wrap-ghc                          "9.2.8"  "9.2"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc928.ghc;
   ghc948     = wrap-ghc                          "9.4.8"  "9.4"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc948.ghc;
 
-  ghc964     = wrap-ghc                          "9.6.4"  "9.6"         pkgs.haskell.compiler.native-bignum.ghc964;
+  ghc965     = wrap-ghc                          "9.6.5"  "9.6"         pkgs.haskell.compiler.native-bignum.ghc965;
   ghc982     = wrap-ghc                          "9.8.2"  "9.8"         ghc982;
 
   ghc9101    = wrap-ghc                          "9.10.1" ["9.10" null] ghc9101;
