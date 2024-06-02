@@ -458,7 +458,7 @@ in
     enable          = true;
     defaultCacheTtl = 3600000000;
     maxCacheTtl     = 3600000000;
-    pinentryFlavor  = "qt";
+    pinentryPackage = pkgs.pinentry-qt;
   };
 
   services.sxhkd = {
@@ -793,7 +793,6 @@ in
       pkgs.oxygen-icons5
       pkgs.p7zip
       pkgs.pavucontrol
-      pkgs.pinentry-qt
       # pkgs.pmutils
       pkgs.pv
       pkgs.smartmontools
