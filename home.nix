@@ -5,7 +5,6 @@
   pinned-pkgs,
   nixpkgs-stable,
   nixpkgs-unstable,
-  nur,
   system,
   ...
 }:
