@@ -48,10 +48,6 @@
       url = "github:nix-community/impermanence";
     };
 
-    nur = {
-      url = "github:nix-community/NUR";
-    };
-
     # flake-utils = {
     #   url = "github:numtide/flake-utils";
     #   inputs.nixpkgs.follows = "nixpkgs";
@@ -66,7 +62,6 @@
     , nixpkgs-23-11
     , nixpkgs-unstable
     # , nixpkgs-fresh-ghc
-    , nur
     , home-manager
     , impermanence
     , ...
@@ -400,7 +395,6 @@
                 };
               in {
                 nixpkgs.overlays = [
-                  nur.overlay
                   overlay-unstable
                   # fcitx-overlay
                   # ssh-overlay
