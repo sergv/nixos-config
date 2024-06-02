@@ -53,7 +53,7 @@ let
   # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
   # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
-  hpkgs964 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc965;
+  hpkgs96 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc965;
   # hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
   overrideCabal =
@@ -65,7 +65,7 @@ let
 
   # hpkgsCabal-raw = pkgs.haskell.packages.ghc945.o
 
-  hpkgsDoctest = hpkgs964.extend (
+  hpkgsDoctest = hpkgs96.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -92,7 +92,7 @@ let
     )
   );
 
-  hpkgsGhcEvensAnalyze = hpkgs964.extend (
+  hpkgsGhcEvensAnalyze = hpkgs96.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -109,7 +109,7 @@ let
     )
   );
 
-  hpkgsEventlog2html = hpkgs964.extend (
+  hpkgsEventlog2html = hpkgs96.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -124,7 +124,7 @@ let
     )
   );
 
-  hpkgsProfiterole = hpkgs964.extend (
+  hpkgsProfiterole = hpkgs96.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -136,7 +136,7 @@ let
   );
 
   # pkgs.haskell.packages.ghc961
-  hpkgsCabal = hpkgs964.extend (
+  hpkgsCabal = hpkgs96.extend (
     new: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
@@ -369,63 +369,6 @@ let
       hardeningDisable = [ "all" ];
     });
 
-  ghc982 =
-    let
-      old-ghc = pkgs.haskell.compiler.ghc981;
-      version = "9.8.2";
-      rev = "f3225ed4b3f3c4309f9342c5e40643eeb0cc45da";
-      ghcSrc = pkgs.fetchgit {
-        url = "https://gitlab.haskell.org/ghc/ghc.git";
-        sha256 = "sha256-EhZSGnr12aWkye9v5Jsm91vbMi/EDzRAPs8/W2aKTZ8="; # pkgs.lib.fakeSha256;
-        inherit rev;
-      };
-      buildPkgs = pkgs.haskell.packages.native-bignum.ghc965;
-      ghc' = (
-        old-ghc.override (
-          old:
-          old
-          // {
-            bootPkgs = buildPkgs;
-            inherit ghcSrc;
-          }
-        )
-      );
-    in
-    disableAllHardening (
-      hutils.smaller-ghc (
-        (ghc'.override (
-          old:
-          old
-          // {
-            bootPkgs = buildPkgs;
-            hadrian = hlib.doJailbreak (
-              ghc'.hadrian.override (
-                old2:
-                old2
-                // {
-                  inherit ghcSrc;
-                  ghcVersion = version;
-                }
-              )
-            );
-            inherit ghcSrc;
-          }
-        )).overrideAttrs
-          (old: {
-            inherit version;
-            preConfigure =
-              builtins.replaceStrings [ old-ghc.version ] [ "${version}" ] old.preConfigure
-              +
-              # Do this if taking sources from git directly.
-              ''
-                echo ${version} > VERSION
-                echo ${rev} > GIT_COMMIT_ID
-                ./boot
-              '';
-          })
-      )
-    );
-
   ghc-platform =
     {
       mkDerivation,
@@ -484,7 +427,7 @@ let
 
   ghc9101 =
     let
-      old-ghc = pkgs.haskell.compiler.ghc981;
+      old-ghc = pkgs.haskell.compiler.ghc982;
       version = "9.10.1";
       rev = "6d779c0fab30c39475aef50d39064ed67ce839d7";
       ghcSrc = pkgs.fetchgit {
@@ -610,9 +553,9 @@ in
   ghc948 = wrap-ghc "9.4.8" "9.4" pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc948.ghc;
 
   ghc965 = wrap-ghc "9.6.5" "9.6" pkgs.haskell.compiler.native-bignum.ghc965;
-  ghc982 = wrap-ghc "9.8.2" "9.8" ghc982;
+  ghc982 = wrap-ghc "9.8.2" "9.8" pkgs.haskell.compiler.native-bignum.ghc982;
 
-  ghc9101 = wrap-ghc "9.10.1" [ "9.10" null ] ghc9101;
+  ghc9101 = wrap-ghc "9.10.1" [ "9.10" null ] pkgs.haskell.compiler.native-bignum.ghc9101;
 
   #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
 
@@ -641,17 +584,17 @@ in
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  alex = hlib.justStaticExecutables hpkgs964.alex;
-  happy = hlib.justStaticExecutables hpkgs964.happy;
+  alex = hlib.justStaticExecutables hpkgs96.alex;
+  happy = hlib.justStaticExecutables hpkgs96.happy;
   cabal-install = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
   doctest = hlib.justStaticExecutables hpkgsDoctest.doctest;
   eventlog2html = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
-  fast-tags = hlib.justStaticExecutables hpkgs964.fast-tags;
+  fast-tags = hlib.justStaticExecutables hpkgs96.fast-tags;
   ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
-  hp2pretty = hlib.justStaticExecutables hpkgs964.hp2pretty;
-  pretty-show = hlib.justStaticExecutables hpkgs964.pretty-show;
+  hp2pretty = hlib.justStaticExecutables hpkgs96.hp2pretty;
+  pretty-show = hlib.justStaticExecutables hpkgs96.pretty-show;
   profiterole = hlib.justStaticExecutables hpkgsProfiterole.profiterole;
-  # hspec-discover     = hlib.justStaticExecutables hpkgs964.hspec-discover;
+  # hspec-discover     = hlib.justStaticExecutables hpkgs96.hspec-discover;
   # threadscope        = threadscopePkgs.threadscope;
   universal-ctags = pkgs.universal-ctags;
 
