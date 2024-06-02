@@ -642,7 +642,7 @@ in
   programs.firefox = {
     enable = true;
     package = pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
-      nativeMessagingHosts = [ pkgs.nur.repos.wolfangaukang.vdhcoapp ];
+      nativeMessagingHosts = [ pkgs.vdhcoapp ];
     };
   };
 
@@ -757,7 +757,7 @@ in
 
         qbittorrent-pkg
 
-        pkgs.nur.repos.wolfangaukang.vdhcoapp
+        pkgs.vdhcoapp
 
         # byar
 
