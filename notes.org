@@ -309,3 +309,9 @@ sudo mount /nix/store -o remount,rw
 sudo rm -f /nix/store/.../my-file
 sergey@home:~$ sudo mount /nix/store -o remount,ro
 #+END_EXAMPLE
+
+** Show what flake builds
+~nix path-info <flake-target>~
+
+** Size of built derivation on disk
+~nix path-info --recursive --closure-size --human-readable <store path>~
