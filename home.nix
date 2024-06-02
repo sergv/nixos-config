@@ -827,7 +827,7 @@ in
       pkgs.wineWowPackages.stagingFull
       pkgs.winetricks
 
-      pkgs.haskell.packages.native-bignum.ghc964.nix-diff
+      pkgs.haskell.packages.native-bignum.ghc965.nix-diff
 
       isabelle-pkg
 
