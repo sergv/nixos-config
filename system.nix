@@ -10,7 +10,6 @@ in
   imports =
     [# Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./compressed-root.nix
       ./kernel.nix
     ];
 
@@ -55,25 +54,17 @@ in
     #             ];
     # };
 
-    "/nix" = {
-      depends       = ["/"];
-      device        = "/dev/disk/by-label/nixos-root";
-      fsType        = "ext4";
-      options       = ["errors=remount-ro" "noatime" "nodiratime" "lazytime" "x-gvfs-hide" "discard"];
+    "/" = {
+      device  = "/dev/disk/by-label/nixos-root";
+      fsType  = "ext4";
+      options = ["errors=remount-ro" "noatime" "nodiratime" "lazytime" "x-gvfs-hide"];
     };
-    "/permanent" = {
-      depends       = ["/"];
-      device        = "/dev/disk/by-label/nixos-permanent";
-      fsType        = "ext4";
-      # options       = ["discard"]; # for ssds
-      options       = ["rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" "x-gvfs-hide"];
-      neededForBoot = true;
-    };
+
     "/boot" = {
       depends = ["/"];
       device  = "/dev/disk/by-label/NIXOS-BOOT";
       fsType  = "vfat";
-      options = ["nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
+      options = ["fmask=0022" "dmask=0022" "x-gvfs-hide"];
     };
   };
 
@@ -130,7 +121,6 @@ in
       "/var/log"
     ];
     files = [
-      "/etc/machine-id"
       "/etc/ssh/ssh_host_rsa_key"
       "/etc/ssh/ssh_host_rsa_key.pub"
       "/etc/ssh/ssh_host_ed25519_key"
@@ -138,8 +128,6 @@ in
     ];
     users.sergey = {
       directories = [
-        "art"
-        "bicycle"
         "books"
         "documents"
         "Documents"
@@ -148,9 +136,6 @@ in
         "films"
         "games"
         "health"
-        "home" # remove?
-        "Katya"
-        "migration" # remove?
         "Music"
         "nix"
         "Pictures"
@@ -162,7 +147,6 @@ in
         "software"
         "Telegram"
         "tmp"
-        "torrents"
         "travelling"
         "Videos"
         "vim"
@@ -170,20 +154,16 @@ in
 
         { directory = ".android"; mode = "0700"; }
         { directory = ".cabal"; mode = "0700"; }
-        { directory = ".cargo"; mode = "0700"; }
         { directory = ".gradle"; mode = "0700"; }
         { directory = ".isabelle"; mode = "0700"; }
         { directory = ".stack"; mode = "0700"; }
 
-        { directory = ".bitcoin"; mode = "0700"; }
-        { directory = ".electrum"; mode = "0700"; }
         { directory = ".dosbox"; mode = "0700"; }
         { directory = ".emacs.d"; mode = "0700"; }
         { directory = ".ghc"; mode = "0700"; }
         { directory = ".gnupg"; mode = "0700"; }
         { directory = ".litecoin"; mode = "0700"; }
         { directory = ".mozilla"; mode = "0700"; }
-        { directory = ".paradoxlauncher"; mode = "0700"; }
         { directory = ".ssh"; mode = "0700"; }
         { directory = ".thunderbird"; mode = "0700"; }
 
@@ -192,7 +172,6 @@ in
         ".config/.arduino15"
         ".config/audacious"
         # ".config/autostart"
-        ".config/bitcoin"
         ".config/chromium"
         ".config/dconf"
         ".config/fontforge"
@@ -201,11 +180,9 @@ in
         ".config/keybase"
         ".config/libreoffice"
         ".config/mc"
-        ".config/paradox-launcher-v2"
         ".config/pulse"
         ".config/ristretto"
         ".config/strawberry"
-        ".config/transmission"
         ".config/vlc"
         ".config/xfce4"
         ".config/VirtualBox"
@@ -216,12 +193,10 @@ in
         ".local/share/3909"
         ".local/share/Anki"
         ".local/share/Anki2"
-        ".local/share/aspyr-media"
         { directory = ".local/share/keyrings"; mode = "0700"; }
         ".local/share/mc"
         ".local/share/mime"
         ".local/share/openmw"
-        ".local/share/Paradox Interactive"
         ".local/share/ristretto"
         ".local/share/strawberry"
         ".local/share/TelegramDesktop"
@@ -325,15 +300,15 @@ in
           storage-driver = "overlay2";
         };
       };
-    }; #.enable = true;
+    };
     virtualbox.host = {
-      enable              = true;
-      enableExtensionPack = true;
+      enable              = false;
+      enableExtensionPack = false;
     };
   };
 
   hardware = {
-    bluetooth.enable  = false;
+    bluetooth.enable = true;
     pulseaudio = {
       enable       = true;
       support32Bit = true;
@@ -344,30 +319,39 @@ in
       driSupport      = true;
       # Enable acceleration in x32 wine apps.
       driSupport32Bit = true;
+
+      extraPackages = [
+        # pkgs.intel-media-driver # LIBVA_DRIVER_NAME=iHD
+        pkgs.intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+        pkgs.libvdpau-va-gl
+      ];
+
+      extraPackages32 = [ pkgs.pkgsi686Linux.intel-vaapi-driver ];
     };
 
-    nvidia = {
-      # Modesetting is needed most of the time
-      modesetting.enable = true;
 
-	    # Enable power management (do not disable this unless you have a reason to).
-	    # Likely to cause problems on laptops and with screen tearing if disabled.
-	    powerManagement.enable = true;
-
-      # Use the open source version of the kernel module ("nouveau")
-	    # Note that this offers much lower performance and does not
-	    # support all the latest Nvidia GPU features.
-	    # You most likely don't want this.
-      # Only available on driver 515.43.04+
-      open = false;
-
-      # Enable the Nvidia settings menu,
-	    # accessible via `nvidia-settings`.
-      nvidiaSettings = true;
-
-      # Optionally, you may need to select the appropriate driver version for your specific GPU.
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
-    };
+    # nvidia = {
+    #   # Modesetting is needed most of the time
+    #   modesetting.enable = true;
+    #
+	   #  # Enable power management (do not disable this unless you have a reason to).
+	   #  # Likely to cause problems on laptops and with screen tearing if disabled.
+	   #  powerManagement.enable = true;
+    #
+    #   # Use the open source version of the kernel module ("nouveau")
+	   #  # Note that this offers much lower performance and does not
+	   #  # support all the latest Nvidia GPU features.
+	   #  # You most likely don't want this.
+    #   # Only available on driver 515.43.04+
+    #   open = false;
+    #
+    #   # Enable the Nvidia settings menu,
+	   #  # accessible via `nvidia-settings`.
+    #   nvidiaSettings = true;
+    #
+    #   # Optionally, you may need to select the appropriate driver version for your specific GPU.
+    #   package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # };
   };
 
   sound.enable = true;
@@ -387,27 +371,28 @@ in
   networking = {
     # Supreme Commander’s faf cilent doesn’t work with IPv6 at all.
     enableIPv6 = false;
-    hostName   = "home"; # Define your hostname.
+    hostName   = "notebook"; # Define your hostname.
     #hostName              = ""; # Use dhcp-provided hostname.
-    # networkmanager.enable = true;
-    #wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
+    networkmanager.enable = true;
+    # wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
 
     # Prefer eth0 to eno1 and the like.
     usePredictableInterfaceNames = true;
 
-    # Don’t autoconfigure all network interfaces
-    useDHCP = false;
-    bridges = {
-      br0 = {
-        interfaces = ["eth-usb" "eth0"];
-      };
+    # # Don’t autoconfigure all network interfaces
+    # useDHCP = false;
+    # bridges = {
+    #   br0 = {
+    #     interfaces = ["eth-usb" "eth0"];
+    #   };
+    # };
+    # interfaces.br0 = {
+    #   useDHCP = true;
+    # };
+
+    interfaces.eth0 = {
+     useDHCP = true;
     };
-    interfaces.br0 = {
-      useDHCP = true;
-    };
-    #interfaces.eth0 = {
-    #  useDHCP = true;
-    #};
   };
 
   # Open ports in the firewall.
@@ -425,7 +410,7 @@ in
       bash-prompt-prefix    = "[nix] ";
       experimental-features = ["nix-command" "flakes"];
       # More at https://nixos.org/nix/manual/#conf-system-features.
-      system-features       = ["big-parallel" "gccarch-znver3" "gccarch-znver4"];
+      system-features       = ["big-parallel"];
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixFlakes)
     #   "experimental-features = nix-command flakes";
@@ -541,7 +526,7 @@ in
     };
   };
 
-  services.displayManager.defaultSession = "plasma";
+  services.displayManager.defaultSession = "xfce";
 
   # Enable the X11 windowing system.
   services.xserver = {
@@ -567,23 +552,23 @@ in
     # Enable touchpad support.
     # libinput.enable = true;
 
-    #videoDrivers = ["intel" "nvidia"]
+    videoDrivers = ["intel"];
     #videoDrivers = ["amdgpu" "nvidia"];
-    videoDrivers = ["nvidia"];
+    # videoDrivers = ["nvidia"];
     #videoDrivers = ["modesetting"];
 
     #KDE
     #displayManager.sddm.enable = false;
 
     desktopManager = {
-      plasma5 = {
-        phononBackend = "vlc";
-        enable        = true;
-      };
-      # xfce                  = {
-      #   enable            = true;
-      #   enableScreensaver = false;
+      # plasma5 = {
+      #   phononBackend = "vlc";
+      #   enable        = true;
       # };
+      xfce                  = {
+        enable            = true;
+        enableScreensaver = false;
+      };
     };
     displayManager = {
       lightdm.enable = true;
@@ -729,6 +714,7 @@ in
     settings    = {
       PermitRootLogin        = "no";
       PasswordAuthentication = false;
+      UsePAM                 = false;
       X11Forwarding          = true;
     };
   };
@@ -782,7 +768,7 @@ in
   zramSwap = {
     enable        = true;
     algorithm     = "zstd";
-    memoryPercent = 33;
+    memoryPercent = 50;
   };
 
   system = {
