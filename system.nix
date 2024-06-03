@@ -193,7 +193,7 @@ in
         ".config/bitcoin"
         ".config/chromium"
         ".config/dconf"
-        ".config/fontforce"
+        ".config/fontforge"
         ".config/Google"
         ".config/htop"
         ".config/keybase"
