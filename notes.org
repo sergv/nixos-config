@@ -167,7 +167,7 @@ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mini
 + ~n~ - create new partition, 200Mb for efi is enough, make sure type is ‘efi partition’
 + ~t~ - amend & list partition types, note which one is ~efi~ partition
 + EFI: ~sudo mkfs.fat -F 32 $efi-dev~
-+ EIF: ~sudo fatlabel $efi-dev nixos-boot~
++ EFI: ~sudo fatlabel $efi-dev nixos-boot~
 + Root: ~sudo mkfs.ext4 $root-dev -L nixos-root~
 + Root SSD: ~mkfs.f2fs -l nixos-root -O extra_attr,inode_checksum,sb_checksum,compression $root-dev~
 + Mount partitions ~sudo mount /dev/disk/by-label/nixos-root /mnt~
