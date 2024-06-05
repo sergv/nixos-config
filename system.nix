@@ -774,6 +774,7 @@ in
   # Feel free to remove if you don't need it.
   services.openssh = {
     enable = true;
+    extraConfig = "PubkeyAcceptedKeyTypes = ssh-rsa,ssh-ed25519";
     settings = {
       PermitRootLogin = "no";
       PasswordAuthentication = false;
