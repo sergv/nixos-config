@@ -175,6 +175,7 @@ in
         { directory = ".stack"; mode = "0700"; }
 
         { directory = ".bitcoin"; mode = "0700"; }
+        { directory = ".electrum"; mode = "0700"; }
         { directory = ".dosbox"; mode = "0700"; }
         { directory = ".emacs.d"; mode = "0700"; }
         { directory = ".ghc"; mode = "0700"; }
