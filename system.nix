@@ -472,6 +472,35 @@ in
     ];
   };
 
+  security.pam = {
+    loginLimits = [
+      {
+        domain = "*";
+        type   = "soft";
+        item   = "nofile";
+        value  = "8192";
+      }
+      {
+        domain = "*";
+        type   = "hard";
+        item   = "nofile";
+        value  = "1048576";
+      }
+      # {
+      #   domain = "@users";
+      #   type   = "hard";
+      #   item   = "data";
+      #   value  = "7000000"; # kill process if it goes over 7Gb
+      # }
+      # {
+      #   domain = "@users";
+      #   type   = "soft";
+      #   item   = "data";
+      #   value  = "4000000"; # Notify process if it eats more than 4Gb
+      # }
+    ];
+  };
+
   services.acpid.enable = true;
   powerManagement = {
     enable          = true;
