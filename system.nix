@@ -219,6 +219,10 @@ in
           mode = "0700";
         }
         {
+          directory = ".electrum";
+          mode = "0700";
+        }
+        {
           directory = ".dosbox";
           mode = "0700";
         }
