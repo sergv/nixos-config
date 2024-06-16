@@ -108,7 +108,7 @@ let
         # patches = (old.patches or []) ++ [
         #   ./patches/emacs-gc-block-increase.patch
         # ];
-        version = "29.2";
+        version = "29.3";
         withNativeCompilation = true;
         withGTK3 = true;
         withSQLite3 = true;
