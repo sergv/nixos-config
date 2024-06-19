@@ -4,6 +4,7 @@
 , pinned-pkgs
 , nixpkgs-stable
 , nixpkgs-unstable
+, arkenfox
 , system
 , ...
 }:
@@ -159,6 +160,11 @@ let wmctrl-pkg = pkgs.wmctrl;
 
 in
 {
+
+  imports = [
+    arkenfox.hmModules.default
+  ];
+
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home = {
@@ -638,11 +644,9 @@ in
   #   videos            = "\$HOME/misc/videos";
   # };
 
-  programs.firefox = {
-    enable = true;
-    package = pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
-      nativeMessagingHosts = [ pkgs.vdhcoapp ];
-    };
+  programs.firefox = import ./firefox.nix {
+    inherit pkgs;
+    firefox-addons = pkgs.nur.repos.rycee.firefox-addons;
   };
 
   home.packages =
@@ -709,8 +713,6 @@ in
         pkgs.ffmpeg-full
         pkgs.file
         pkgs.findutils
-        #pkgs.firefox
-        # pkgs.firefox-esr
         pkgs.gimp
         pkgs.glxinfo
         pkgs.gparted
