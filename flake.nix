@@ -3,15 +3,6 @@
 
   inputs = {
 
-    nixpkgs-stable = {
-      # # unstable
-      # url = "nixpkgs/nixos-unstable";
-      #url = "nixpkgs/nixos-22.05";
-      #url = "/home/sergey/nix/nixpkgs";
-      # url = "nixpkgs/nixos-23.05";
-      url = "nixpkgs/nixos-24.05";
-    };
-
     nixpkgs-20-03 = {
       url = "nixpkgs/nixos-20.03";
     };
@@ -22,6 +13,15 @@
 
     nixpkgs-23-11 = {
       url = "nixpkgs/nixos-23.11";
+    };
+
+    nixpkgs-stable = {
+      # # unstable
+      # url = "nixpkgs/nixos-unstable";
+      #url = "nixpkgs/nixos-22.05";
+      #url = "/home/sergey/nix/nixpkgs";
+      # url = "nixpkgs/nixos-23.05";
+      url = "nixpkgs/nixos-24.05";
     };
 
     nixpkgs-unstable = {
@@ -48,10 +48,33 @@
       url = "github:nix-community/impermanence";
     };
 
-    # flake-utils = {
-    #   url = "github:numtide/flake-utils";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+    };
+
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+    };
+
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+      inputs.flake-compat.follows = "flake-compat";
+    };
+
+    arkenfox = {
+      # url = "git+https://github.com/dwarfmaster/arkenfox-nixos?ref=main";
+      url = "github:dwarfmaster/arkenfox-nixos";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.flake-compat.follows = "flake-compat";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.pre-commit.follows = "git-hooks";
+    };
+
+    nur = {
+      url = "github:nix-community/NUR";
+    };
 
   };
 
@@ -64,6 +87,8 @@
     # , nixpkgs-fresh-ghc
     , home-manager
     , impermanence
+    , arkenfox
+    , nur
     , ...
     }:
     let system = "x86_64-linux";
@@ -369,7 +394,7 @@
         home-manager-extra-args = {
           # inherit nixpkgs-fresh-ghc system;
           inherit pkgs-pristine;
-          inherit nixpkgs-stable nixpkgs-unstable system;
+          inherit nixpkgs-stable nixpkgs-unstable system arkenfox;
           pinned-pkgs = {
             nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };
             nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
@@ -386,7 +411,9 @@
         home = nixpkgs-unstable.lib.nixosSystem {
           inherit system;
           inherit pkgs;
+
           modules = [
+
             ({ config, pkgs, ... }:
               let
                 overlay-unstable = _: _: {
@@ -395,6 +422,7 @@
                 };
               in {
                 nixpkgs.overlays = [
+                  nur.overlay
                   overlay-unstable
                   # fcitx-overlay
                   # ssh-overlay
@@ -404,7 +432,7 @@
 
                   # arch-native-overlay
                 ];
-	            })
+              })
 
             ./system.nix
 
@@ -422,6 +450,7 @@
               #   imports = [ ./home.nix ];
               # };
             }
+
           ];
         };
       };
