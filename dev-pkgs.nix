@@ -42,6 +42,13 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       sha256 = "sha256-RRa3bB6As5QnHaOH9AP4yc5b4cigGY27MeQsyiYo65k="; #pkgs.lib.fakeSha256;
     };
 
+    fast-tags-repo = pkgs.fetchFromGitHub {
+      owner  = "sergv";
+      repo   = "fast-tags";
+      rev    = "098c9a8ad5005a146928fc17957210e23227e0c5";
+      sha256 = "sha256-fc5LOea02ix9pobFGSqsIArekRYRqGHkSsffX/RgXzM="; #pkgs.lib.fakeSha256;
+    };
+
     # hpkgs = pkgs.haskell.packages.ghc945;
     # Doesn’t work but could be cool: static executables
     # hpkgs = pkgs.pkgsStatic.haskell.packages.ghc961.override {
@@ -53,6 +60,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
     # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
     hpkgs96 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc965;
+    hpkgs910 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9101;
     # hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
     overrideCabal = revision: editedSha: pkg:
@@ -179,6 +187,57 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         #       sha256 = "sha256-x/8O0KFlj2SDVDKp3IPIvqklmZHfBYKGwygbG48q5Ig=";
         #     }
         #       {}));
+      }));
+
+    hpkgsFastTags = hpkgs910.extend (_: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+        fast-tags = hlib.dontCheck (hlib.doJailbreak (old.callCabal2nix "fast-tags" fast-tags-repo {}));
+
+        # Curse him who put os-string, a boot package, in the package set for
+        # 9.10.1!
+        #
+        # Having boot package in here, e.g. containers, will create conflicts
+        # when building packages that depend on it.
+        #
+        # Seriously, nix has pretty shitty parts and bullshit like
+        # this can kill a few hours of your life like it’s nothing.
+        #
+        # Nix is great when it works, but when it doesn’t it’s a miserable
+        # piece of FUCK.
+        os-string = null;
+
+        vector = hlib.dontCheck old.vector;
+        async = hlib.dontCheck old.async;
+        alex = hlib.dontCheck old.alex;
+        happy = hlib.dontCheck old.happy;
+        code-page = hlib.dontCheck old.code-page;
+        inspection-testing = hlib.dontCheck old.inspection-testing;
+        call-stack = hlib.dontCheck old.call-stack;
+        QuickCheck = hlib.dontCheck old.QuickCheck;
+        silently = hlib.dontCheck old.silently;
+        HUnit = hlib.dontCheck old.HUnit;
+        optparse-applicative = hlib.dontCheck old.optparse-applicative;
+        hspec-expectations = hlib.dontCheck old.hspec-expectations;
+        pcre-light = hlib.dontCheck old.pcre-light;
+        file-io = hlib.dontCheck old.file-io;
+        syb = hlib.dontCheck old.syb;
+        hspec-discover = hlib.dontCheck old.hspec-discover;
+        tasty-quickcheck = hlib.dontCheck old.tasty-quickcheck;
+        stringbuilder = hlib.dontCheck old.stringbuilder;
+        base-orphans = hlib.dontCheck old.base-orphans;
+
+        doctest = hlib.dontCheck (hlib.doJailbreak (old.callHackage "doctest" "0.22.2" {}));
+
+        hashable =
+          hlib.dontCheck
+            (old.callHackageDirect {
+              pkg    = "hashable";
+              ver    = "1.4.6.0";
+              sha256 = "sha256-UK24kyPDWNwkmSJP04DATlXRrfmX+mWBUeGaO4ZYgTM="; #pkgs.lib.fakeSha256;
+            }
+              {});
+
+        primitive = hlib.dontCheck (old.callHackage "primitive" "0.9.0.0" {});
       }));
 
     # pkgs.haskell.packages.ghc961
@@ -457,7 +516,7 @@ in {
   cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
   doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
   eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
-  fast-tags          = hlib.justStaticExecutables hpkgs96.fast-tags;
+  fast-tags          = hlib.justStaticExecutables hpkgsFastTags.fast-tags;
   ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
   hp2pretty          = hlib.justStaticExecutables hpkgs96.hp2pretty;
   pretty-show        = hlib.justStaticExecutables hpkgs96.pretty-show;
