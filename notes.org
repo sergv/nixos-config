@@ -246,7 +246,7 @@ Can be checked out when something fails to build
 * Shell
 ~nix-shell~ ~ ~nix develop~
 
-* NixOs TODO
+* NixOS TODO
 - [X] Build firefox with addons baked-in
 - [X] Build firefox with pre-disabled options https://github.com/hlissner/dotfiles/blob/master/modules/desktop/browsers/firefox.nix
 - [X] Install torrent client
