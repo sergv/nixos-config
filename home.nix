@@ -700,6 +700,15 @@ in
     firefox-addons = pkgs.nur.repos.rycee.firefox-addons;
   };
 
+  programs.chromium = {
+    enable = true;
+    # Take from pristine so that it will be picked up from cache. Building chromium
+    # is almost impossible.
+    # pkgs-pristine.chromium
+    # pkgs.google-chrome
+    package = pkgs-pristine.ungoogled-chromium;
+  };
+
   home.packages =
     let
       tex-pkg = (
@@ -759,10 +768,6 @@ in
       pkgs.baobab
       pkgs.bridge-utils
       # pkgs.ccache
-      # Take from pristine so that it will be picked up from cache. Building chromium
-      # is almost impossible.
-      pkgs-pristine.chromium
-      #pkgs.google-chrome
       # pkgs.clang
       # pkgs.clang-tools
       pkgs.clinfo
