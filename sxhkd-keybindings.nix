@@ -23,6 +23,8 @@ let misc-keybindings = {
           "XF86Go"
           # Prior = Page Down
           "mod4 + Prior"
+          # Regular keyboards
+          "Menu"
         ];
       }
 
