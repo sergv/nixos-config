@@ -689,7 +689,6 @@ in
         d.ru
         d.uk
       ]))
-      pkgs.audacious
       # pkgs.autoconf
       pkgs.baobab
       pkgs.bridge-utils
@@ -744,6 +743,10 @@ in
       # pkgs.yasm
       pkgs.zstd
       # pkgs.z3
+
+      # Music
+      pkgs.audacious
+      pkgs.strawberry
 
       fahclient-pkg
 
