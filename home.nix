@@ -665,6 +665,8 @@ in
         pkgs.pavucontrol
         # pkgs.pmutils
         pkgs.pv
+        # for shsplit
+        pkgs.shntool
         pkgs.smartmontools
         pkgs.sshfs
         pkgs.telegram-desktop
