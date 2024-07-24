@@ -168,6 +168,7 @@ in
         "vim"
         "VirtualBox VMs"
 
+        { directory = ".android"; mode = "0700"; }
         { directory = ".cabal"; mode = "0700"; }
         { directory = ".cargo"; mode = "0700"; }
         { directory = ".gradle"; mode = "0700"; }
