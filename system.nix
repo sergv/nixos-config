@@ -194,6 +194,10 @@ in
         "VirtualBox VMs"
 
         {
+          directory = ".android";
+          mode = "0700";
+        }
+        {
           directory = ".cabal";
           mode = "0700";
         }
