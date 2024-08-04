@@ -9,7 +9,12 @@
 set -u
 
 if [[ "$EUID" != 0 ]] ; then
-  echo "This must be run as root!"
+  echo "This must be run as root!" >&2
+  exit 1
+fi
+
+if [[ "$#" == 0 ]] ; then
+  echo "usage: $0 [nixos-rebuild command]" >&2
   exit 1
 fi
 
