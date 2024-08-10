@@ -267,7 +267,14 @@ in {
           "ublock-quick-fixes"
           "ublock-unbreak"
           "urlhaus-1"
+          # Enable my custom filtering rules from "userFilters".
+          "user-filters"
         ];
+        userFilters =
+          pkgs.lib.concatStringsSep "\n" [
+            # https://www.youtube.com Remove annoying logo that may have animations, I hate them real bad now
+            "www.youtube.com##ytd-yoodle-renderer.ytd-topbar-logo-renderer.style-scope"
+          ];
       };
     };
 
