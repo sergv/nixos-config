@@ -274,6 +274,7 @@ in {
           pkgs.lib.concatStringsSep "\n" [
             # https://www.youtube.com Remove annoying logo that may have animations, I hate them real bad now
             "www.youtube.com##ytd-yoodle-renderer.ytd-topbar-logo-renderer.style-scope"
+            "www.youtube.com##.ytd-topbar-logo-renderer.style-scope > .ytd-logo.style-scope"
             "www.google.com###hplogo"
             "www.google.co.uk###hplogo"
             "www.google.com.ua###hplogo"
