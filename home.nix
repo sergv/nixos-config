@@ -93,35 +93,37 @@ let wmctrl-pkg = pkgs.wmctrl;
       };
     });
 
-    emacs-bytecode = (emacs-pkg.override (_: { withNativeCompilation = false; })).overrideAttrs (_: {
+    emacs-debug-pkg = pkgs.enableDebugging emacs-pkg;
+
+    emacs-bytecode-pkg = (emacs-pkg.override (_: { withNativeCompilation = false; })).overrideAttrs (_: {
       withNativeCompilation = false;
       withTreeSitter        = true;
     });
 
-    emacs-bytecode-wrapped =
-      pkgs.runCommand "emacs-bytecode" {}
-        ''
-          mkdir -p "$out/bin"
-          ln -s "${emacs-bytecode}/bin/emacs" "$out/bin/emacs-bytecode"
-        '';
+    mk-emacs-pkg = exe-name: pkg: wrapper:
+      pkgs.writeScriptBin exe-name ''
+        #!${pkgs.bash}/bin/bash
+        if [[ ! -z "''${EMACS_ROOT+x}" ]]; then
+            dump_file="$EMACS_ROOT/compiled/${exe-name}.dmp"
+        else
+            dump_file="$HOME/.emacs.d/compiled/${exe-name}.dmp"
+        fi
 
-    emacs-wrapped = pkgs.writeScriptBin "emacs" ''
-      #!${pkgs.bash}/bin/bash
-      if [[ ! -z "''${EMACS_ROOT+x}" ]]; then
-          dump_file="$EMACS_ROOT/compiled/emacs.dmp"
-      else
-          dump_file="$HOME/.emacs.d/compiled/emacs.dmp"
-      fi
+        # For native compilation
+        export LIBRARY_PATH="${pkgs.lib.makeLibraryPath [pkgs.stdenv.cc.cc pkgs.glibc]}:${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc/${pkgs.stdenv.hostPlatform.config}/${pkgs.lib.getVersion pkgs.stdenv.cc.cc}:$LIBRARY_PATH"
 
-      # For native compilation
-      export LIBRARY_PATH="${pkgs.lib.makeLibraryPath [pkgs.stdenv.cc.cc pkgs.glibc]}:${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc/${pkgs.stdenv.hostPlatform.config}/${pkgs.lib.getVersion pkgs.stdenv.cc.cc}:$LIBRARY_PATH"
+        if [[ ! -f "$dump_file" || ! -z "''${EMACS_FORCE_PRISTINE+x}" ]]; then
+          ${wrapper}${pkg}/bin/emacs "''${@}"
+        else
+          ${wrapper}${pkg}/bin/emacs --dump-file "$dump_file" "''${@}"
+        fi
+      '';
 
-      if [[ ! -f "$dump_file" || ! -z "''${EMACS_FORCE_PRISTINE+x}" ]]; then
-        ${emacs-pkg}/bin/emacs "''${@}"
-      else
-        ${emacs-pkg}/bin/emacs --dump-file "$dump_file" "''${@}"
-      fi
-    '';
+    emacs-wrapped = mk-emacs-pkg "emacs" emacs-pkg "";
+
+    emacs-debug-wrapped = mk-emacs-pkg "emacs-debug" emacs-debug-pkg "gdb --ex run --args ";
+
+    emacs-bytecode-wrapped = mk-emacs-pkg "emacs-bytecode" emacs-bytecode-pkg "";
 
     emacsDesktopItem = pkgs.lib.generators.toINI {} {
       "Desktop Entry" = {
@@ -719,6 +721,7 @@ in
 
         emacs-wrapped
         emacs-bytecode-wrapped
+        emacs-debug-wrapped
         pkgs.tree-sitter
       ] ++
       # Btrfs utils
