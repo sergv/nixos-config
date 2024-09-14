@@ -45,8 +45,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     fast-tags-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "fast-tags";
-      rev    = "098c9a8ad5005a146928fc17957210e23227e0c5";
-      sha256 = "sha256-fc5LOea02ix9pobFGSqsIArekRYRqGHkSsffX/RgXzM="; #pkgs.lib.fakeSha256;
+      rev    = "e9a40703a80f745825ad2ac544fe226bdf197eb5";
+      sha256 = "sha256-dQxlMePbTQsY8PPxaq3F3ougoMj9Zrh044jQkr21DrI="; #pkgs.lib.fakeSha256;
     };
 
     # hpkgs = pkgs.haskell.packages.ghc945;
