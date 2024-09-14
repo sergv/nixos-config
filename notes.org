@@ -315,3 +315,67 @@ sergey@home:~$ sudo mount /nix/store -o remount,ro
 
 ** Size of built derivation on disk
 ~nix path-info --recursive --closure-size --human-readable <store path>~
+
+** IBM S390x emulator
+
+From https://pijul.org/posts/2024-02-13-mainframe/
+
+#+BEGIN_EXAMPLE
+with import <nixpkgs> {
+  overlays = map (uri: import (fetchTarball uri)) [
+    https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz
+  ];
+};
+
+let s390x = import <nixpkgs> { crossSystem = { config = "s390x-unknown-linux-gnu"; }; };
+in
+
+clangStdenv.mkDerivation rec {
+  name = "s390x";
+  buildInputs = [
+    s390x.zstd
+    s390x.libsodium
+    s390x.openssl
+    s390x.libiconv
+    s390x.xxHash
+    s390x.pkg-config
+  ];
+  nativeBuildInputs = [
+    pkg-config
+    qemu
+    s390x.stdenv.cc
+    ((pkgs.rustChannelOf {
+      channel = "stable";
+    }).rust.override {
+      targets = [
+        "x86_64-unknown-linux-gnu"
+        "s390x-unknown-linux-gnu"
+      ];
+    })
+  ];
+
+  CFLAGS="-I${glibc.dev}/include";
+  CFLAGS_s390x-unknown-linux-gnu="-I${s390x.glibc.dev}/include";
+  RUSTFLAGS="-L${glibc}/lib";
+  CARGO_TARGET_S390X_UNKNOWN_LINUX_GNU_RUSTFLAGS="-L${s390x.glibc}/lib";
+}
+#+END_EXAMPLE
+
+Then, for some reason Rust needs to be told which linker to use, which can be done by adding the following to .cargo/config at the root of the Pijul repository (or in ~/.cargo/config):
+
+#+BEGIN_EXAMPLE
+[target.s390x-unknown-linux-gnu]
+linker = "s390x-unknown-linux-gnu-cc"
+#+END_EXAMPLE
+
+Finally, if you are running Linux with Nix (or NixOS, and possibly OSX with Nix, I don’t know), you can just do the following:
+
+#+BEGIN_EXAMPLE
+nix-shell
+
+cargo build --target s390x-unknown-linux-gnu --release
+
+qemu-s390x target/s390x-unknown-linux-gnu/release/pijul
+#+END_EXAMPLE
+
+This runs an emulation of Pijul on the s390x architecture, using the native system calls of your system (I’ve only tested this on Linux).
