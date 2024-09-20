@@ -533,10 +533,12 @@ in {
   # lld   = pkgs.lld_15;
   lld  = filter-bin "llvmPackages_15.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_15.bintools;
 
-  cmake      = pkgs.cmake;
-  gnumake    = pkgs.gnumake;
-  gdb        = pkgs.gdb;
-  patchelf   = pkgs.patchelf;
-  pkg-config = pkgs.pkg-config;
-  diffutils  = pkgs.diffutils;
+  # for ‘clang-format’
+  clang-tools = pkgs.clang-tools;
+  cmake       = pkgs.cmake;
+  gnumake     = pkgs.gnumake;
+  gdb         = pkgs.gdb;
+  patchelf    = pkgs.patchelf;
+  pkg-config  = pkgs.pkg-config;
+  diffutils   = pkgs.diffutils;
 }
