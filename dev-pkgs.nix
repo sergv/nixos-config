@@ -675,10 +675,12 @@ in
     }
   ] pkgs.llvmPackages_15.bintools;
 
-  cmake      = pkgs.cmake;
-  gnumake    = pkgs.gnumake;
-  gdb        = pkgs.gdb;
-  patchelf   = pkgs.patchelf;
-  pkg-config = pkgs.pkg-config;
-  diffutils  = pkgs.diffutils;
+  # for ‘clang-format’
+  clang-tools = pkgs.clang-tools;
+  cmake       = pkgs.cmake;
+  gnumake     = pkgs.gnumake;
+  gdb         = pkgs.gdb;
+  patchelf    = pkgs.patchelf;
+  pkg-config  = pkgs.pkg-config;
+  diffutils   = pkgs.diffutils;
 }
