@@ -596,6 +596,15 @@ in
     };
   };
 
+  environment.etc."tmpfiles.d/tmp.conf".text =
+    ''
+      # Never clear /tmp directory
+      q /tmp     1777 root root - -
+
+      # Clear /var/tmp whenever as it was by default.
+      q /var/tmp 1777 root root - 30d
+    '';
+
   environment.plasma5.excludePackages = [
     pkgs.plasma5Packages.kpeople
     pkgs.plasma5Packages.kwallet
