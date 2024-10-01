@@ -590,6 +590,14 @@ in
     package = pkgs-pristine.ungoogled-chromium;
   };
 
+  # Same as "github:NixOS/nixpkgs/nixpkgs-unstable";
+  nix.registry.nixpkgs-unstable.to = {
+    owner = "NixOS";
+    repo  = "nixpkgs";
+    ref   = "nixpkgs-unstable";
+    type  = "github";
+  };
+
   home.packages =
     let
       tex-pkg = (pkgs.texlive.combine {
