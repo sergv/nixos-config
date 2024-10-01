@@ -541,6 +541,8 @@ in
     };
   };
 
+  services.displayManager.defaultSession = "plasma";
+
   # Enable the X11 windowing system.
   services.xserver = {
     autorun    = true; # Start automatically at boot time.
@@ -584,7 +586,6 @@ in
       # };
     };
     displayManager = {
-      defaultSession = "plasma";
       lightdm.enable = true;
     };
   };
