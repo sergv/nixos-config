@@ -591,11 +591,15 @@ in
   };
 
   # Same as "github:NixOS/nixpkgs/nixpkgs-unstable";
-  nix.registry.nixpkgs-unstable.to = {
-    owner = "NixOS";
-    repo  = "nixpkgs";
-    ref   = "nixpkgs-unstable";
-    type  = "github";
+  nix.registry = {
+    "nixpkgs-unstable" = {
+      to = {
+        owner = "NixOS";
+        repo  = "nixpkgs";
+        ref   = "nixpkgs-unstable";
+        type  = "github";
+      };
+    };
   };
 
   home.packages =
@@ -673,7 +677,7 @@ in
         pkgs.mc
         pkgs.mplayer
         pkgs.nix-index
-        pkgs.nyx
+        pinned-pkgs.nixpkgs-22-11.nyx
         pkgs.oxygen-icons5
         pkgs.p7zip
         pkgs.pavucontrol
