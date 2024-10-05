@@ -515,6 +515,7 @@ in
 
         ".config/Audaciousrc"
         ".config/QtProject.conf"
+        ".config/Triblerrc"
 
         ".local/ghci.conf"
         ".local/share/recently-used.xbel"
@@ -774,6 +775,7 @@ in
       fahclient-pkg
 
       qbittorrent-pkg
+      pkgs.tribler
 
       pkgs.vdhcoapp
 
