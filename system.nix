@@ -745,7 +745,7 @@ in
 
     # Enable and configure the Tor relay
     relay = {
-      enable = true;
+      enable = false;
       role = "relay";  # Set the relay role (e.g., "relay", "bridge")
     };
 
