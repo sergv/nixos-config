@@ -536,9 +536,10 @@ in {
   # for ‘clang-format’
   clang-tools = pkgs.clang-tools;
   cmake       = pkgs.cmake;
-  gnumake     = pkgs.gnumake;
+  diffutils   = pkgs.diffutils;
   gdb         = pkgs.gdb;
+  gnumake     = pkgs.gnumake;
+  libtree     = pkgs.libtree;
   patchelf    = pkgs.patchelf;
   pkg-config  = pkgs.pkg-config;
-  diffutils   = pkgs.diffutils;
 }
