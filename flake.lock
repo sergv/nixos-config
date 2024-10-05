@@ -176,6 +176,21 @@
         "type": "indirect"
       }
     },
+    "nixpkgs-22-11": {
+      "locked": {
+        "lastModified": 1688392541,
+        "narHash": "sha256-lHrKvEkCPTUO+7tPfjIcb7Trk6k31rz18vkyqmkeJfY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "ea4c80b39be4c09702b0cb3b42eab59e2ba4f24b",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "nixos-22.11",
+        "type": "indirect"
+      }
+    },
     "nixpkgs-23-11": {
       "locked": {
         "lastModified": 1716991068,
@@ -246,6 +261,7 @@
         "impermanence": "impermanence",
         "nixpkgs-20-03": "nixpkgs-20-03",
         "nixpkgs-20-09": "nixpkgs-20-09",
+        "nixpkgs-22-11": "nixpkgs-22-11",
         "nixpkgs-23-11": "nixpkgs-23-11",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixpkgs-unstable": "nixpkgs-unstable",
