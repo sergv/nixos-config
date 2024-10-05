@@ -710,6 +710,7 @@ in
         fahclient-pkg
 
         qbittorrent-pkg
+        pkgs.tribler
 
         pkgs.vdhcoapp
 
