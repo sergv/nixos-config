@@ -11,6 +11,10 @@
       url = "nixpkgs/nixos-20.09";
     };
 
+    nixpkgs-22-11 = {
+      url = "nixpkgs/nixos-22.11";
+    };
+
     nixpkgs-23-11 = {
       url = "nixpkgs/nixos-23.11";
     };
@@ -83,6 +87,7 @@
       nixpkgs-stable,
       nixpkgs-20-03,
       nixpkgs-20-09,
+      nixpkgs-22-11,
       nixpkgs-23-11,
       nixpkgs-unstable,
       # , nixpkgs-fresh-ghc
@@ -425,6 +430,7 @@
           nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
           nixpkgs-20-03 = import nixpkgs-20-03 { inherit system; };
           nixpkgs-20-09 = import nixpkgs-20-09 { inherit system; };
+          nixpkgs-22-11 = import nixpkgs-22-11 { inherit system; };
           nixpkgs-23-11 = import nixpkgs-23-11 { inherit system; };
         };
       };
