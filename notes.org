@@ -157,7 +157,7 @@ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mini
 * Nix config in git
 ~git-crypt~ can help with storing secrets in git
 
-* NixOs installation
+* NixOS installation
 ** Partition disk
 *** ~lsblk~ - check available disks
 *** ~fdisk~
