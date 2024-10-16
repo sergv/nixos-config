@@ -395,22 +395,18 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         license = lib.licenses.bsd3;
       };
 
-    ghc9101 =
+    build-ghc = { base-ghc-to-override, build-pkgs, version, rev, sha256 }:
       let old-ghc = pkgs.haskell.compiler.ghc982;
-          version = "9.10.1";
-          rev     = "6d779c0fab30c39475aef50d39064ed67ce839d7";
           ghcSrc = pkgs.fetchgit {
-            url    = "https://gitlab.haskell.org/ghc/ghc.git";
-            sha256 = "sha256-GxLntQzaqbb0rPNMIN2GxkQANbWFyiwNfEMUcCiD/bw="; # pkgs.lib.fakeSha256;
-            inherit rev;
+            url = "https://gitlab.haskell.org/ghc/ghc.git";
+            inherit rev sha256;
           };
-          buildPkgs = pkgs.haskell.packages.native-bignum.ghc965;
-          ghc'      = (old-ghc.override (old: old // {
-            bootPkgs = buildPkgs;
+          ghc'      = (base-ghc-to-override.override (old: old // {
+            bootPkgs = build-pkgs;
             inherit ghcSrc;
           }));
 
-          callPackage' = f: args: buildPkgs.callPackage f ({
+          callPackage' = f: args: build-pkgs.callPackage f ({
             inherit ghcSrc;
             ghcVersion = version;
           } // args);
@@ -420,7 +416,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
       in
         disableAllHardening (hutils.smaller-ghc ((ghc'.override (old: old // {
-          bootPkgs = buildPkgs;
+          bootPkgs = build-pkgs;
           hadrian  = hlib.doJailbreak (ghc'.hadrian.override (old2: old2 // {
             inherit ghcSrc;
             ghc-platform  = ghc-platform-pkg;
@@ -430,7 +426,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           inherit ghcSrc;
         })).overrideAttrs (old: {
           inherit version;
-          preConfigure = builtins.replaceStrings [ old-ghc.version ] [ "${version}" ] old.preConfigure +
+          preConfigure = builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ] old.preConfigure +
             # Do this if taking sources from git directly.
             ''
               echo ${version} > VERSION
@@ -439,6 +435,21 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             '';
         })));
 
+    ghc966 = build-ghc {
+      base-ghc-to-override = pkgs.haskell.compiler.ghc965;
+      build-pkgs           = pkgs.haskell.packages.native-bignum.ghc965;
+      version              = "9.6.6";
+      rev                  = "f2e75e156014544d81428f60b4355cc9ca1e1aca";
+      sha256               = "sha256-n+pgZW8KZTdTqlu7vHWaimPqmfRAaZD7vXVn1RWD2w4="; #pkgs.lib.fakeSha256;
+    };
+
+    ghc9101 = build-ghc {
+      base-ghc-to-override = pkgs.haskell.compiler.ghc982;
+      build-pkgs           = pkgs.haskell.packages.native-bignum.ghc965;
+      version              = "9.10.1";
+      rev                  = "6d779c0fab30c39475aef50d39064ed67ce839d7";
+      sha256               = "sha256-GxLntQzaqbb0rPNMIN2GxkQANbWFyiwNfEMUcCiD/bw="; #pkgs.lib.fakeSha256;
+    };
 
     filter-bin = name: keep-these: pkg:
       assert (builtins.isList keep-these);
@@ -479,7 +490,7 @@ in {
   ghc928     = wrap-ghc                          "9.2.8"  "9.2"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc928.ghc;
   ghc948     = wrap-ghc                          "9.4.8"  "9.4"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc948.ghc;
 
-  ghc965     = wrap-ghc                          "9.6.5"  "9.6"         pkgs.haskell.compiler.native-bignum.ghc965;
+  ghc966     = wrap-ghc                          "9.6.6"  "9.6"         ghc966;
   ghc982     = wrap-ghc                          "9.8.2"  "9.8"         pkgs.haskell.compiler.native-bignum.ghc982;
 
   ghc9101    = wrap-ghc                          "9.10.1" ["9.10" null] pkgs.haskell.compiler.native-bignum.ghc9101;
