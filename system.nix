@@ -170,9 +170,6 @@ in
         "films"
         "games"
         "health"
-        "home" # remove?
-        "Katya"
-        "migration" # remove?
         "Music"
         "nix"
         "Pictures"
