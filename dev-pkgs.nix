@@ -4,6 +4,7 @@ args@{
   nixpkgs-unstable,
   system,
   pkgs,
+  fetchgit-improved,
   ...
 }:
 let
@@ -498,7 +499,7 @@ let
     }:
     let
       old-ghc = pkgs.haskell.compiler.ghc982;
-      ghcSrc = pkgs.fetchgit {
+      ghcSrc = fetchgit-improved {
         url = "https://gitlab.haskell.org/ghc/ghc.git";
         inherit rev sha256;
       };
