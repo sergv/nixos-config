@@ -11,12 +11,35 @@
 
 let wmctrl-pkg = pkgs.wmctrl;
 
+    fetchgit-improved = pkgs.fetchgit;
+
+    # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
+    #
+    # git-proxy-conf = {
+    #   proxy           = git-proxy;
+    #   sslCAInfo       = "path";
+    #   sslCAPath       = "path";
+    #   sslverify       = false;
+    #   proxyAuthMethod = "basic;"
+    # };
+    #
+    # # From https://stackoverflow.com/questions/58169512/call-fetchgit-without-ssl-verify
+    # fetchgit-improved = pkgs.fetchgit // {
+    #   __functor = self : args :
+    #     (pkgs.fetchgit.__functor self args).overrideAttrs (oldAttrs: {
+    #       GIT_SSL_NO_VERIFY         = true;
+    #       GIT_HTTP_PROXY_AUTHMETHOD = "basic";
+    #       https_proxy               = git-proxy;
+    #     });
+    # } ;
+
     my-fonts = import ./fonts { inherit pkgs; };
 
     scripts = import ./scripts { inherit pkgs; wmctrl = wmctrl-pkg; };
 
     dev-pkgs = import ./dev-pkgs.nix {
       inherit pkgs pinned-pkgs system nixpkgs-unstable; #nixpkgs-stable
+      inherit fetchgit-improved;
     };
 
     cuda-pkgs = import ./cuda-pkgs.nix {
@@ -85,11 +108,11 @@ let wmctrl-pkg = pkgs.wmctrl;
       withGTK3              = true;
       withSQLite3           = true;
       withTreeSitter        = true;
-      src                   = pkgs.fetchFromGitHub {
-        owner  = "sergv";
-        repo   = "emacs";
+      src                   = fetchgit-improved {
+        url    = "https://github.com/sergv/emacs.git";
         rev    = "7441c4bc28337d3e3f46681ee04687978a60638b";
         sha256 = "sha256-tUAbIPfmsXtzzA4l7HBAk5V7N+OfoqNKdGYx2sR5eDU="; # pkgs.lib.fakeSha256;
+
       };
     });
 
@@ -334,6 +357,8 @@ in
             # Show more informative diff when submodules are involved.
             submodule = "log";
           };
+          # http = git-proxy-conf;
+          # https = git-proxy-conf;
           merge = {
             # Always show a diffstat at the end of merge.
             stat = true;
