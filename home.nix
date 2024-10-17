@@ -460,11 +460,17 @@ in
         ".vimrc"
 
         ".config/Audaciousrc"
+        ".config/PCSX2"
         ".config/QtProject.conf"
         ".config/Triblerrc"
 
         ".local/ghci.conf"
+        ".local/share/krunnerstaterc"
+        ".local/share/qBittorrent"
         ".local/share/recently-used.xbel"
+        ".local/share/user-places.xbel"
+        ".local/share/user-places.xbel.bak"
+        ".local/share/user-places.xbel.tbcache"
 
         "github-recovery-codes.txt"
         #"mars.exe"
@@ -545,14 +551,6 @@ in
         ".config/Trolltech.conf"
         ".config/user-dirs.dirs"
         ".config/user-dirs.locale"
-
-        ".config/PCSX2"
-
-        ".local/share/krunnerstaterc"
-        ".local/share/qBittorrent"
-        ".local/share/user-places.xbel"
-        ".local/share/user-places.xbel.bak"
-        ".local/share/user-places.xbel.tbcache"
     ];
 
   dconf.settings = {
