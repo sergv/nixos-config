@@ -80,7 +80,7 @@ let wmctrl-pkg = pkgs.wmctrl;
       # patches = (old.patches or []) ++ [
       #   ./patches/emacs-gc-block-increase.patch
       # ];
-      version               = "29.3";
+      version               = "29.4";
       withNativeCompilation = true;
       withGTK3              = true;
       withSQLite3           = true;
@@ -88,8 +88,8 @@ let wmctrl-pkg = pkgs.wmctrl;
       src                   = pkgs.fetchFromGitHub {
         owner  = "sergv";
         repo   = "emacs";
-        rev    = "4a6f60ec8cfe89031d31b87b7cb58508d81622fe";
-        sha256 = "sha256-ByQz24gDdYNYZENiUzbkMWOhUbOezVssHRFbBheVEdQ="; # pkgs.lib.fakeSha256;
+        rev    = "7441c4bc28337d3e3f46681ee04687978a60638b";
+        sha256 = "sha256-tUAbIPfmsXtzzA4l7HBAk5V7N+OfoqNKdGYx2sR5eDU="; # pkgs.lib.fakeSha256;
       };
     });
 
