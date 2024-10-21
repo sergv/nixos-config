@@ -145,8 +145,6 @@ let
         };
       });
 
-  emacs-debug-pkg = pkgs.enableDebugging emacs-pkg;
-
   emacs-bytecode-pkg =
     (emacs-pkg.override (_: {
       withNativeCompilation = false;
@@ -155,6 +153,8 @@ let
         withNativeCompilation = false;
         withTreeSitter = true;
       });
+
+  emacs-debug-pkg = pkgs.enableDebugging emacs-bytecode-pkg;
 
   mk-emacs-pkg =
     exe-name: pkg: wrapper:
