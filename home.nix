@@ -144,7 +144,7 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     emacs-wrapped = mk-emacs-pkg "emacs" emacs-pkg "";
 
-    emacs-debug-wrapped = mk-emacs-pkg "emacs-debug" emacs-debug-pkg "gdb --ex run --args ";
+    emacs-debug-wrapped = mk-emacs-pkg "emacs-debug" emacs-debug-pkg "gdb -ex='set confirm on' -ex=run -ex=quit --args ";
 
     emacs-bytecode-wrapped = mk-emacs-pkg "emacs-bytecode" emacs-bytecode-pkg "";
 
