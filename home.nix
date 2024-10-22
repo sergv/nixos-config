@@ -103,20 +103,46 @@ let wmctrl-pkg = pkgs.wmctrl;
       # patches = (old.patches or []) ++ [
       #   ./patches/emacs-gc-block-increase.patch
       # ];
-      version               = "29.4";
+      version               = "30.0.91";
+      patches               = [
+        (pkgs.substituteAll {
+          src = ./patches/native-comp-driver-options-30.patch;
+
+          backendPath =
+            let libGccJitLibraryPaths = [
+                  "${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc"
+                  "${pkgs.lib.getLib pkgs.stdenv.cc.libc}/lib"
+                ] ++ pkgs.lib.optionals (pkgs.stdenv.cc?cc.lib.libgcc) [
+                  "${pkgs.lib.getLib pkgs.stdenv.cc.cc.lib.libgcc}/lib"
+                ];
+            in
+            pkgs.lib.concatStringsSep " "
+              (builtins.map
+                (x: ''"-B${x}"'')
+                ([
+                  # Paths necessary so the JIT compiler finds its libraries:
+                  "${pkgs.lib.getLib pkgs.libgccjit}/lib"
+                ] ++ libGccJitLibraryPaths ++ [
+                  # Executable paths necessary for compilation (ld, as):
+                  "${pkgs.lib.getBin pkgs.stdenv.cc.cc}/bin"
+                  "${pkgs.lib.getBin pkgs.stdenv.cc.bintools}/bin"
+                  "${pkgs.lib.getBin pkgs.stdenv.cc.bintools.bintools}/bin"
+                ]));
+        })
+      ];
       withNativeCompilation = true;
       withGTK3              = true;
       withSQLite3           = true;
       withTreeSitter        = true;
       src                   = fetchgit-improved {
         url    = "https://github.com/sergv/emacs.git";
-        rev    = "7441c4bc28337d3e3f46681ee04687978a60638b";
-        sha256 = "sha256-tUAbIPfmsXtzzA4l7HBAk5V7N+OfoqNKdGYx2sR5eDU="; # pkgs.lib.fakeSha256;
-
+        rev    = "044a87a46a40ec87058184435f2456f101dfc79b";
+        sha256 = "sha256-8wU5bQCQoQ1NjU/jVNze77T3CnCtt1nsbzKEAimVAeo="; # pkgs.lib.fakeSha256;
       };
     });
 
     emacs-bytecode-pkg = (emacs-pkg.override (_: { withNativeCompilation = false; })).overrideAttrs (_: {
+      patchess              = [];
       withNativeCompilation = false;
       withTreeSitter        = true;
     });
