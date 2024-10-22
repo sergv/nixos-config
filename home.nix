@@ -205,7 +205,7 @@ let
         ]
       }:${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc/${pkgs.stdenv.hostPlatform.config}/${pkgs.lib.getVersion pkgs.stdenv.cc.cc}:$LIBRARY_PATH"
 
-      if [[ ! -f "$dump_file" || ! -z "''${EMACS_FORCE_PRISTINE+x}" ]]; then
+      if [[ ! -f "$dump_file" || "''${EMACS_FORCE_PRISTINE:-0}" != 0 ]]; then
         ${wrapper}${pkg}/bin/emacs "''${@}"
       else
         ${wrapper}${pkg}/bin/emacs --dump-file "$dump_file" "''${@}"
