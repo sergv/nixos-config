@@ -86,8 +86,49 @@ let wmctrl-pkg = pkgs.wmctrl;
         ''
           sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=1.5 \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
         '';
-      # postInstall = builtins.replaceStrings [ "${old.desktopItem}" ] [ "${newDesktopItem}" ] old.postInstall;
     });
+
+    tribler-pkg =
+      let tribler-python = pkgs.python310;
+          libtorrent-rasterbar-1_2_x-upd =
+            let version = "1.2.19";
+            in
+              (pkgs.libtorrent-rasterbar-1_2_x.override (old: {
+                boost  = old.boost.override (_: {
+                  enableStatic = true;
+                  enableShared = false;
+                });
+                openssl = old.openssl.override (_: {
+                  static = true;
+                });
+                python = tribler-python;
+              })).overrideAttrs (old: {
+
+                inherit version;
+
+                src = fetchgit-improved {
+                  url    = "https://github.com/arvidn/libtorrent.git";
+                  rev    = "v${version}";
+                  sha256 = "sha256-dkjNv40/B1bbY16xtYFXOgbbOFnRSp9G2eG5/6dxfgI="; # pkgs.lib.fakeSha256;
+                };
+
+                nativeBuildInputs =
+                  old.nativeBuildInputs ++ [
+                    tribler-python.pkgs.setuptools
+                    pkgs.boost-build
+                    pkgs.openssl.dev
+                  ];
+
+                preConfigure = (old.preConfigure or "") + "\n" + ''
+                  configureFlagsArray+=('PYTHON_INSTALL_PARAMS=--prefix=$(DESTDIR)$(prefix) --single-version-externally-managed --record=installed-files.txt')
+                '';
+
+              });
+      in
+        pkgs.tribler.override (old: {
+          libtorrent-rasterbar-1_2_x = libtorrent-rasterbar-1_2_x-upd;
+          python3                    = tribler-python;
+        });
 
     fahclient-pkg = import ./fahclient.nix {
       inherit (pkgs)
@@ -760,7 +801,7 @@ in
         fahclient-pkg
 
         qbittorrent-pkg
-        pkgs.tribler
+        tribler-pkg
 
         pkgs.vdhcoapp
 
