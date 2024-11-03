@@ -222,6 +222,7 @@ in
         ".local/share/ristretto"
         ".local/share/strawberry"
         ".local/share/TelegramDesktop"
+        ".local/share/Tyranny"
         ".local/share/trash"
         ".local/share/vlc"
 
