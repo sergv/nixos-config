@@ -731,6 +731,14 @@ in
     };
   };
 
+  services.i2p = {
+    enable        = true;
+  };
+
+  # services.i2pd = {
+  #   enable        = true;
+  # };
+
   services.tor = {
     enable        = true;
     client.enable = true;
