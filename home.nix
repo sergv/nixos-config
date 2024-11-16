@@ -876,6 +876,9 @@ in
 
       fahclient-pkg
 
+      pkgs.i2p
+      pkgs.xd
+
       qbittorrent-pkg
       tribler-pkg
 
