@@ -42,51 +42,12 @@ let wmctrl-pkg = pkgs.wmctrl;
       inherit fetchgit-improved;
     };
 
-    cuda-pkgs = import ./cuda-pkgs.nix {
-      inherit pkgs;
-    };
-
-    byar = import ./beyond-all-reason-launcher.nix {
-      inherit (pkgs-pristine)
-        lib
-        stdenv
-        fetchFromGitHub
-        buildNpmPackage
-        runCommand
-        nodejs
-        electron
-        # butler
-        steam-run
-        jq
-        xorg
-        libcxx
-
-        gcc
-        cmake
-        curl
-        pkg-config
-        jsoncpp
-        boost
-        minizip;
-    };
-
     wm-sh = scripts.wm-sh;
 
-    game-run-wrapper = pkgs.writeScriptBin "game-run" ''
-      #!${pkgs.bash}/bin/bash
-      exec ${pkgs.steam-run}/bin/steam-run "''${@}"
-    '';
-
-    qbittorrent-pkg = (pkgs.qbittorrent.override {
+    qbittorrent-pkg = pkgs.qbittorrent.override {
       webuiSupport  = false;
       trackerSearch = false;
-    }).overrideAttrs (old: {
-
-      postInstall = old.postInstall +
-        ''
-          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=1.5 \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
-        '';
-    });
+    };
 
     tribler-pkg =
       let tribler-python = pkgs.python310;
@@ -129,12 +90,6 @@ let wmctrl-pkg = pkgs.wmctrl;
           libtorrent-rasterbar-1_2_x = libtorrent-rasterbar-1_2_x-upd;
           python3                    = tribler-python;
         });
-
-    fahclient-pkg = import ./fahclient.nix {
-      inherit (pkgs)
-        lib buildFHSEnv fetchFromGitHub ocl-icd openssl scons stdenv re2 libevent git;
-      extraPkgs = [pkgs.expat pkgs.zlib];
-    };
 
     isabelle-pkg = import ./isabelle/isabelle.nix {
       inherit pkgs;
@@ -761,6 +716,7 @@ in
         pkgs.lsof
         pkgs.lzip
         pkgs.lzop
+        pkgs.maxima
         pkgs.mc
         pkgs.mplayer
         pkgs.nix-index
@@ -794,8 +750,6 @@ in
         pkgs.audacious
         pkgs.strawberry
 
-        fahclient-pkg
-
         pkgs.i2p
         pkgs.xd
 
@@ -804,20 +758,11 @@ in
 
         pkgs.vdhcoapp
 
-        # byar
-
-        # pkgs.vmware-workstation
-
-        pkgs.cabextract
-        pkgs.wineWowPackages.stagingFull
-        pkgs.winetricks
-
         pkgs.haskell.packages.native-bignum.ghc965.nix-diff
 
         isabelle-pkg
 
         pkgs.pcsx2
-        game-run-wrapper
 
         tex-pkg
         wmctrl-pkg
@@ -832,7 +777,6 @@ in
       #   pkgs.compsize
       # ] ++
       builtins.attrValues dev-pkgs ++
-      builtins.attrValues cuda-pkgs ++
       builtins.attrValues my-fonts ++
       builtins.attrValues scripts;
 
