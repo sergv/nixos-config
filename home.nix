@@ -199,9 +199,6 @@ let wmctrl-pkg = pkgs.wmctrl;
             dump_file="$HOME/.emacs.d/compiled/${exe-name}.dmp"
         fi
 
-        # For native compilation
-        export LIBRARY_PATH="${pkgs.lib.makeLibraryPath [pkgs.stdenv.cc.cc pkgs.glibc]}:${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc/${pkgs.stdenv.hostPlatform.config}/${pkgs.lib.getVersion pkgs.stdenv.cc.cc}:$LIBRARY_PATH"
-
         if [[ ! -f "$dump_file" || "''${EMACS_FORCE_PRISTINE:-0}" != 0 ]]; then
           ${wrapper}${pkg}/bin/emacs "''${@}"
         else
