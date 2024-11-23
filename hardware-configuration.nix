@@ -10,9 +10,9 @@
 
   boot.initrd.availableKernelModules =
     #[ "xhci_pci" "nvme" "ahci" "usb_storage" "usbhid" "sd_mod" ];
-    ["nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod"];
+    ["xhci_pci" "ahci" "usb_storage" "sd_mod" "sr_mod" "rtsx_pci_sdmmc"];
   boot.initrd.kernelModules = [];
-  boot.kernelModules = ["kvm-amd"];
+  boot.kernelModules = ["kvm-intel"];
   boot.extraModulePackages = [];
 
   swapDevices = [];

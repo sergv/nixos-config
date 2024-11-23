@@ -42,47 +42,7 @@ let wmctrl-pkg = pkgs.wmctrl;
       inherit fetchgit-improved;
     };
 
-    cuda-pkgs = import ./cuda-pkgs.nix {
-      inherit pkgs;
-    };
-
-    byar = import ./beyond-all-reason-launcher.nix {
-      inherit (pkgs-pristine)
-        lib
-        stdenv
-        fetchFromGitHub
-        buildNpmPackage
-        runCommand
-        nodejs
-        electron
-        # butler
-        steam-run
-        jq
-        xorg
-        libcxx
-
-        gcc
-        cmake
-        curl
-        pkg-config
-        jsoncpp
-        boost
-        minizip;
-    };
-
     wm-sh = scripts.wm-sh;
-
-    steam = pkgs.steam.override (_: {
-      # Remove non-free parts.
-      steam-unwrapped = null;
-      # Add 32-bit pulseaudio for Supreme Commander.
-      extraLibraries = steam-pkgs: [steam-pkgs.libpulseaudio];
-    });
-
-    game-run-wrapper = pkgs.writeScriptBin "game-run" ''
-      #!${pkgs.bash}/bin/bash
-      exec "${steam.run}/bin/steam-run" "''${@}"
-    '';
 
     clementine-pkg = (pkgs.clementine.override (old: old // {
       liblastfm               = null;
@@ -125,16 +85,10 @@ let wmctrl-pkg = pkgs.wmctrl;
       ];
     });
 
-    qbittorrent-pkg = (pkgs.qbittorrent.override {
+    qbittorrent-pkg  (pkgs.qbittorrent.override {
       webuiSupport  = false;
       trackerSearch = false;
-    }).overrideAttrs (old: {
-
-      postInstall = old.postInstall +
-        ''
-          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=1.5 \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
-        '';
-    });
+    };
 
     tribler-pkg =
       let tribler-python = pkgs.python310;
@@ -825,6 +779,7 @@ in
         pkgs.lsof
         pkgs.lzip
         pkgs.lzop
+        pkgs.maxima
         pkgs.mc
         pkgs.mplayer
         pkgs.nix-index
@@ -865,21 +820,12 @@ in
 
         pkgs.vdhcoapp
 
-        # byar
-
-        # pkgs.vmware-workstation
-
-        pkgs.cabextract
-        pkgs.wineWowPackages.stagingFull
-        pkgs.winetricks
-
         pkgs.nix-diff
 
         isabelle-pkg
         isabelle-lsp-wrapper
 
         pkgs.pcsx2
-        game-run-wrapper
 
         tex-pkg
         wmctrl-pkg
@@ -894,7 +840,6 @@ in
       #   pkgs.compsize
       # ] ++
       builtins.attrValues dev-pkgs ++
-      builtins.attrValues cuda-pkgs ++
       builtins.attrValues my-fonts ++
       builtins.attrValues scripts;
 
