@@ -292,9 +292,20 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           # ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
           ''
             mkdir -p "$out/bin"
-            for x in ghc ghci ghc-pkg haddock-ghc runghc; do
+            for x in ghc ghci ghc-pkg haddock hpc runghc; do
               # makeWrapper "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}" --suffix "LD_LIBRARY_PATH" ":" "${pkgs.lib.makeLibraryPath bakedInNativeDeps}"
-              ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
+
+              if [[ -f "${pkg}/bin/$x-${version}" ]]; then
+                ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
+              elif [[ -f "${pkg}/bin/$x-ghc-${version}" ]]; then
+                ln -s "${pkg}/bin/$x-ghc-${version}" "$out/bin/$x-${version}"
+              elif [[ -f "${pkg}/bin/$x" ]]; then
+                ln -s "${pkg}/bin/$x" "$out/bin/$x-${version}"
+              else
+                echo "Cannot find source for ‘$x’ in ‘${pkg}/bin’" >&2
+                exit 1
+              fi
+
               ${if builtins.isList alias-versions
                 then builtins.concatStringsSep "\n" (builtins.map f alias-versions)
                 else f alias-versions}
@@ -326,9 +337,21 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             mkdir -p "$out/bin"
             ln -s "${wrapped-ghc}" "$out/bin/ghc-${version}"
             ln -s "$out/bin/ghc-${version}" "$out/bin/ghc-${alias-version}"
-            for x in ghci ghc-pkg haddock-ghc runghc; do
-              ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
-              ln -s "$out/bin/$x-${version}"   "$out/bin/$x-${alias-version}"
+
+            for x in ghci ghc-pkg haddock hpc runghc; do
+
+              if [[ -f "${pkg}/bin/$x-${version}" ]]; then
+                ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
+              elif [[ -f "${pkg}/bin/$x-ghc-${version}" ]]; then
+                ln -s "${pkg}/bin/$x-ghc-${version}" "$out/bin/$x-${version}"
+              elif [[ -f "${pkg}/bin/$x" ]]; then
+                ln -s "${pkg}/bin/$x" "$out/bin/$x-${version}"
+              else
+                echo "Cannot find source for ‘$x’ in ‘${pkg}/bin’" >&2
+                exit 1
+              fi
+
+              ln -s "$out/bin/$x-${version}" "$out/bin/$x-${alias-version}"
             done
           '';
 
