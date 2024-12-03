@@ -276,9 +276,9 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         nativeBuildInputs = [ pkgs.makeWrapper ];
       }
         ''
-            mkdir -p "$out/bin"
-            makeWrapper "${pkg}/bin/cabal" "$out/bin/cabal" --suffix "PKG_CONFIG_PATH" ":" "${pkgs.lib.makeSearchPathOutput "dev" "lib/pkgconfig" bakedInNativeDeps}"
-          '';
+          mkdir -p "$out/bin"
+          makeWrapper "${pkg}/bin/cabal" "$out/bin/cabal" --suffix "PKG_CONFIG_PATH" ":" "${pkgs.lib.makeSearchPathOutput "dev" "lib/pkgconfig" bakedInNativeDeps}"
+        '';
 
     wrap-ghc = version: alias-versions: pkg:
       let f = alias-version:
