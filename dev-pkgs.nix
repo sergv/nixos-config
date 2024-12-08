@@ -19,7 +19,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       owner  = "sergv";
       repo   = "cabal";
       rev    = "c0a21d0c4e451d662e337d3ec28a6ac77b0058f9"; # "dev";
-      sha256 = "sha256-vx8s2cMm30+3UjWKNUXtgi7xyRLMlSXF1QisVC5QBOA="; # pkgs.lib.fakeSha256;
+      sha256 = "sha256-vx8s2cMm30+3UjWKNUXtgi7xyRLMlSXF1QisVC5QBOA="; #pkgs.lib.fakeSha256;
     };
 
     doctest-repo = pkgs.fetchFromGitHub {
@@ -46,8 +46,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     fast-tags-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "fast-tags";
-      rev    = "e9a40703a80f745825ad2ac544fe226bdf197eb5";
-      sha256 = "sha256-dQxlMePbTQsY8PPxaq3F3ougoMj9Zrh044jQkr21DrI="; #pkgs.lib.fakeSha256;
+      rev    = "3e44dbcc3da564ed7dd057ba2563752065985486";
+      sha256 = "sha256-b/2j3qob6+cqhWT312N2rWCmq2VB2x/chfkOYV8qZbM="; #pkgs.lib.fakeSha256;
     };
 
     # hpkgs = pkgs.haskell.packages.ghc945;
