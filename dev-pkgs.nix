@@ -18,8 +18,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     cabal-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "cabal";
-      rev    = "c0a21d0c4e451d662e337d3ec28a6ac77b0058f9"; # "dev";
-      sha256 = "sha256-vx8s2cMm30+3UjWKNUXtgi7xyRLMlSXF1QisVC5QBOA="; #pkgs.lib.fakeSha256;
+      rev    = "33156b80a813c9b6f4ad65a87ecc6e9fe6d7e86a"; # "dev";
+      sha256 = "sha256-oQ8utMGZbRwtztGdN86IKneKD7lEZZLL8N8f6TpceFU="; #pkgs.lib.fakeSha256;
     };
 
     doctest-repo = pkgs.fetchFromGitHub {
@@ -60,7 +60,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
     # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
-    hpkgs96 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc965;
+    hpkgs96 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc966;
     hpkgs910 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9101;
     # hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
 
@@ -71,6 +71,16 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       };
 
     # hpkgsCabal-raw = pkgs.haskell.packages.ghc945.o
+
+    hashable-pkg = pkgs:
+      hlib.dontCheck
+        (pkgs.callHackageDirect
+          {
+            pkg    = "hashable";
+            ver    = "1.5.0.0";
+            sha256 = "sha256-IYAGl8K4Fo1DGSE2kok3HMtwUOJ/mwGHzVJfNYQTAsI="; #pkgs.lib.fakeSha256;
+          }
+          {});
 
     hpkgsDoctest = hpkgs96.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
@@ -117,8 +127,9 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       }));
 
     # pkgs.haskell.packages.ghc961
-    hpkgsCabal = hpkgs96.extend (new: old:
-      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
+    hpkgsCabal = hpkgs910.extend (new: old:
+      builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller
+        (old // {
         ghc = hutils.smaller-ghc(old.ghc);
 
         # builtins.mapAttrs (_name: value: hlib.doJailbreak value) old //
@@ -148,30 +159,63 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           {});
         # hlib.dontCheck
         # (old.callHackage "cabal-install-solver" "3.8.1.0" {});
-        cabal-install = hlib.doJailbreak (old.callCabal2nix
+        cabal-install = # hlib.doJailbreak
+          (old.callCabal2nix
           "cabal-install"
           (cabal-repo + "/cabal-install")
           { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff Cabal-tests;
           });
 
-        hackage-security = #old.callHackage "hackage-security" "0.6.2.6" {};
-          (old.callHackageDirect {
-            pkg    = "hackage-security";
-            ver    = "0.6.2.6";
-            sha256 = "sha256-B61sYNOJXszHBA4JWFP5UZBp3UcJk9ufnGE3Li5rQNI="; # pkgs.lib.fakeSha256;
-          }
-            {});
+        hackage-security = hlib.doJailbreak
+          (old.callHackage "hackage-security" "0.6.2.6" {});
 
-        semaphore-compat = hlib.markUnbroken old.semaphore-compat;
+        # semaphore-compat = hlib.markUnbroken old.semaphore-compat;
+
+        # Force reinstall
+        semaphore-compat = old.callHackage "semaphore-compat" "1.0.0" {};
 
         # Disable tests which take around 1 hour!
         statistics = hlib.dontCheck old.statistics;
 
+        async = hlib.dontCheck old.async;
+        vector = hlib.dontCheck old.vector;
+
+        file-io = hlib.dontCheck old.file-io;
+
+        uuid-types = hlib.doJailbreak old.uuid-types;
+        strict = hlib.doJailbreak old.strict;
+
+        hashable = hashable-pkg old;
+
+        unix = hlib.dontCheck
+          (old.callHackageDirect
+            {
+              pkg    = "unix";
+              ver    = "2.8.6.0";
+              sha256 = "sha256-Tnkda3SJu5R2O9bYbrw+Fy/OQNxqOfWBP+Zv0jqDI6Q="; #pkgs.lib.fakeSha256;
+            }
+            {});
+
+        tasty = hlib.dontCheck
+          (old.callHackageDirect
+            {
+              pkg    = "tasty";
+              ver    = "1.5.2";
+              sha256 = "sha256-ikV62VQAAxsekESCxp7vldxopYiQGoYTCANsvGJlGcs="; #pkgs.lib.fakeSha256;
+            }
+            {});
+
         # ghc-lib-parser = hlib.markBroken old.ghc-lib-parser;
         # ghc-prof = hlib.doJailbreak old.ghc-prof;
 
-        # process = hlib.dontCheck
-        #   (old.callHackage "process" "1.6.15.0" {});
+        witherable = hlib.dontCheck
+          (old.callHackage "witherable" "0.5" {});
+
+        process = hlib.dontCheck
+          (old.callHackage "process" "1.6.25.0" {});
+
+        directory = hlib.dontCheck
+          (old.callHackage "directory" "1.3.9.0" {});
 
         # tar = hlib.doJailbreak old.tar;
         # ed25519 = hlib.doJailbreak old.ed25519;
@@ -229,14 +273,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
         doctest = hlib.dontCheck (hlib.doJailbreak (old.callHackage "doctest" "0.22.2" {}));
 
-        hashable =
-          hlib.dontCheck
-            (old.callHackageDirect {
-              pkg    = "hashable";
-              ver    = "1.4.6.0";
-              sha256 = "sha256-UK24kyPDWNwkmSJP04DATlXRrfmX+mWBUeGaO4ZYgTM="; #pkgs.lib.fakeSha256;
-            }
-              {});
+        hashable = hashable-pkg old;
 
         primitive = hlib.dontCheck (old.callHackage "primitive" "0.9.0.0" {});
       }));
@@ -420,8 +457,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       };
 
     build-ghc = { base-ghc-to-override, build-pkgs, version, rev, sha256 }:
-      let old-ghc = pkgs.haskell.compiler.ghc982;
-          ghcSrc = fetchgit-improved {
+      let ghcSrc = fetchgit-improved {
             url = "https://gitlab.haskell.org/ghc/ghc.git";
             inherit rev sha256;
           };
@@ -443,14 +479,20 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           bootPkgs = build-pkgs;
           hadrian  = hlib.doJailbreak (ghc'.hadrian.override (old2: old2 // {
             inherit ghcSrc;
-            ghc-platform  = ghc-platform-pkg;
-            ghc-toolchain = ghc-toolchain-pkg;
+            ghc-platform  = hutils.makeHaskellPackageSmaller ghc-platform-pkg;
+            ghc-toolchain = hutils.makeHaskellPackageSmaller ghc-toolchain-pkg;
             ghcVersion    = version;
           }));
           inherit ghcSrc;
         })).overrideAttrs (old: {
           inherit version;
-          preConfigure = builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ] old.preConfigure +
+
+          postInstall =
+            builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ] old.postInstall;
+
+          preConfigure = old.preConfigure +
+            # builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ] old.preConfigure +
+
             # Do this if taking sources from git directly.
             ''
               echo ${version} > VERSION
@@ -459,20 +501,12 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             '';
         })));
 
-    ghc966 = build-ghc {
-      base-ghc-to-override = pkgs.haskell.compiler.ghc965;
-      build-pkgs           = pkgs.haskell.packages.native-bignum.ghc965;
-      version              = "9.6.6";
-      rev                  = "f2e75e156014544d81428f60b4355cc9ca1e1aca";
-      sha256               = "sha256-n+pgZW8KZTdTqlu7vHWaimPqmfRAaZD7vXVn1RWD2w4="; #pkgs.lib.fakeSha256;
-    };
-
-    ghc9101 = build-ghc {
-      base-ghc-to-override = pkgs.haskell.compiler.ghc982;
-      build-pkgs           = pkgs.haskell.packages.native-bignum.ghc965;
-      version              = "9.10.1";
-      rev                  = "6d779c0fab30c39475aef50d39064ed67ce839d7";
-      sha256               = "sha256-GxLntQzaqbb0rPNMIN2GxkQANbWFyiwNfEMUcCiD/bw="; #pkgs.lib.fakeSha256;
+    ghc9121 = build-ghc {
+      base-ghc-to-override = pkgs.haskell.compiler.ghc9101;
+      build-pkgs           = hpkgsCabal; #pkgs.haskell.packages.native-bignum.ghc9101;
+      version              = "9.12.1";
+      rev                  = "daf659b6e3c8f2a84100fbee797cd9d457c00df5";
+      sha256               = "sha256-oSiGEkiQlkmCr7qsFUJ9qpwsU4AumOIpFn6zN4ByMNg="; #pkgs.lib.fakeSha256;
     };
 
     filter-bin = name: keep-these: pkg:
@@ -499,27 +533,29 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           '';
 in {
 
-  ghc7103    = wrap-ghc-filter-all               "7.10.3" "7.10"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
-  ghc802     = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"         pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
+  ghc7103     = wrap-ghc-filter-all               "7.10.3" "7.10"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
+  ghc802      = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"         pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
 
-  ghc822     = wrap-ghc                          "8.2.2"  "8.2"         pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
-  ghc844     = wrap-ghc                          "8.4.4"  "8.4"         pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
+  ghc822      = wrap-ghc                          "8.2.2"  "8.2"         pinned-pkgs.nixpkgs-19-09.haskell.packages.ghc822.ghc;
+  ghc844      = wrap-ghc                          "8.4.4"  "8.4"         pinned-pkgs.nixpkgs-20-03.haskell.packages.ghc844.ghc;
 
-  ghc865     = wrap-ghc                          "8.6.5"  "8.6"         pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
+  ghc865      = wrap-ghc                          "8.6.5"  "8.6"         pinned-pkgs.nixpkgs-20-09.haskell.packages.ghc865.ghc;
 
-  ghc884     = wrap-ghc                          "8.8.4"  "8.8"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
+  ghc884      = wrap-ghc                          "8.8.4"  "8.8"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc884.ghc;
 
-  ghc8107    = wrap-ghc                          "8.10.7" "8.10"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc8107.ghc;
-  # ghc902     = wrap-ghc                          "9.0.2"  "9.0"         (hutils.smaller-ghc pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc902.ghc);
-  ghc928     = wrap-ghc                          "9.2.8"  "9.2"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc928.ghc;
-  ghc948     = wrap-ghc                          "9.4.8"  "9.4"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc948.ghc;
+  ghc8107     = wrap-ghc                          "8.10.7" "8.10"        pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc8107.ghc;
+  # ghc902    = wrap-ghc                          "9.0.2"  "9.0"         (hutils.smaller-ghc pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc902.ghc);
+  ghc928      = wrap-ghc                          "9.2.8"  "9.2"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc928.ghc;
+  ghc948      = wrap-ghc                          "9.4.8"  "9.4"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc948.ghc;
 
-  ghc966     = wrap-ghc                          "9.6.6"  "9.6"         ghc966;
-  ghc982     = wrap-ghc                          "9.8.2"  "9.8"         pkgs.haskell.compiler.native-bignum.ghc982;
+  ghc966      = wrap-ghc                          "9.6.6"  "9.6"         pkgs.haskell.compiler.native-bignum.ghc966;
+  ghc982      = wrap-ghc                          "9.8.2"  "9.8"         pkgs.haskell.compiler.native-bignum.ghc982;
 
-  ghc9101    = wrap-ghc                          "9.10.1" ["9.10" null] pkgs.haskell.compiler.native-bignum.ghc9101;
+  ghc9101     = wrap-ghc                          "9.10.1" "9.10"        pkgs.haskell.compiler.native-bignum.ghc9101;
 
-  #ghc961-pie = wrap-ghc-rename "9.6.1" "9.6.1-pie" (relocatable-static-libs-ghc (hutils.smaller-ghc pkgs.haskell.packages.ghc961.ghc));
+  ghc9121     = wrap-ghc                          "9.12.1" ["9.12" null] ghc9121;
+
+  ghc9121-pie = wrap-ghc-rename                   "9.12.1" "9.12.1-pie"  (relocatable-static-libs-ghc ghc9121);
 
   # callPackage = newScope {
   #   haskellLib = haskellLibUncomposable.compose;
