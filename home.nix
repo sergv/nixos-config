@@ -756,7 +756,7 @@ in
         pkgs.gparted
         pkgs.graphviz
         pkgs.htop
-        pkgs.imagemagick7
+        pkgs.imagemagick
         #pkgs.inkscape
         pkgs.iotop
         pkgs.okular
@@ -784,7 +784,6 @@ in
         pkgs.usbutils
         pkgs.vlc
         pkgs.vorbis-tools
-        pkgs.vuze
         pkgs.wget
         pkgs.xorg.xev
         pkgs.yt-dlp
@@ -803,7 +802,7 @@ in
         pkgs.xd
 
         qbittorrent-pkg
-        tribler-pkg
+        # tribler-pkg
 
         pkgs.vdhcoapp
 
