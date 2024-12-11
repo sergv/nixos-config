@@ -25,11 +25,11 @@
       #url = "nixpkgs/nixos-22.05";
       #url = "/home/sergey/nix/nixpkgs";
       # url = "nixpkgs/nixos-23.05";
-      url = "nixpkgs/nixos-24.05";
+      url = "nixpkgs/nixos-24.11";
     };
 
     nixpkgs-unstable = {
-      url = "nixpkgs/nixos-24.05";
+      url = "nixpkgs/nixos-24.11";
       # url = "nixpkgs/nixos-23.05";
       # url = "nixpkgs/nixos-unstable";
     };
@@ -40,7 +40,7 @@
 
     home-manager = {
       # # unstable
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       # url                    = "github:nix-community/home-manager/release-23.05";
       # url                    = "github:nix-community/home-manager/master";
       # url                    = "github:nix-community/home-manager/release-22.11";
@@ -125,7 +125,7 @@
 
       smaller-haskell-overlay = new: old: {
         haskellPackages =
-          hutils.fixedExtend (hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc965)
+          hutils.fixedExtend (hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc966)
             (
               _: old2: {
                 # Make everything smaller at the core by altering arguments to mkDerivation.
@@ -159,6 +159,7 @@
             ghc963 = hutils.smaller-ghc old.haskell.compiler.ghc963;
             ghc964 = hutils.smaller-ghc old.haskell.compiler.ghc964;
             ghc965 = hutils.smaller-ghc old.haskell.compiler.ghc965;
+            ghc966 = hutils.smaller-ghc old.haskell.compiler.ghc966;
             ghc98 = hutils.smaller-ghc old.haskell.compiler.ghc98;
             ghc981 = hutils.smaller-ghc old.haskell.compiler.ghc981;
 
@@ -172,6 +173,7 @@
               ghc963 = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc963;
               ghc964 = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc964;
               ghc965 = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc965;
+              ghc966 = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc966;
               ghc98 = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc98;
               ghc981 = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc981;
             };
@@ -187,6 +189,7 @@
             ghc963 = hutils.smaller-hpkgs old.haskell.packages.ghc963;
             ghc964 = hutils.smaller-hpkgs old.haskell.packages.ghc964;
             ghc965 = hutils.smaller-hpkgs old.haskell.packages.ghc965;
+            ghc966 = hutils.smaller-hpkgs old.haskell.packages.ghc966;
             ghc98 = hutils.smaller-hpkgs old.haskell.packages.ghc98;
             ghc981 = hutils.smaller-hpkgs old.haskell.packages.ghc981;
 
@@ -200,6 +203,7 @@
               ghc963 = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc963;
               ghc964 = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc964;
               ghc965 = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc965;
+              ghc966 = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc966;
               ghc98 = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc98;
               ghc981 = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc981;
             };
@@ -246,6 +250,11 @@
 
             # ghc964 = hutils.fixedExtend old.haskell.packages.ghc964 (_: old2: temporarily-disable-problematic-haskell-pkgs-checks old old2 // disable-problematic-haskell-crypto-pkgs-checks old old2);
             ghc965 = hutils.fixedExtend old.haskell.packages.ghc965 (
+              _: old2:
+              temporarily-disable-problematic-haskell-pkgs-checks old old2
+              // disable-problematic-haskell-crypto-pkgs-checks old old2
+            );
+            ghc966 = hutils.fixedExtend old.haskell.packages.ghc966 (
               _: old2:
               temporarily-disable-problematic-haskell-pkgs-checks old old2
               // disable-problematic-haskell-crypto-pkgs-checks old old2
@@ -348,9 +357,9 @@
 
         # To avoid infinite recursion
         cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables (
-          old.haskell.packages.native-bignum.ghc965.generateOptparseApplicativeCompletions [
+          old.haskell.packages.native-bignum.ghc966.generateOptparseApplicativeCompletions [
             "cabal2nix"
-          ] old.haskell.packages.native-bignum.ghc965.cabal2nix
+          ] old.haskell.packages.native-bignum.ghc966.cabal2nix
         );
       };
 
@@ -456,7 +465,7 @@
               in
               {
                 nixpkgs.overlays = [
-                  nur.overlay
+                  nur.overlays.default
                   overlay-unstable
                   # fcitx-overlay
                   # ssh-overlay

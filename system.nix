@@ -349,8 +349,8 @@ in
   # $ nix-env -qaP | grep wget
   environment = {
     systemPackages = [
-      pkgs.alsaTools
-      pkgs.alsaUtils
+      pkgs.alsa-tools
+      pkgs.alsa-utils
       # pkgs.android-studio
       # pkgs.androidsdk
       # pkgs.androidndk
@@ -420,12 +420,11 @@ in
       support32Bit = true;
     };
 
-    opengl            = {
-      enable          = true;
-      driSupport      = true;
-      # Enable acceleration in x32 wine apps.
-      driSupport32Bit = true;
-    };
+    # OpenGL
+    graphics.enable = true;
+
+    # Enable acceleration in x32 wine apps.
+    graphics.enable32Bit = true;
 
     nvidia = {
       # Modesetting is needed most of the time
@@ -450,8 +449,6 @@ in
       package = config.boot.kernelPackages.nvidiaPackages.stable;
     };
   };
-
-  sound.enable = true;
 
   console = {
     font = "Lat2-Terminus16";
@@ -503,7 +500,7 @@ in
   # Enable commands like ‘nix search’ and flakes.
   nix = {
     gc.automatic = false;
-    package      = pkgs.unstable.nixFlakes;
+    package      = pkgs.unstable.nixVersions.stable;
     settings     = {
       allowed-users = [ "@wheel" ];
       bash-prompt-prefix = "[nix] ";
@@ -518,11 +515,11 @@ in
         "gccarch-znver4"
       ];
     };
-    # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixFlakes)
+    # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
   };
 
-  programs.bash.enableCompletion = true;
+  programs.bash.completion.enable = true;
 
   # To be able to manipulate gtk settings.
   programs.dconf.enable = true;
@@ -618,6 +615,10 @@ in
     interval = "daily";
     # Silence warning.
     localuser = null;
+  };
+
+  services.pipewire = {
+    enable = false;
   };
 
   # Enable CUPS to print documents.
