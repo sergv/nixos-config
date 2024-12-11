@@ -437,7 +437,7 @@ in {
 
   arkenfox = {
     enable = true; # Decide how we want to handle these things
-    version = "115.1"; # Used on 119.0, because we don't have firefox 118.0 handy
+    version = "128.0"; # Used on 119.0, because we don't have firefox 118.0 handy
   };
 
   profiles.Default = {
@@ -468,11 +468,9 @@ in {
       "0200" = {
         enable = false;
         # GEOLOCATION / LANGUAGE / LOCALE
-        "0201".enable = true; # Use Mozilla geolocation service instead of Google if permission is granted [FF74+]
         "0202".enable = true; # Disable using the OS's geolocation service
         # "0203".enable = true; # disable region updates
         # WARNING(Krey): May break some input methods e.g xim/ibus for CJK languages [1]
-        "0211".enable = true; # Use en-US locale regardless of the system or region locale
       };
 
       # QUIETER FOX (Handles telemetry, etc..)
@@ -494,7 +492,6 @@ in {
         enable = false;
         # LOCATION BAR / SEARCH BAR / SUGGESTIONS / HISTORY / FORMS
         "0802".enable = true; # disable location bar domain guessing
-        "0804".enable = true; # disable live search suggestions
         "0805".enable = true; # disable location bar making speculative connections
         "0806".enable = true; # disable location bar leaking single words to a DNS provider **after searching**
         "0807".enable = true; # disable location bar contextual suggestions
@@ -508,11 +505,6 @@ in {
 
       # HTTPS (SSL/TLS / OCSP / CERTS / HPKP)
       "1200" = {
-        enable = true;
-      };
-
-      # FONTS
-      "1400" = {
         enable = true;
       };
 
@@ -546,7 +538,6 @@ in {
       "2600" = {
         enable = false;
         # MISCELLANEOUS
-        "2601".enable = true; # Prevent accessibility services from accessing your browser
         "2603".enable = true; # Remove temp files opened with an external application on exit
         "2606".enable = true; # Disable UITour backend so there is no chance that a remote page can use it
         "2608".enable = true; # Reset remote debugging to disabled
@@ -556,7 +547,6 @@ in {
         "2619".enable = true; # Use Punycode in Internationalized Domain Names to eliminate possible spoofing
         "2620".enable = true; # Enforce PDFJS, disable PDFJS scripting
         # "2621".enable = true; # Disable links launching Windows Store on Windows 8/8.1/10 [WINDOWS]
-        "2623".enable = true; # Disable permissions delegation [FF73+], Disabling delegation means any prompts for these will show/use their correct 3rd party origin
         "2624".enable = true; # Disable middle click on new tab button opening URLs or searches using clipboard [FF115+]
         "2651".enable = true; # Enable user interaction for security by always asking where to download
         "2652".enable = true; # Disable downloads panel opening on every download [FF96+]
