@@ -722,6 +722,7 @@ in
           collection-texworks
           collection-xetex
 
+          bussproofs # for natural deduction notation
           fncychap
           framed
           needspace
