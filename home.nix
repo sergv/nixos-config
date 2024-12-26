@@ -638,6 +638,7 @@ in
         ".config/systemmonitorrc"
         ".config/systemsettingsrc"
         ".config/Trolltech.conf"
+        ".config/unity3d"
         ".config/user-dirs.dirs"
         ".config/user-dirs.locale"
     ];
