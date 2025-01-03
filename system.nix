@@ -169,6 +169,7 @@ in
         { directory = ".cabal"; mode = "0700"; }
         { directory = ".cargo"; mode = "0700"; }
         { directory = ".gradle"; mode = "0700"; }
+        { directory = ".ghc-wasm"; mode = "0700"; }
         { directory = ".isabelle"; mode = "0700"; }
         { directory = ".stack"; mode = "0700"; }
 
