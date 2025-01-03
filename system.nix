@@ -207,6 +207,10 @@ in
           mode = "0700";
         }
         {
+          directory = ".ghc-wasm";
+          mode = "0700";
+        }
+        {
           directory = ".isabelle";
           mode = "0700";
         }
