@@ -183,6 +183,7 @@ in
         "sites"
         "software"
         "Telegram"
+        "todo"
         "tmp"
         "torrents"
         "travelling"
