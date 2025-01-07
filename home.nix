@@ -130,12 +130,6 @@ let wmctrl-pkg = pkgs.wmctrl;
           python3                    = tribler-python;
         });
 
-    fahclient-pkg = import ./fahclient.nix {
-      inherit (pkgs)
-        lib buildFHSEnv fetchFromGitHub ocl-icd openssl scons stdenv re2 libevent git;
-      extraPkgs = [pkgs.expat pkgs.zlib];
-    };
-
     isabelle-pkg = import ./isabelle/isabelle.nix {
       inherit pkgs;
     };
@@ -748,6 +742,7 @@ in
         pkgs.cpu-x
         pkgs.curl
         pkgs.dmidecode
+        pkgs.fahclient
         pkgs.ffmpeg-full
         pkgs.file
         pkgs.findutils
@@ -795,8 +790,6 @@ in
         # Music
         pkgs.audacious
         pkgs.strawberry
-
-        fahclient-pkg
 
         pkgs.i2p
         pkgs.xd
