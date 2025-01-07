@@ -582,8 +582,8 @@ in {
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
-  alex               = hlib.justStaticExecutables hpkgs96.alex;
-  happy              = hlib.justStaticExecutables hpkgs96.happy;
+  alex               = hlib.justStaticExecutables hpkgs910.alex;
+  happy              = hlib.justStaticExecutables hpkgs910.happy;
   cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
   doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
   eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
