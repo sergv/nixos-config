@@ -598,11 +598,11 @@ in {
 
   gcc  = pkgs.gcc;
   # Conflicts with gcc regarding ld.gold
-  # clang = pkgs.clang_15;
-  llvm = pkgs.llvm_15;
-  # bintools = pkgs.llvmPackages_15.bintools;
-  # lld   = pkgs.lld_15;
-  lld  = filter-bin "llvmPackages_15.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_15.bintools;
+  # clang = pkgs.clang_19;
+  llvm = pkgs.llvm_19;
+  # bintools = pkgs.llvmPackages_19.bintools;
+  # lld   = pkgs.lld_19;
+  lld  = filter-bin "llvmPackages_19.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_19.bintools;
 
   # for ‘clang-format’
   clang-tools = pkgs.clang-tools;
