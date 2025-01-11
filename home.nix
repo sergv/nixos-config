@@ -176,10 +176,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     };
 
     emacs-pkg = (pkgs.emacs29.override (_: { withNativeCompilation = true; })).overrideAttrs (old: {
-      # patches = (old.patches or []) ++ [
-      #   ./patches/emacs-gc-block-increase.patch
-      # ];
-      version               = "30.0.91";
+      version               = "30.0.93";
       patches               = [
         (pkgs.substituteAll {
           src = ./patches/native-comp-driver-options-30.patch;
@@ -210,10 +207,15 @@ let wmctrl-pkg = pkgs.wmctrl;
       withGTK3              = true;
       withSQLite3           = true;
       withTreeSitter        = true;
+
+      configureFlags = old.configureFlags ++ [
+        (pkgs.lib.withFeature false "gc-mark-trace")
+      ];
+
       src                   = fetchgit-improved {
         url    = "https://github.com/sergv/emacs.git";
-        rev    = "044a87a46a40ec87058184435f2456f101dfc79b";
-        sha256 = "sha256-8wU5bQCQoQ1NjU/jVNze77T3CnCtt1nsbzKEAimVAeo="; # pkgs.lib.fakeSha256;
+        rev    = "a3272e003d7a2a456ec4c1dffa2156803d9723bf";
+        sha256 = "sha256-hiR6EZsfQAnBwrS46oAEGmm4evFTcB59yr1fBjfxYU0="; #pkgs.lib.fakeSha256;
       };
     });
 
