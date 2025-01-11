@@ -111,7 +111,11 @@ let wmctrl-pkg = pkgs.wmctrl;
         "-DTRANSLATIONS=OFF"
       ];
 
-      patches = (old.patches or []) ++ [patches/clementine-remove-love-scrobbling-and-button-to-clear-playlist.patch];
+      patches = (old.patches or []) ++ [
+        patches/clementine-remove-love-scrobbling-and-button-to-clear-playlist.patch
+        patches/clementine-enlarge-playback-control-buttons.patch
+        patches/clementine-enlarge-volume-slider.patch
+      ];
     });
 
     qbittorrent-pkg = (pkgs.qbittorrent.override {
