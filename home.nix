@@ -789,7 +789,7 @@ in
 
         # Music
         pkgs.audacious
-        pkgs.strawberry
+        pkgs.clementine
 
         pkgs.i2p
         pkgs.xd
