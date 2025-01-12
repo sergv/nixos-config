@@ -5,98 +5,18 @@
 { config, pkgs, ... }:
 
 let nix-daemon-build-dir = "/tmp/nix-daemon";
+
+    # TODO: add certificate file and reference it here
+    certificateFile = null;
 in
 {
-  imports =
-    [# Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./kernel.nix
-    ];
 
-  # For booting see https://nixos.wiki/wiki/Bootloader
-
-  #boot.initrd.kernelModules = ["amdgpu"];
-
-  # For EFI-based systems
-  boot.loader.systemd-boot.enable      = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
-
-  boot.kernelParams = [
-    "mitigations=off"
-    "preempt=full"
-  ];
-
-  boot.kernel.sysctl = {
-    # Allow ‘perf’ without root.
-    "kernel.perf_event_paranoid" = -1;
-    "kernel.kptr_restrict"       = pkgs.lib.mkForce 0;
+  wsl = {
+    enable                             = true;
+    defaultUser                        = "sergey";
+    nativeSystemd                      = true;
+    wslConf.network.generateResolvConf = false;
   };
-
-  # # More for legacy systems, use the GRUB 2 boot loader.
-  # boot.loader.grub = {
-  #   enable  = true;
-  #   version = 2;
-  #   # Define on which hard drive you want to install Grub.
-  #   device  = "/dev/sda";
-  #   # Include entries for other OSes.
-  #   useOSProber = true;
-  #   efiSupport = true;
-  # };
-
-  # New desktop
-  fileSystems = {
-    # # Vanilla tmpfs root, includes /tmp.
-    # "/" = {
-    #   device  = "tmpfs";
-    #   fsType  = "tmpfs";
-    #   options = ["noatime" "nodiratime" "size=8000M" # "mode=1777"
-    #             ];
-    # };
-
-    "/" = {
-      device  = "/dev/disk/by-label/nixos-root";
-      fsType  = "ext4";
-      options = ["errors=remount-ro" "noatime" "nodiratime" "lazytime" "x-gvfs-hide"];
-    };
-
-    "/boot" = {
-      depends = ["/"];
-      device  = "/dev/disk/by-label/NIXOS-BOOT";
-      fsType  = "vfat";
-      options = ["fmask=0022" "dmask=0022" "x-gvfs-hide"];
-    };
-  };
-
-  # Old desktop
-  # fileSystems = {
-  #   # Includes /tmp
-  #   "/" = {
-  #     device  = "tmpfs";
-  #     fsType  = "tmpfs";
-  #     options = ["noatime" "nodiratime" "size=10000M" # "mode=1777"
-  #               ];
-  #   };
-  #   "/nix" = {
-  #     device        = "/dev/disk/by-label/NIXOS-ROOT";
-  #     fsType        = "ext4";
-  #     options       = ["errors=remount-ro" "noatime" "nodiratime" "lazytime"];
-  #   };
-  #   "/permanent" = {
-  #     device        = "/dev/disk/by-label/NIXOS-ROOT";
-  #     fsType        = "ext4";
-  #     # options       = ["discard"]; # for ssds
-  #     options       = ["rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
-  #     neededForBoot = true;
-  #   };
-  #   "/boot" = {
-  #     device  = "/dev/disk/by-label/NIXOS-BOOT";
-  #     # device  = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-BOOT";
-  #     # device  = "/dev/disk/by-uuid/459be4d4-751d-4032-abef-6faf9545790c";
-  #     fsType  = "vfat";
-  #     options = ["nofail" "rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime"];
-  #   };
-  # };
 
   # Will activate home-manager profiles for each user upon login
   # This is useful when using ephemeral installations
@@ -111,137 +31,6 @@ in
   #   "ssh/ssh_host_ed25519_key".source     = "/permanent/etc/ssh/ssh_host_ed25519_key";
   #   "ssh/ssh_host_ed25519_key.pub".source = "/permanent/etc/ssh/ssh_host_ed25519_key.pub";
   # };
-
-  environment.persistence."/permanent" = {
-    hideMounts = true;
-
-    directories = [
-      "/etc/NetworkManager/system-connections"
-      "/var/lib"
-      "/var/log"
-    ];
-    files = [
-      "/etc/ssh/ssh_host_rsa_key"
-      "/etc/ssh/ssh_host_rsa_key.pub"
-      "/etc/ssh/ssh_host_ed25519_key"
-      "/etc/ssh/ssh_host_ed25519_key.pub"
-    ];
-    users.sergey = {
-      directories = [
-        "books"
-        "documents"
-        "Documents"
-        "Downloads"
-        "dwhelper"
-        "films"
-        "games"
-        "health"
-        "Music"
-        "nix"
-        "Pictures"
-        { directory = "projects"; mode = "0700"; }
-        "recipes"
-        "relocation"
-        "scripts"
-        "sites"
-        "software"
-        "Telegram"
-        "todo"
-        "tmp"
-        "travelling"
-        "Videos"
-        "vim"
-        "VirtualBox VMs"
-
-        { directory = ".android"; mode = "0700"; }
-        { directory = ".cabal"; mode = "0700"; }
-        { directory = ".gradle"; mode = "0700"; }
-        { directory = ".ghc-wasm"; mode = "0700"; }
-        { directory = ".isabelle"; mode = "0700"; }
-        { directory = ".stack"; mode = "0700"; }
-
-        { directory = ".dosbox"; mode = "0700"; }
-        { directory = ".emacs.d"; mode = "0700"; }
-        { directory = ".ghc"; mode = "0700"; }
-        { directory = ".gnupg"; mode = "0700"; }
-        { directory = ".litecoin"; mode = "0700"; }
-        { directory = ".mozilla"; mode = "0700"; }
-        { directory = ".ssh"; mode = "0700"; }
-        { directory = ".thunderbird"; mode = "0700"; }
-
-        ".config/android"
-        ".config/AndroidStudio3.2"
-        ".config/.arduino15"
-        ".config/audacious"
-        # ".config/autostart"
-        ".config/chromium"
-        ".config/Clementine"
-        ".config/dconf"
-        ".config/fontforge"
-        ".config/Google"
-        ".config/htop"
-        ".config/keybase"
-        ".config/libreoffice"
-        ".config/mc"
-        ".config/pulse"
-        ".config/ristretto"
-        ".config/transmission"
-        ".config/vlc"
-        ".config/xfce4"
-        ".config/VirtualBox"
-        ".config/Xilinx"
-
-        ".local/share/direnv"
-        ".local/share/docker"
-        ".local/share/3909"
-        ".local/share/Anki"
-        ".local/share/Anki2"
-        { directory = ".local/share/keyrings"; mode = "0700"; }
-        ".local/share/mc"
-        ".local/share/mime"
-        ".local/share/openmw"
-        ".local/share/ristretto"
-        ".local/share/strawberry"
-        ".local/share/TelegramDesktop"
-        ".local/share/Tyranny"
-        ".local/share/trash"
-        ".local/share/vlc"
-
-        # KDE
-        ".config/gtk-3.0" # fuse mounted to /home/$USERNAME/.config/gtk-3.0
-        ".config/gtk-4.0"
-        ".config/KDE"
-        ".config/kde.org"
-        ".config/kdedefaults"
-        ".config/plasma-workspace"
-        ".config/xsettingsd"
-        ".kde"
-
-        ".local/share/RecentDocuments"
-        ".local/share/baloo"
-        ".local/share/dolphin"
-        ".local/share/feral-interactive"
-        ".local/share/gwenview"
-        ".local/share/kactivitymanagerd"
-        ".local/share/kate"
-        ".local/share/kcookiejar"
-        ".local/share/kded5"
-        ".local/share/klipper"
-        ".local/share/konsole"
-        ".local/share/kscreen"
-        ".local/share/ksysguard"
-        ".local/share/kwalletd"
-        ".local/share/kxmlgui5"
-        ".local/share/okular"
-        ".local/share/plasma_icons"
-        ".local/share/plasma_notes"
-        ".local/share/plasma-systemmonitor"
-        ".local/share/sddm"
-      ];
-    };
-  };
-
-  programs.adb.enable = true;
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
@@ -291,73 +80,6 @@ in
     ];
   };
 
-  # For running within a VM
-  # virtualisation.virtualbox.guest.enable = true;
-  virtualisation = {
-    docker = {
-      # storageDriver = "overlay2";
-      rootless = {
-        enable            = true;
-        setSocketVariable = true;
-        daemon.settings   = {
-          storage-driver = "overlay2";
-        };
-      };
-    };
-    virtualbox.host = {
-      enable              = false;
-      enableExtensionPack = false;
-    };
-  };
-
-  services.pulseaudio = {
-    enable       = true;
-    support32Bit = true;
-  };
-
-  hardware = {
-    bluetooth.enable = true;
-
-    # OpenGL
-    graphics.enable = true;
-
-    # Enable acceleration in x32 wine apps.
-    graphics.enable32Bit = true;
-
-    opengl = {
-      extraPackages = [
-        # pkgs.intel-media-driver # LIBVA_DRIVER_NAME=iHD
-        pkgs.intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
-        pkgs.libvdpau-va-gl
-      ];
-
-      extraPackages32 = [ pkgs.pkgsi686Linux.intel-vaapi-driver ];
-    };
-
-    # nvidia = {
-    #   # Modesetting is needed most of the time
-    #   modesetting.enable = true;
-    #
-	   #  # Enable power management (do not disable this unless you have a reason to).
-	   #  # Likely to cause problems on laptops and with screen tearing if disabled.
-	   #  powerManagement.enable = true;
-    #
-    #   # Use the open source version of the kernel module ("nouveau")
-	   #  # Note that this offers much lower performance and does not
-	   #  # support all the latest Nvidia GPU features.
-	   #  # You most likely don't want this.
-    #   # Only available on driver 515.43.04+
-    #   open = false;
-    #
-    #   # Enable the Nvidia settings menu,
-	   #  # accessible via `nvidia-settings`.
-    #   nvidiaSettings = true;
-    #
-    #   # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    #   package = config.boot.kernelPackages.nvidiaPackages.stable;
-    # };
-  };
-
   console = {
     font   = "Lat2-Terminus16";
     keyMap = "dvorak";
@@ -373,7 +95,7 @@ in
   networking = {
     # Supreme Commander’s faf cilent doesn’t work with IPv6 at all.
     enableIPv6 = false;
-    hostName   = "notebook"; # Define your hostname.
+    hostName   = "nixos"; # Define your hostname.
     #hostName              = ""; # Use dhcp-provided hostname.
     networkmanager.enable = true;
     # wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
@@ -392,9 +114,13 @@ in
     #   useDHCP = true;
     # };
 
-    interfaces.eth0 = {
-     useDHCP = true;
-    };
+    # interfaces.eth0 = {
+    #  useDHCP = true;
+    # };
+
+    nameservers = [
+      # Todo, e.g. "8.8.8.8"
+    ];
   };
 
   # Open ports in the firewall.
@@ -447,6 +173,8 @@ in
     pubkeyAcceptedKeyTypes = ["ssh-ed25519" "ssh-rsa"];
   };
 
+  security.pki.certificateFiles = [ certificateFile ];
+
   security.sudo = {
     enable             = true;
     execWheelOnly      = true;
@@ -493,10 +221,6 @@ in
   };
 
   services.acpid.enable = true;
-  powerManagement = {
-    enable          = true;
-    cpuFreqGovernor = "performance";
-  };
 
   services.locate = {
     enable    = true;
@@ -518,62 +242,6 @@ in
     # Kiev
     # latitude    = "50.45";
     # longitude   = "30.5233";
-  };
-
-  services.redshift = {
-    enable    = true;
-    executable = "/bin/redshift";
-    # executable = "/bin/redshift-gtk";
-    temperature = {
-      day   = 5500;
-      night = 1900;
-    };
-  };
-
-  services.displayManager.defaultSession = "xfce";
-
-  # Enable the X11 windowing system.
-  services.xserver = {
-    autorun    = true; # Start automatically at boot time.
-    enable     = true;
-
-    # # So that Xorg's config will be present in /etc
-    # exportConfiguration = false;
-
-    xkb = {
-      layout  = "us,ru";
-      model   = "pc105";
-      variant = "dvorak,";
-      # terminate:ctrl_alt_bksp
-      options = "grp:shifts_toggle,caps:escape";
-    };
-
-    # Touchpad
-    # synaptics  = {
-    #   enable          = true;
-    #   twoFingerScroll = true;
-    # };
-    # Enable touchpad support.
-    # libinput.enable = true;
-
-    videoDrivers = ["intel"];
-    #videoDrivers = ["amdgpu" "nvidia"];
-    # videoDrivers = ["nvidia"];
-    #videoDrivers = ["modesetting"];
-
-    #KDE
-    #displayManager.sddm.enable = false;
-
-    displayManager = {
-      lightdm.enable = true;
-    };
-
-    desktopManager = {
-      xfce                  = {
-        enable            = true;
-        enableScreensaver = false;
-      };
-    };
   };
 
   environment.etc."xdg/kwinrc".text = pkgs.lib.generators.toINI {} {
@@ -620,50 +288,34 @@ in
   #   fadeDelta       = 4;
   # };
 
-  services.udev = {
-    extraRules =
-      ''
-        ## Embedded devices
-
-        SUBSYSTEM=="usb", ATTRS{product}== "Arduino Uno", GROUP="users", MODE="0666"
-        SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE="0666"
-
-        #SUBSYSTEM="usb", ATTRS{product}== "FT232R USB UART", GROUP="users", MODE="0666"
-
-
-        ## Ergodox EZ keyboard
-
-        # UDEV Rules for Teensy boards, http://www.pjrc.com/teensy/
-        #
-        # The latest version of this file may be found at:
-        #   http://www.pjrc.com/teensy/49-teensy.rules
-
-        # Teensy rules for the Ergodox EZ Original / Shine / Glow
-        ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", ENV{ID_MM_DEVICE_IGNORE}="1"
-        ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789A]?", ENV{MTP_NO_PROBE}="1"
-        SUBSYSTEMS=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789ABCD]?", MODE:="0666"
-        KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", MODE:="0666"
-
-        # STM32 rules for the Planck EZ Standard / Glow
-        SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", \
-            MODE:="0666", \
-            SYMLINK+="stm32_dfu"
-
-        ## Network adapters
-
-        # Recognize my usb wifi router.
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="a0:f3:c1:1f:1c:30", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan0"
-
-        ## Usb to ethernet adapter.
-        #SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:60:6e:43:a4:aa", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth-usb"
-
-        # Lenovo usb to ethernet adapter.
-        SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:1a:9f:0c:99:65", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth-usb"
-      '';
-  };
-
   systemd = {
-    services.nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
+
+    services = {
+      nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
+
+      # Make nix-daemon be able to download git repositories through proxy.
+      nix-daemon.environment.NIX_GIT_SSL_CAINFO = certificateFile;
+      nix-daemon.environment.NIX_SSL_CERT_FILE  = certificateFile;
+
+      nixos-wsl-systemd-fix = {
+        description = "Fix the /dev/shm symlink to be a mount";
+        unitConfig = {
+          DefaultDependencies         = "no";
+          Before                      = "sysinit.target";
+          ConditionPathExists         = "/dev/shm";
+          ConditionPathIsSymbolicLink = "/dev/shm";
+          ConditionPathIsMountPoint   = "/run/shm";
+        };
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = [
+            "${pkgs.coreutils-full}/bin/rm /dev/shm"
+            "/run/wrappers/bin/mount --bind -o X-mount.mkdir /run/shm /dev/shm"
+          ];
+        };
+        wantedBy = [ "sysinit.target" ];
+      };
+    };
 
     tmpfiles.rules = [
       "d ${nix-daemon-build-dir} - root nixbld 7d -"
@@ -719,6 +371,7 @@ in
   # Feel free to remove if you don't need it.
   services.openssh = {
     enable      = true;
+    ports       = [ 2023 ];
     extraConfig = "PubkeyAcceptedKeyTypes = ssh-rsa,ssh-ed25519";
     settings    = {
       PermitRootLogin        = "no";
@@ -728,65 +381,11 @@ in
     };
   };
 
-  services.i2p = {
-    enable        = true;
-  };
-
-  # services.i2pd = {
+  # zramSwap = {
   #   enable        = true;
+  #   algorithm     = "zstd";
+  #   memoryPercent = 50;
   # };
-
-  services.tor = {
-    enable        = true;
-    client.enable = true;
-    settings      = {
-      ControlPort = 9051;
-    };
-
-    # Disable GeoIP to prevent the Tor client from estimating the locations of Tor nodes it connects to
-    enableGeoIP = false;
-
-    # Enable and configure the Tor relay
-    relay = {
-      enable = false;
-      role = "relay";  # Set the relay role (e.g., "relay", "bridge")
-    };
-
-    # Configure Tor settings
-    settings = {
-      Nickname = "WeAreLegion";
-      ContactInfo = "legion@legion.com";
-
-      # Bandwidth settings
-      MaxAdvertisedBandwidth = "6 MB";
-      BandWidthRate = "5 MB";
-      RelayBandwidthRate = "5 MB";
-      RelayBandwidthBurst = "6 MB";
-
-      # # Restrict exit nodes to a specific country (use the appropriate country code)
-      # ExitNodes = "{ch} StrictNodes 1";
-
-      # Reject all exit traffic
-      ExitPolicy = ["reject *:*"];
-
-      # Performance and security settings
-      CookieAuthentication = true;
-      AvoidDiskWrites      = 1;
-      HardwareAccel        = 1;
-      SafeLogging          = 1;
-      NumCPUs              = 2;
-
-      # Network settings
-      ORPort  = [443 9001];
-      Dirport = 9002;
-    };
-  };
-
-  zramSwap = {
-    enable        = true;
-    algorithm     = "zstd";
-    memoryPercent = 50;
-  };
 
   system = {
     nixos.label = "arch-generic";
@@ -807,5 +406,5 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.05"; # Did you read the comment?
+  system.stateVersion = "24.05"; # Did you read the comment?
 }
