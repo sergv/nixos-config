@@ -25,8 +25,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     doctest-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "doctest";
-      rev    = "5d47e8591862a89dac01be52fe1a89e46285d2df";
-      sha256 = "sha256-8eU9l4QNRGlCcMQ/9JN0q83GIch5BX4sFDezhKgpDGM="; #pkgs.lib.fakeSha256;
+      rev    = "b996c217e72b9b53f8315933d12e41eef5692455";
+      sha256 = "sha256-UIPzjWJeKYGEKlcrSEv8ey7Ln40lxIxTneQPjAqFraY="; #pkgs.lib.fakeSha256;
     };
 
     ghc-events-analyze-repo = pkgs.fetchFromGitHub {
@@ -82,16 +82,19 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           }
           {});
 
-    hpkgsDoctest = hpkgs96.extend (_: old:
+    allowGhcReference = x: hlib.overrideCabal x (drv: { disallowGhcReference = false; });
+
+    hpkgsDoctest = hpkgs910.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
-        doctest = (old.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
-          # buildInputs = [haskellPackages.GLFW-b];
-          configureFlags = oldAttrs.configureFlags ++ [
-            # cabal config passes RTS options to GHC so doctest will receive them too
-            # ‘cabal repl --with-ghc=doctest’
-            "--ghc-option=-rtsopts"
-          ];
-        });
+        doctest =
+          hlib.dontCheck ((old.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
+            # buildInputs = [haskellPackages.GLFW-b];
+            configureFlags = oldAttrs.configureFlags ++ [
+              # cabal config passes RTS options to GHC so doctest will receive them too
+              # ‘cabal repl --with-ghc=doctest’
+              "--ghc-option=-rtsopts"
+            ];
+          }));
 
         # primitive = hlib.dontCheck (old.callHackage "primitive" "0.8.0.0" {});
         # tagged = old.callHackage "tagged" "0.8.7" {};
@@ -270,8 +273,6 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         tasty-quickcheck = hlib.dontCheck old.tasty-quickcheck;
         stringbuilder = hlib.dontCheck old.stringbuilder;
         base-orphans = hlib.dontCheck old.base-orphans;
-
-        doctest = hlib.dontCheck (hlib.doJailbreak (old.callHackage "doctest" "0.22.2" {}));
 
         hashable = hashable-pkg old;
 
@@ -585,7 +586,7 @@ in {
   alex               = hlib.justStaticExecutables hpkgs910.alex;
   happy              = hlib.justStaticExecutables hpkgs910.happy;
   cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
-  doctest            = hlib.justStaticExecutables hpkgsDoctest.doctest;
+  doctest            = allowGhcReference (hlib.justStaticExecutables hpkgsDoctest.doctest);
   eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
   fast-tags          = hlib.justStaticExecutables hpkgsFastTags.fast-tags;
   ghc-events-analyze = hlib.justStaticExecutables hpkgsGhcEvensAnalyze.ghc-events-analyze;
