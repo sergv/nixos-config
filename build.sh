@@ -10,10 +10,10 @@ set -u
 # propagate errors from all parts of pipes
 set -o pipefail
 
-export NIX_BUILD_CORES="2"
-export NINJAFLAGS="-j2 -l2"
+export NIX_BUILD_CORES="4"
+export NINJAFLAGS="-j4 -l4"
 
-nix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j2 --cores 16 --keep-going "${@}"
+nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#nixosConfigurations."work-wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j2 --cores 10 --keep-going "${@}"
 
 # exec ./apply-system.sh build "${@}"
 
