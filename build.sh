@@ -13,7 +13,7 @@ set -o pipefail
 export NIX_BUILD_CORES="10"
 export NINJAFLAGS="-j10 -l10"
 
-nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#nixosConfigurations."work-wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j2 --cores 10 --keep-going "${@}"
+nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#nixosConfigurations."work-wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j4 --cores 10 --keep-going "${@}"
 
 # exec ./apply-system.sh build "${@}"
 
