@@ -13,6 +13,7 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     fetchgit-improved = pkgs.fetchgit;
 
+    # TODO: setup proxy
     # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
     #
     # git-proxy-conf = {
@@ -43,94 +44,6 @@ let wmctrl-pkg = pkgs.wmctrl;
     };
 
     wm-sh = scripts.wm-sh;
-
-    clementine-pkg = (pkgs.clementine.override (old: old // {
-      liblastfm               = null;
-      config.clementine.ipod  = false;
-      config.clementine.mtp   = false;
-      config.clementine.cd    = false;
-      config.clementine.cloud = false;
-    })).overrideAttrs (old: {
-      version = "1.4.1-27";
-      src     = pkgs.fetchFromGitHub {
-        owner  = "clementine-player";
-        repo   = "Clementine";
-        rev    = "658f34ec40dde09b473bdda3d90050455e724fad";
-        sha256 = "sha256-VdMw8pFgw+jhXKFw5+lnxTzmhB9F44zqhqCLAss1WBQ="; #pkgs.lib.fakeSha256;
-      };
-      cmakeFlags = [
-        "-DFORCE_GIT_REVISION=1.4.1"
-        "-DUSE_SYSTEM_PROJECTM=ON"
-        "-DSPOTIFY_BLOB=OFF"
-        "-DGOOGLE_DRIVE=OFF"
-        "-DDROPBOX=OFF"
-        "-DSKYDRIVE=OFF"
-        "-DBOX=OFF"
-        "-DSEAFILE=OFF"
-        "-DAUDIOCD=OFF"
-        "-DLIBGPOD=OFF"
-        "-DGIO=OFF"
-        "-DLIBMTP=OFF"
-        "-DWIIMOTEDEV=OFF"
-        "-DUDISKS2=OFF"
-        "-DMOODBAR=OFF"
-        "-DSPARKLE=OFF"
-        "-DTRANSLATIONS=OFF"
-      ];
-
-      patches = (old.patches or []) ++ [
-        patches/clementine-remove-love-scrobbling-and-button-to-clear-playlist.patch
-        patches/clementine-enlarge-playback-control-buttons.patch
-        patches/clementine-enlarge-volume-slider.patch
-      ];
-    });
-
-    qbittorrent-pkg  (pkgs.qbittorrent.override {
-      webuiSupport  = false;
-      trackerSearch = false;
-    };
-
-    tribler-pkg =
-      let tribler-python = pkgs.python310;
-          libtorrent-rasterbar-1_2_x-upd =
-            let version = "1.2.19";
-            in
-              (pkgs.libtorrent-rasterbar-1_2_x.override (old: {
-                boost  = old.boost.override (_: {
-                  enableStatic = true;
-                  enableShared = false;
-                });
-                openssl = old.openssl.override (_: {
-                  static = true;
-                });
-                python = tribler-python;
-              })).overrideAttrs (old: {
-
-                inherit version;
-
-                src = fetchgit-improved {
-                  url    = "https://github.com/arvidn/libtorrent.git";
-                  rev    = "v${version}";
-                  sha256 = "sha256-dkjNv40/B1bbY16xtYFXOgbbOFnRSp9G2eG5/6dxfgI="; # pkgs.lib.fakeSha256;
-                };
-
-                nativeBuildInputs =
-                  old.nativeBuildInputs ++ [
-                    tribler-python.pkgs.setuptools
-                    pkgs.boost-build
-                    pkgs.openssl.dev
-                  ];
-
-                preConfigure = (old.preConfigure or "") + "\n" + ''
-                  configureFlagsArray+=('PYTHON_INSTALL_PARAMS=--prefix=$(DESTDIR)$(prefix) --single-version-externally-managed --record=installed-files.txt')
-                '';
-
-              });
-      in
-        pkgs.tribler.override (old: {
-          libtorrent-rasterbar-1_2_x = libtorrent-rasterbar-1_2_x-upd;
-          python3                    = tribler-python;
-        });
 
     mk-isabelle = include-emacs-lsp-fixes:
       import ./isabelle/isabelle.nix {
@@ -285,6 +198,8 @@ in
     homeDirectory = "/home/sergey";
     stateVersion  = "22.05";
 
+    sessionPath = ["$HOME/local/bin"];
+
     keyboard = {
       layout  = "us,ru";
       variant = "dvorak,";
@@ -375,16 +290,12 @@ in
       "diff"                = "diff --unified --recursive --ignore-tab-expansion --ignore-blank-lines";
       "diffw"               = "diff --unified --recursive --ignore-tab-expansion --ignore-space-change --ignore-blank-lines";
 
-      "youtube-dl-playlist" = "yt-dlp --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s'";
-      "youtube-dl-single"   = "yt-dlp --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(title)s.%(ext)s'";
-      "youtube-dl-audio"    = "yt-dlp --add-metadata -f 'bestaudio[ext=m4a]' --output '%(title)s.%(ext)s'";
-
       "baobab-new"          = "nohup dbus-run-session baobab >/dev/null";
     };
     sessionVariables = {
       "HIE_BIOS_CACHE_DIR"        = "/tmp/dist/hie-bios";
       "EMACS_ROOT"                = "/home/sergey/.emacs.d";
-      "EMACS_SYSTEM_TYPE"         = "(linux home)";
+      "EMACS_SYSTEM_TYPE"         = "(linux work)";
       "CCACHE_COMPRESS"           = "1";
       "CCACHE_DIR"                = "/tmp/.ccache";
       "CCACHE_NOSTATS"            = "1";
@@ -397,11 +308,12 @@ in
 
   programs.git = {
     enable    = true;
-    userName  = "Sergey Vinokurov";
-    userEmail = "serg.foo@gmail.com";
+    # TODO: set up user and email
+    userName  = "";
+    userEmail = "";
     signing   = {
-      key = "47E4DA2E6A3F58FE3F0198F4D6CD29530F98D6B8";
-      signByDefault = true;
+      key           = "47E4DA2E6A3F58FE3F0198F4D6CD29530F98D6B8";
+      signByDefault = false;
     };
     aliases   = {
       "lg"  = "log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(red)%h %G?%C(reset)%C(yellow)%d%C(reset) %C(white)%s%C(reset) - %C(dim white)%an%C(reset) %C(green)(%ar)%C(reset)'";
@@ -435,8 +347,8 @@ in
             # Show more informative diff when submodules are involved.
             submodule = "log";
           };
-          # http = git-proxy-conf;
-          # https = git-proxy-conf;
+          http = git-proxy-conf;
+          https = git-proxy-conf;
           merge = {
             # Always show a diffstat at the end of merge.
             stat = true;
@@ -544,118 +456,7 @@ in
     "L+ /home/sergey/.emacs.d/compiled -    -      -     - /tmp/emacs-cache"
     "L+ /home/sergey/.gradle/caches    -    -      -     - /tmp/cache/gradle-caches"
     "L+ /home/sergey/.gradle/daemon    -    -      -     - /tmp/cache/gradle-daemon"
-  ] ++ map
-    (x:
-      # Forcefully symlink, removing destination if it exists.
-      "L+ \"/home/sergey/${x}\" - - - - /permanent/home/sergey/${x}"
-    )
-    [
-        ".emacs"
-        "machine-specific-setup.el"
-
-        # Supreme Commander FAF
-        # ".gapforever"
-        ".faforever"
-
-        ".bash_history"
-        ".rtorrent.rc"
-        ".viminfo"
-        ".vimrc"
-
-        ".config/Audaciousrc"
-        ".config/PCSX2"
-        ".config/QtProject.conf"
-        ".config/Triblerrc"
-
-        ".local/ghci.conf"
-        ".local/share/krunnerstaterc"
-        ".local/share/qBittorrent"
-        ".local/share/recently-used.xbel"
-        ".local/share/user-places.xbel"
-        ".local/share/user-places.xbel.bak"
-        ".local/share/user-places.xbel.tbcache"
-
-        "github-recovery-codes.txt"
-        #"mars.exe"
-        "password.org"
-        "todo.org"
-
-        "O0DGDxpMBNs.jpg"
-
-        ".aspell.en.prepl"
-        ".aspell.en.pws"
-
-        # KDE
-        ".config/akregatorrc"
-        ".config/baloofileinformationrc"
-        ".config/baloofilerc"
-        ".config/bluedevilglobalrc"
-        ".config/device_automounter_kcmrc"
-        ".config/dolphinrc"
-        ".config/filetypesrc"
-        ".config/gtkrc"
-        ".config/gtkrc-2.0"
-        ".config/gwenviewrc"
-        ".config/kaccessrc-pluginsrc"
-        ".config/kactivitymanagerd-pluginsrc"
-        ".config/kactivitymanagerd-statsrc"
-        ".config/kactivitymanagerd-switcher"
-        ".config/kactivitymanagerdrc"
-        ".config/katemetainfos"
-        ".config/katerc"
-        ".config/kateschemarc"
-        ".config/katevirc"
-        ".config/kcmfonts"
-        ".config/kcminputrc"
-        ".config/kconf_updaterc"
-        ".config/kded5rc"
-        ".config/kded_device_automounterrc"
-        ".config/kdeglobals"
-        ".config/kgammarc"
-        ".config/kglobalshortcutsrc"
-        ".config/kfontinstuirc"
-        ".config/khotkeysrc"
-        ".config/kiorc"
-        ".config/kmenueditrc"
-        ".config/kmixrc"
-        ".config/konsolerc"
-        ".config/konsolesshconfig"
-        ".config/krunnerrc"
-        ".config/kscreenlockerrc"
-        ".config/kservicemenurc"
-        ".config/ksmserverrc"
-        ".config/ksplashrc"
-        ".config/ktimezonedrc"
-        ".config/kuriikwsfilterrc"
-        ".config/kwalletrc"
-        ".config/kwinrc"
-        ".config/kwinrulesrc"
-        ".config/kxkbrc"
-        ".config/mimeapps.list"
-        ".config/okularpartrc"
-        ".config/okularrc"
-        ".config/partitionmanagerrc"
-        ".config/plasma-localerc"
-        ".config/plasma-nm"
-        ".config/plasma-org.kde.plasma.desktop-appletsrc"
-        ".config/plasmanotifyrc"
-        ".config/plasmarc"
-        ".config/plasmashellrc"
-        ".config/PlasmaUserFeedback"
-        ".config/plasmawindowed-appletsrc"
-        ".config/plasmawindowedrc"
-        ".config/powerdevilrc"
-        ".config/powermanagementprofilesrc"
-        ".config/qBittorrent"
-        ".config/spectaclerc"
-        ".config/startkderc"
-        ".config/systemmonitorrc"
-        ".config/systemsettingsrc"
-        ".config/Trolltech.conf"
-        ".config/unity3d"
-        ".config/user-dirs.dirs"
-        ".config/user-dirs.locale"
-    ];
+  ];
 
   dconf.settings = {
     "org/gtk/settings/file-chooser" = {
@@ -747,18 +548,11 @@ in
       });
     in
       [
-        pkgs.anki
         pkgs.ark
         (pkgs.aspellWithDicts (d: [d.en d.en-computers d.en-science d.ru d.uk]))
-        # pkgs.autoconf
         pkgs.baobab
-        pkgs.bridge-utils
-        # pkgs.ccache
-        # pkgs.clang
-        # pkgs.clang-tools
         pkgs.clinfo
         pkgs.cloc
-        # pkgs.coq
         pkgs.cpu-x
         pkgs.curl
         pkgs.dmidecode
@@ -770,9 +564,9 @@ in
         pkgs.glxinfo
         pkgs.gparted
         pkgs.graphviz
+        pkgs.gwenview
         pkgs.htop
         pkgs.imagemagick
-        #pkgs.inkscape
         pkgs.iotop
         pkgs.okular
         pkgs.libreoffice
@@ -786,49 +580,31 @@ in
         pinned-pkgs.nixpkgs-22-11.nyx
         pkgs.oxygen-icons5
         pkgs.p7zip
-        pkgs.pavucontrol
-        # pkgs.pmutils
         pkgs.pv
-        # for shsplit
         pkgs.shntool
         pkgs.smartmontools
         pkgs.sshfs
-        pkgs.telegram-desktop
-        pkgs.tdesktop
-        pkgs.thunderbird
         pkgs.unzip
         pkgs.usbutils
-        pkgs.vlc
         pkgs.vorbis-tools
         pkgs.wget
         pkgs.xorg.xev
         pkgs.yt-dlp
         pkgs.zip
-        # pkgs.yasm
         pkgs.zstd
-        # pkgs.z3
 
         # Music
-        pkgs.audacious
-        clementine-pkg
-
-        pkgs.i2p
         pkgs.xd
-
-        qbittorrent-pkg
-        # tribler-pkg
-
-        pkgs.vdhcoapp
 
         pkgs.nix-diff
 
         isabelle-pkg
         isabelle-lsp-wrapper
 
-        pkgs.pcsx2
-
         tex-pkg
         wmctrl-pkg
+
+        pkgs.wineWowPackages.stable
 
         emacs-wrapped
         emacs-bytecode-wrapped

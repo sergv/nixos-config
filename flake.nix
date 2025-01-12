@@ -48,10 +48,6 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
-    impermanence = {
-      url = "github:nix-community/impermanence";
-    };
-
     flake-compat = {
       url = "github:edolstra/flake-compat";
     };
@@ -80,6 +76,11 @@
       url = "github:nix-community/NUR";
     };
 
+    NixOS-WSL = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+
   };
 
   outputs =
@@ -91,9 +92,9 @@
     , nixpkgs-unstable
     # , nixpkgs-fresh-ghc
     , home-manager
-    , impermanence
     , arkenfox
     , nur
+    , NixOS-WSL
     , ...
     }:
     let system = "x86_64-linux";
@@ -419,11 +420,15 @@
 
       # System configs
       nixosConfigurations = {
-        home = nixpkgs-unstable.lib.nixosSystem {
+        work-wsl = nixpkgs-unstable.lib.nixosSystem {
           inherit system;
           inherit pkgs;
 
           modules = [
+
+            { nix.registry.nixpkgs.flake = nixpkgs-stable; }
+
+            NixOS-WSL.nixosModules.wsl
 
             ({ config, pkgs, ... }:
               let
@@ -446,8 +451,6 @@
               })
 
             ./system.nix
-
-            impermanence.nixosModule
 
             # Enable Home Manager as NixOs module
             home-manager.nixosModules.home-manager
