@@ -21,14 +21,14 @@ fi
 export TMPDIR=/tmp/nix-daemon
 export TEMPDIR=/tmp/nix-daemon
 
-jobs="1"
-export NIX_BUILD_CORES="2"
-export NINJAFLAGS="-j2 -l2"
+jobs="4"
+export NIX_BUILD_CORES="8"
+export NINJAFLAGS="-j8 -l8"
 
 command="$1"
 shift
 
-nixos-rebuild "${command}" --flake .#home --verbose --keep-going --cores 1 --max-jobs 1 "${@}"
+nixos-rebuild "${command}" --flake .#work-wsl --verbose --keep-going --cores 1 --max-jobs 1 "${@}"
 
 # nixos-rebuild build --flake .#home --verbose --keep-going "${@}"
 # nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
