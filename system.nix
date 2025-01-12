@@ -346,8 +346,7 @@ in
     graphics.enable32Bit = true;
 
     nvidia = {
-      # Modesetting is needed most of the time
-      modesetting.enable = true;
+      modesetting.enable = false;
 
 	    # Enable power management (do not disable this unless you have a reason to).
 	    # Likely to cause problems on laptops and with screen tearing if disabled.
@@ -359,6 +358,8 @@ in
 	    # You most likely don't want this.
       # Only available on driver 515.43.04+
       open = false;
+
+      prime.offload.enable = false;
 
       # Enable the Nvidia settings menu,
 	    # accessible via `nvidia-settings`.
