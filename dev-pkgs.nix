@@ -830,6 +830,7 @@ in ghc-win // {
   lld  = filter-bin "llvmPackages_19.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_19.bintools;
 
   # for ‘clang-format’
+  astyle      = pkgs.astyle;
   clang-tools = pkgs.clang-tools;
   cmake       = pkgs.cmake;
   diffutils   = pkgs.diffutils;
