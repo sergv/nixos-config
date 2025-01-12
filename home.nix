@@ -6,7 +6,6 @@
 # , nixpkgs-stable
 # , nixpkgs-unstable
 , arkenfox
-, impermanence
 , git-proxy-conf
 , arch
 , system
@@ -24,108 +23,6 @@ let wmctrl-pkg = pkgs.wmctrl;
     };
 
     wm-sh = scripts.wm-sh;
-
-    clementine-pkg =
-      let clementine-scale = "1.0";
-      in
-        (pkgs.clementine.override (old: old // {
-          liblastfm               = null;
-          config.clementine.ipod  = false;
-          config.clementine.mtp   = false;
-          config.clementine.cd    = false;
-          config.clementine.cloud = false;
-        })).overrideAttrs (old: {
-          cmakeFlags = [
-            "-DFORCE_GIT_REVISION=1.4.1"
-            "-DUSE_SYSTEM_PROJECTM=ON"
-            "-DSPOTIFY_BLOB=OFF"
-            "-DGOOGLE_DRIVE=OFF"
-            "-DDROPBOX=OFF"
-            "-DSKYDRIVE=OFF"
-            "-DBOX=OFF"
-            "-DSEAFILE=OFF"
-            "-DAUDIOCD=OFF"
-            "-DLIBGPOD=OFF"
-            "-DGIO=OFF"
-            "-DLIBMTP=OFF"
-            "-DWIIMOTEDEV=OFF"
-            "-DUDISKS2=OFF"
-            "-DMOODBAR=OFF"
-            "-DSPARKLE=OFF"
-            "-DTRANSLATIONS=OFF"
-          ];
-
-          patches = (old.patches or []) ++ [
-            patches/clementine-remove-love-scrobbling-and-button-to-clear-playlist.patch
-            patches/clementine-enlarge-playback-control-buttons.patch
-            patches/clementine-enlarge-volume-slider.patch
-          ];
-
-          postInstall =
-            builtins.replaceStrings
-              [ "wrapQtApp $out/bin/clementine"
-              ]
-              [ ''wrapQtApp $out/bin/clementine --set-default QT_SCALE_FACTOR "${clementine-scale}"''
-              ]
-              old.postInstall;
-        });
-
-
-    qbittorrent-pkg =
-      let scale = "1.0";
-      in
-        (pkgs.qbittorrent.override {
-          webuiSupport  = false;
-          trackerSearch = false;
-        }).overrideAttrs (old: {
-
-          postInstall = old.postInstall +
-                        ''
-          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=${scale} \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
-        '';
-        });
-
-    tribler-pkg =
-      let tribler-python = pkgs.python310;
-          libtorrent-rasterbar-1_2_x-upd =
-            let version = "1.2.19";
-            in
-              (pkgs.libtorrent-rasterbar-1_2_x.override (old: {
-                boost  = old.boost.override (_: {
-                  enableStatic = true;
-                  enableShared = false;
-                });
-                openssl = old.openssl.override (_: {
-                  static = true;
-                });
-                python = tribler-python;
-              })).overrideAttrs (old: {
-
-                inherit version;
-
-                src = pkgs.fetchgit {
-                  url    = "https://github.com/arvidn/libtorrent.git";
-                  rev    = "v${version}";
-                  sha256 = "sha256-dkjNv40/B1bbY16xtYFXOgbbOFnRSp9G2eG5/6dxfgI="; # pkgs.lib.fakeSha256;
-                };
-
-                nativeBuildInputs =
-                  old.nativeBuildInputs ++ [
-                    tribler-python.pkgs.setuptools
-                    pkgs.boost-build
-                    pkgs.openssl.dev
-                  ];
-
-                preConfigure = (old.preConfigure or "") + "\n" + ''
-                  configureFlagsArray+=('PYTHON_INSTALL_PARAMS=--prefix=$(DESTDIR)$(prefix) --single-version-externally-managed --record=installed-files.txt')
-                '';
-
-              });
-      in
-        pkgs.tribler.override (old: {
-          libtorrent-rasterbar-1_2_x = libtorrent-rasterbar-1_2_x-upd;
-          python3                    = tribler-python;
-        });
 
     mk-isabelle = include-emacs-lsp-fixes:
       import ./isabelle/isabelle.nix {
@@ -239,7 +136,6 @@ in
 
   imports = [
     arkenfox.hmModules.default
-    impermanence.homeManagerModules.impermanence
   ];
 
   # Home Manager needs a bit of information about you and the
@@ -258,6 +154,8 @@ in
     username      = "sergey";
     homeDirectory = "/home/sergey";
     stateVersion  = "22.05";
+
+    sessionPath = ["$HOME/local/bin"];
 
     keyboard = {
       layout  = "us,ru";
@@ -350,16 +248,12 @@ in
       "diff"                = "diff --unified --recursive --ignore-tab-expansion --ignore-blank-lines";
       "diffw"               = "diff --unified --recursive --ignore-tab-expansion --ignore-space-change --ignore-blank-lines";
 
-      "youtube-dl-playlist" = "yt-dlp --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s'";
-      "youtube-dl-single"   = "yt-dlp --write-description --add-metadata -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' --output '%(title)s.%(ext)s'";
-      "youtube-dl-audio"    = "yt-dlp --add-metadata -f 'bestaudio[ext=m4a]' --output '%(title)s.%(ext)s'";
-
       "baobab-new"          = "nohup dbus-run-session baobab >/dev/null";
     };
     sessionVariables = {
       "HIE_BIOS_CACHE_DIR"        = "/tmp/dist/hie-bios";
       "EMACS_ROOT"                = "/home/sergey/.emacs.d";
-      "EMACS_SYSTEM_TYPE"         = "(linux home)";
+      "EMACS_SYSTEM_TYPE"         = "(linux work)";
       "CCACHE_COMPRESS"           = "1";
       "CCACHE_DIR"                = "/tmp/.ccache";
       "CCACHE_NOSTATS"            = "1";
@@ -373,8 +267,8 @@ in
   programs.git = {
     enable    = true;
     signing   = {
-      key = "47E4DA2E6A3F58FE3F0198F4D6CD29530F98D6B8";
-      signByDefault = true;
+      key           = "47E4DA2E6A3F58FE3F0198F4D6CD29530F98D6B8";
+      signByDefault = false;
     };
     ignores = [
       ".eproj-info"
@@ -396,8 +290,9 @@ in
         "m"   = "merge";
       };
       user = {
-        name  = "Sergey Vinokurov";
-        email = "serg.foo@gmail.com";
+        # TODO: set up user and email
+        name  = "";
+        email = "";
       };
       advice = {
         # Disable `git status' hints on how to stage, etc.
@@ -419,8 +314,8 @@ in
         # Show more informative diff when submodules are involved.
         submodule = "log";
       };
-      # http = git-proxy-conf;
-      # https = git-proxy-conf;
+      http = git-proxy-conf;
+      https = git-proxy-conf;
       merge = {
         # Always show a diffstat at the end of merge.
         stat = true;
@@ -516,244 +411,6 @@ in
     # Forcefully symlink, removing destination if it exists.
     "L+ /home/sergey/.emacs.d/compiled 0755 -      -     - /tmp/cache/emacs"
   ];
-
-  home.persistence."/permanent" = {
-    hideMounts = true;
-
-    directories = [
-
-      # {
-      #   directory = ".local/share/Steam";
-      #   method = "symlink";
-      # }
-
-      # Pulseaudio doesn’t like symlinks.
-      ".config/pulse"
-    ] ++
-    builtins.map
-      (x: { directory = x; mode = "0700"; })
-      [
-        "Documents"
-        "Downloads"
-        "London"
-        "Music"
-        "Pictures"
-        "Telegram"
-        "Videos"
-        "VirtualBox VMs"
-        "art"
-        "bicycle"
-        "books"
-        "documents"
-        "dwhelper"
-        "films"
-        "games"
-        "health"
-        "nix"
-        "projects"
-        "recipes"
-        "scripts"
-        "sites"
-        "software"
-        "tmp"
-        "todo"
-        "torrents"
-        "travelling"
-        "vim"
-
-        # Supreme Commander FAF
-        # ".gapforever"
-        ".faforever"
-
-        ".android"
-        ".cabal"
-        ".dosbox"
-        ".emacs.d"
-        ".ghc"
-        ".ghc-wasm"
-        ".gnupg"
-        ".gradle"
-        ".isabelle"
-        ".java/.userPrefs"
-        ".litecoin"
-        ".mozilla"
-        ".ssh"
-        ".stack"
-        ".thunderbird"
-
-        ".config/.arduino15"
-        ".config/AndroidStudio3.2"
-        ".config/Clementine"
-        ".config/Google"
-        ".config/PCSX2"
-        ".config/VirtualBox"
-        ".config/Xilinx"
-        ".config/android"
-        ".config/audacious"
-        ".config/chromium"
-        ".config/dconf"
-        ".config/fontforge"
-        ".config/htop"
-        ".config/keybase"
-        ".config/libreoffice"
-        ".config/mc"
-        ".config/ristretto"
-        ".config/transmission"
-        ".config/vlc"
-        ".config/xfce4"
-        ".local/share/3909"
-        ".local/share/Anki"
-        ".local/share/Anki2"
-        ".local/share/TelegramDesktop"
-        ".local/share/Tyranny"
-        ".local/share/direnv"
-        ".local/share/docker"
-        ".local/share/keyrings"
-        ".local/share/mc"
-        ".local/share/mime"
-        ".local/share/openmw"
-        ".local/share/qBittorrent"
-        ".local/share/ristretto"
-        ".local/share/strawberry"
-        ".local/share/trash"
-        ".local/share/vlc"
-
-        # KDE
-        ".config/KDE"
-        ".config/gtk-3.0"
-        ".config/gtk-4.0"
-        ".config/kde.org"
-        ".config/kdedefaults"
-        ".config/plasma-workspace"
-        ".config/qBittorrent"
-        ".config/unity3d"
-        ".config/xsettingsd"
-        ".kde"
-        ".local/share/RecentDocuments"
-        ".local/share/baloo"
-        ".local/share/dolphin"
-        ".local/share/feral-interactive"
-        ".local/share/gwenview"
-        ".local/share/kactivitymanagerd"
-        ".local/share/kate"
-        ".local/share/kcookiejar"
-        ".local/share/kded5"
-        ".local/share/klipper"
-        ".local/share/konsole"
-        ".local/share/kscreen"
-        ".local/share/ksysguard"
-        ".local/share/kwalletd"
-        ".local/share/kxmlgui5"
-        ".local/share/okular"
-        ".local/share/plasma_icons"
-        ".local/share/plasma_notes"
-        ".local/share/plasma-systemmonitor"
-        ".local/share/sddm"
-      ];
-
-    files = [
-      ".emacs"
-      "machine-specific-setup.el"
-      "password.org"
-      "todo.org"
-      "O0DGDxpMBNs.jpg"
-      ".aspell.en.prepl"
-      ".aspell.en.pws"
-      ".bash_history"
-      ".rtorrent.rc"
-      ".vimrc"
-      ".config/Audaciousrc"
-      ".config/QtProject.conf"
-      ".config/Triblerrc"
-      ".local/ghci.conf"
-    ] ++
-    builtins.map (x: { file = x; method = "symlink"; })
-      [
-        # KDE, prefers symlinks - bind mounts cannot be overwritten in-place which has led to
-        # following issues previously (may or may not be relevant any more):
-        # - broken plasma config from nixpkgs and konsole.
-        # - KDE shortcuts are not preserved between reboots.
-        ".config/PlasmaUserFeedback"
-        ".config/Trolltech.conf"
-        ".config/akregatorrc"
-        ".config/baloofileinformationrc"
-        ".config/baloofilerc"
-        ".config/bluedevilglobalrc"
-        ".config/device_automounter_kcmrc"
-        ".config/dolphinrc"
-        ".config/filetypesrc"
-        ".config/gtkrc"
-        ".config/gtkrc-2.0"
-        ".config/gwenviewrc"
-        ".config/kaccessrc-pluginsrc"
-        ".config/kactivitymanagerd-pluginsrc"
-        ".config/kactivitymanagerd-statsrc"
-        ".config/kactivitymanagerd-switcher"
-        ".config/kactivitymanagerdrc"
-        ".config/katemetainfos"
-        ".config/katerc"
-        ".config/kateschemarc"
-        ".config/katevirc"
-        ".config/kcmfonts"
-        ".config/kcminputrc"
-        ".config/kconf_updaterc"
-        ".config/kded5rc"
-        ".config/kded_device_automounterrc"
-        ".config/kdeglobals"
-        ".config/kfontinstuirc"
-        ".config/kgammarc"
-        ".config/kglobalshortcutsrc"
-        ".config/khotkeysrc"
-        ".config/kiorc"
-        ".config/kmenueditrc"
-        ".config/kmixrc"
-        ".config/konsolerc"
-        ".config/konsolesshconfig"
-        ".config/krunnerrc"
-        ".config/kscreenlockerrc"
-        ".config/kservicemenurc"
-        ".config/ksmserverrc"
-        ".config/ksplashrc"
-        ".config/ktimezonedrc"
-        ".config/kuriikwsfilterrc"
-        ".config/kwalletrc"
-        ".config/kwinrc"
-        ".config/kwinrulesrc"
-        ".config/kxkbrc"
-        ".config/mimeapps.list"
-        ".config/okularpartrc"
-        ".config/okularrc"
-        ".config/partitionmanagerrc"
-        ".config/plasma-localerc"
-        ".config/plasma-nm"
-        ".config/plasma-org.kde.plasma.desktop-appletsrc"
-        ".config/plasmanotifyrc"
-        ".config/plasmarc"
-        ".config/plasmashellrc"
-        ".config/plasmawindowed-appletsrc"
-        ".config/plasmawindowedrc"
-        ".config/powerdevilrc"
-        ".config/powermanagementprofilesrc"
-        ".config/spectaclerc"
-        ".config/startkderc"
-        ".config/systemmonitorrc"
-        ".config/systemsettingsrc"
-        ".config/user-dirs.dirs"
-        ".config/user-dirs.locale"
-
-        ".local/share/krunnerstaterc"
-        ".local/share/recently-used.xbel"
-        ".local/share/user-places.xbel"
-        ".local/share/user-places.xbel.bak"
-        ".local/share/user-places.xbel.tbcache"
-
-        ".local/state/dolphinstaterc"
-        ".local/state/kickerstaterc"
-        ".local/state/konsolestaterc"
-        ".local/state/plasmashellstaterc"
-        ".local/state/systemsettingsstaterc"
-      ];
-  };
 
   dconf.settings = {
     "org/gtk/settings/file-chooser" = {
@@ -891,17 +548,10 @@ in
       });
     in
       [
-        pkgs-pristine.anki
         (pkgs.aspellWithDicts (d: [d.en d.en-computers d.en-science d.ru d.uk]))
-        # pkgs.autoconf
         pkgs.baobab
-        pkgs.bridge-utils
-        # pkgs.ccache
-        # pkgs.clang
-        # pkgs.clang-tools
         pkgs.clinfo
         pkgs.cloc
-        # pkgs.coq
         pkgs.cpu-x
         pkgs.curl
         pkgs.dmidecode
@@ -914,9 +564,9 @@ in
         pkgs.graphviz
         pkgs.htop
         pkgs.imagemagick
-        #pkgs.inkscape
         pkgs.iotop
         pkgs.kdePackages.ark
+        pkgs.kdePackages.gwenview
         pkgs.kdePackages.okular
         pkgs.kdePackages.oxygen-icons
         pkgs.kdePackages.plasma-systemmonitor
@@ -929,26 +579,18 @@ in
         pkgs.mplayer
         pkgs.nix-index
         pkgs.p7zip
-        pkgs.pavucontrol
-
-        # pkgs.pmutils
         pkgs.pv
-        # for shsplit
         pkgs.shntool
         pkgs.smartmontools
         pkgs.sshfs
-        pkgs-pristine.telegram-desktop
         pkgs.unzip
         pkgs.usbutils
-        pkgs.vlc
         pkgs.vorbis-tools
         pkgs.wget
         pkgs.xorg.xev
         pkgs.yt-dlp
         pkgs.zip
-        # pkgs.yasm
         pkgs.zstd
-        # pkgs.z3
 
         # Take from pristine so that it will be picked up from cache. Building thunderbird
         # is almost impossible - linking consumes too much memory.
@@ -956,27 +598,18 @@ in
         pkgs-pristine.libreoffice
 
         # Music
-        clementine-pkg
-
-        pkgs.i2p
         pkgs.xd
-
-        qbittorrent-pkg
-        # tribler-pkg
-
-        pkgs.vdhcoapp
 
         pkgs.nix-diff
 
         isabelle-pkg
         isabelle-lsp-wrapper
 
-        pkgs.pcsx2
-
         tex-pkg
         wmctrl-pkg
 
-        # emacs-native-wrapped
+        pkgs.wineWowPackages.stable
+
         emacs-bytecode-wrapped
         emacs-debug-wrapped
         pkgs.tree-sitter

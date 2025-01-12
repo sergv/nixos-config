@@ -47,13 +47,6 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
-    impermanence = {
-      # url = "github:nix-community/impermanence";
-      url = "github:nix-community/impermanence/home-manager-v2";
-      inputs.home-manager.follows = "home-manager";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-
     flake-compat = {
       url = "github:edolstra/flake-compat";
     };
@@ -95,27 +88,17 @@
       inputs.haskellNix.follows = "haskellNix";
     };
 
-    bore-scheduler-src = {
-      url = "github:firelzrd/bore-scheduler";
-      flake = false;
-    };
-
-    kernel-march-patches = {
-      url = "github:graysky2/kernel_compiler_patch";
-      flake = false;
-    };
-
-    linuk-tkg-src = {
-      url = "github:Frogging-Family/linux-tkg";
-      flake = false;
-    };
-
     # # inputs.nixpkgs.url = "github:nixos/nixpkgs";
     # inputs.hackage-server.url = "github:bgamari/hackage-server/wip/doc-builder-tls";
     # inputs.cabal.url = "github:haskell/cabal/cabal-install-v3.10.3.0";
     # inputs.cabal.flake = false;
     # inputs.hackage-security.url = "github:haskell/hackage-security/hackage-security/v0.6.2.6";
     # inputs.hackage-security.flake = false;
+
+    NixOS-WSL = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
 
   };
 
@@ -128,14 +111,11 @@
     , nixpkgs-unstable
     # , nixpkgs-fresh-ghc
     , home-manager
-    , impermanence
     , arkenfox
     , nur
     # , haskellNix
     , haskell-nixpkgs-improvements
-    , bore-scheduler-src
-    , kernel-march-patches
-    , linuk-tkg-src
+    , NixOS-WSL
     , ...
     }:
     let system = "x86_64-linux";
@@ -257,6 +237,7 @@
 
         };
 
+        # TODO: setup proxy
         # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
         #
         # git-proxy-conf = {
@@ -336,7 +317,6 @@
           inherit arch system;
           inherit pkgs-pristine;
           inherit arkenfox;
-          inherit impermanence;
           inherit git-proxy-conf;
           inherit haskell-nixpkgs-improvements;
         };
@@ -350,31 +330,32 @@
 
       # System configs
       nixosConfigurations = {
-        home = nixpkgs-unstable.lib.nixosSystem {
+        work-wsl = nixpkgs-unstable.lib.nixosSystem {
           inherit system;
           inherit pkgs;
 
           modules = [
 
-            ({ config, pkgs, ... }: {
+            { nix.registry.nixpkgs.flake = nixpkgs-stable; }
 
-              nixpkgs.overlays = [
-                nur.overlays.default
-                overlay-unstable
-                # Don’t uncomment, otherwise overlays will be applied one more time.
-                # haskell-nixpkgs-improvements.overlay.enable-ghc-unit-ids
-                # ssh-overlay
-                # haskell-nixpkgs-improvements.overlay.smaller-haskell
-                # haskell-nixpkgs-improvements.overlay.disable-checks
-                # zen4-march-overlay
+            NixOS-WSL.nixosModules.wsl
+
+            ({ config, pkgs, ... }:
+              {
+                nixpkgs.overlays = [
+                  nur.overlays.default
+                  overlay-unstable
+                  # Don’t uncomment, otherwise overlays will be applied one more time.
+                  # ssh-overlay
+                  # smaller-haskell-overlay
+                  # haskell-disable-checks-overlay
+                  # zen4-march-overlay
 
                 # arch-native-overlay
               ];
             })
 
-            (import ./system.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
-
-            impermanence.nixosModules.impermanence
+            (import ./system.nix {})
 
             # Enable Home Manager as NixOs module
             home-manager.nixosModules.home-manager
