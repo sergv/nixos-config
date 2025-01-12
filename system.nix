@@ -289,9 +289,10 @@ in
     services = {
       nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
 
-      # Make nix-daemon be able to download git repositories through proxy.
-      nix-daemon.environment.NIX_GIT_SSL_CAINFO = certificateFile;
-      nix-daemon.environment.NIX_SSL_CERT_FILE  = certificateFile;
+      # Not strictly required: default nixpkgs setup seems to be enough.
+      # # Make nix-daemon be able to download git repositories through proxy.
+      # nix-daemon.environment.NIX_GIT_SSL_CAINFO = certificateFile;
+      # nix-daemon.environment.NIX_SSL_CERT_FILE  = certificateFile;
 
       nixos-wsl-systemd-fix = {
         description = "Fix the /dev/shm symlink to be a mount";
