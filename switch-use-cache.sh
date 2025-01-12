@@ -1,8 +1,6 @@
 #! /usr/bin/env bash
 #
-# File: boot.sh
-#
-# Created: 19 November 2023
+# File: switch-use-cache.sh
 #
 
 # treat undefined variable substitutions as errors
@@ -10,5 +8,7 @@ set -u
 # propagate errors from all parts of pipes
 set -o pipefail
 
-exec ./apply-system.sh boot "${@}"
+set -e
+
+exec ./apply-system.sh switch
 
