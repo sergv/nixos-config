@@ -505,9 +505,7 @@ let
       pname = "ghc-platform";
       version = ghcVersion;
       src = ghcSrc;
-      postUnpack = ''
-        sourceRoot="$sourceRoot/libraries/ghc-platform"
-      '';
+      postUnpack = ''sourceRoot="$sourceRoot/libraries/ghc-platform"'';
       libraryHaskellDepends = [ base ];
       description = "Platform information used by GHC and friends";
       license = lib.licenses.bsd3;
@@ -532,9 +530,7 @@ let
       pname = "ghc-toolchain";
       version = ghcVersion;
       src = ghcSrc;
-      postUnpack = ''
-        sourceRoot="$sourceRoot/utils/ghc-toolchain"
-      '';
+      postUnpack = ''sourceRoot="$sourceRoot/utils/ghc-toolchain"'';
       libraryHaskellDepends = [
         base
         directory
@@ -561,15 +557,13 @@ let
         url = "https://gitlab.haskell.org/ghc/ghc.git";
         inherit rev sha256;
       };
-      ghc' = (
-        base-ghc-to-override.override (
-          old:
-          old
-          // {
-            bootPkgs = build-pkgs;
-            inherit ghcSrc;
-          }
-        )
+      ghc' = base-ghc-to-override.override (
+        old:
+        old
+        // {
+          bootPkgs = build-pkgs;
+          inherit ghcSrc;
+        }
       );
 
       callPackage' =
