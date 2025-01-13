@@ -252,31 +252,31 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         #
         # Nix is great when it works, but when it doesn’t it’s a miserable
         # piece of FUCK.
-        os-string = null;
+        os-string            = null;
 
-        vector = hlib.dontCheck old.vector;
-        async = hlib.dontCheck old.async;
-        alex = hlib.dontCheck old.alex;
-        happy = hlib.dontCheck old.happy;
-        code-page = hlib.dontCheck old.code-page;
-        inspection-testing = hlib.dontCheck old.inspection-testing;
-        call-stack = hlib.dontCheck old.call-stack;
-        QuickCheck = hlib.dontCheck old.QuickCheck;
-        silently = hlib.dontCheck old.silently;
-        HUnit = hlib.dontCheck old.HUnit;
+        vector               = hlib.dontCheck old.vector;
+        async                = hlib.dontCheck old.async;
+        alex                 = hlib.dontCheck old.alex;
+        happy                = hlib.dontCheck old.happy;
+        code-page            = hlib.dontCheck old.code-page;
+        inspection-testing   = hlib.dontCheck old.inspection-testing;
+        call-stack           = hlib.dontCheck old.call-stack;
+        QuickCheck           = hlib.dontCheck old.QuickCheck;
+        silently             = hlib.dontCheck old.silently;
+        HUnit                = hlib.dontCheck old.HUnit;
         optparse-applicative = hlib.dontCheck old.optparse-applicative;
-        hspec-expectations = hlib.dontCheck old.hspec-expectations;
-        pcre-light = hlib.dontCheck old.pcre-light;
-        file-io = hlib.dontCheck old.file-io;
-        syb = hlib.dontCheck old.syb;
-        hspec-discover = hlib.dontCheck old.hspec-discover;
-        tasty-quickcheck = hlib.dontCheck old.tasty-quickcheck;
-        stringbuilder = hlib.dontCheck old.stringbuilder;
-        base-orphans = hlib.dontCheck old.base-orphans;
+        hspec-expectations   = hlib.dontCheck old.hspec-expectations;
+        pcre-light           = hlib.dontCheck old.pcre-light;
+        file-io              = hlib.dontCheck old.file-io;
+        syb                  = hlib.dontCheck old.syb;
+        hspec-discover       = hlib.dontCheck old.hspec-discover;
+        tasty-quickcheck     = hlib.dontCheck old.tasty-quickcheck;
+        stringbuilder        = hlib.dontCheck old.stringbuilder;
+        base-orphans         = hlib.dontCheck old.base-orphans;
 
-        hashable = hashable-pkg old;
+        hashable             = hashable-pkg old;
 
-        primitive = hlib.dontCheck (old.callHackage "primitive" "0.9.0.0" {});
+        primitive            = hlib.dontCheck (old.callHackage "primitive" "0.9.0.0" {});
       }));
 
     # pkgs.haskell.packages.ghc961
@@ -425,15 +425,13 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       , ghcVersion
       }:
       mkDerivation {
-        pname = "ghc-platform";
-        version = ghcVersion;
-        src = ghcSrc;
-        postUnpack = ''
-          sourceRoot="$sourceRoot/libraries/ghc-platform"
-        '';
-        libraryHaskellDepends = [ base ];
-        description = "Platform information used by GHC and friends";
-        license = lib.licenses.bsd3;
+        pname                 = "ghc-platform";
+        version               = ghcVersion;
+        src                   = ghcSrc;
+        postUnpack            = ''sourceRoot="$sourceRoot/libraries/ghc-platform"'';
+        libraryHaskellDepends = [base];
+        description           = "Platform information used by GHC and friends";
+        license               = lib.licenses.bsd3;
       };
 
     ghc-toolchain =
@@ -444,17 +442,13 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       , ghcSrc
       }:
       mkDerivation {
-        pname = "ghc-toolchain";
-        version = ghcVersion;
-        src = ghcSrc;
-        postUnpack = ''
-          sourceRoot="$sourceRoot/utils/ghc-toolchain"
-        '';
-        libraryHaskellDepends = [
-          base directory filepath ghc-platform process text transformers
-        ];
-        description = "Utility for managing GHC target toolchains";
-        license = lib.licenses.bsd3;
+        pname                 = "ghc-toolchain";
+        version               = ghcVersion;
+        src                   = ghcSrc;
+        postUnpack            = ''sourceRoot="$sourceRoot/utils/ghc-toolchain"'';
+        libraryHaskellDepends = [base directory filepath ghc-platform process text transformers];
+        description           = "Utility for managing GHC target toolchains";
+        license               = lib.licenses.bsd3;
       };
 
     build-ghc = { base-ghc-to-override, build-pkgs, version, rev, sha256 }:
@@ -462,10 +456,10 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             url = "https://gitlab.haskell.org/ghc/ghc.git";
             inherit rev sha256;
           };
-          ghc'      = (base-ghc-to-override.override (old: old // {
+          ghc' = base-ghc-to-override.override (old: old // {
             bootPkgs = build-pkgs;
             inherit ghcSrc;
-          }));
+          });
 
           callPackage' = f: args: build-pkgs.callPackage f ({
             inherit ghcSrc;
