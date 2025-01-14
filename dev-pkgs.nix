@@ -550,7 +550,7 @@ in {
 
   ghc9121     = wrap-ghc                          "9.12.1" ["9.12" null] ghc9121;
 
-  ghc9121-pie = wrap-ghc-rename                   "9.12.1" "9.12.1-pie"  (relocatable-static-libs-ghc ghc9121);
+  ghc9121-pie = wrap-ghc-rename                   "9.12.1" "9.12-pie"    (relocatable-static-libs-ghc ghc9121);
 
   # callPackage = newScope {
   #   haskellLib = haskellLibUncomposable.compose;
