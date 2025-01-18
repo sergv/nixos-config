@@ -83,9 +83,16 @@ let
 
   wm-sh = scripts.wm-sh;
 
+  steam = pkgs.steam.override (_: {
+    # Remove non-free parts.
+    steam-unwrapped = null;
+    # Add 32-bit pulseaudio for Supreme Commander.
+    extraLibraries = steam-pkgs: [ steam-pkgs.libpulseaudio ];
+  });
+
   game-run-wrapper = pkgs.writeScriptBin "game-run" ''
     #!${pkgs.bash}/bin/bash
-    exec ${pkgs.steam-run}/bin/steam-run "''${@}"
+    exec ${steam.run}/bin/steam-run "''${@}"
   '';
 
   clementine-pkg =
