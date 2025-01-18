@@ -1,4 +1,5 @@
 { pkgs
+, include-emacs-lsp-fixes
 }:
 let naproche = pkgs.naproche.overrideAttrs (old: {
       src = pkgs.fetchFromGitHub {
@@ -48,9 +49,7 @@ in
       };
       desktopItem = newDesktopItem;
       dirname = fixVersion old.dirname;
-      patches = (old.patches or []) ++ [
-        ./patches/VCSE-2024.patch
-      ];
+      patches = (old.patches or []) ++ (if include-emacs-lsp-fixes then [ ./patches/VCSE-2024.patch ] else []);
       sourceRoot = fixVersion old.sourceRoot;
       installPhase =
         fixVersion
