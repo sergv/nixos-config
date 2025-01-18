@@ -1,5 +1,6 @@
 {
   pkgs,
+  include-emacs-lsp-fixes,
 }:
 let
   naproche = pkgs.naproche.overrideAttrs (old: {
@@ -34,32 +35,31 @@ in
   (
     old:
     let
-      isabelle-icon = ./icons/isabelle.png;
-      getExt = x: pkgs.lib.lists.last (pkgs.lib.strings.splitString "." x);
+      isabelle-icon  = ./icons/isabelle.png;
+      getExt         = x: pkgs.lib.lists.last (pkgs.lib.strings.splitString "." x);
       newDesktopItem = pkgs.makeDesktopItem {
-        name = "isabelle";
-        exec = "isabelle jedit";
-        icon = isabelle-icon;
+        name        = "isabelle";
+        exec        = "isabelle jedit";
+        icon        = isabelle-icon;
         desktopName = "Isabelle";
-        comment = "A generic proof assistant";
-        categories = [ "Math" ];
+        comment     = "A generic proof assistant";
+        categories  = [ "Math" ];
       };
       newVersion = "2024";
       fixVersion = x: builtins.replaceStrings [ "2023" ] [ "${newVersion}" ] x;
     in
     {
       version = newVersion;
-      src = pkgs.fetchurl {
+      src     = pkgs.fetchurl {
         url    = "https://isabelle.in.tum.de/dist/Isabelle2024_linux.tar.gz";
         sha256 = "sha256-YDqq+KvqNll687BlHSwWKobAoN1EIHZvR+VyQDljkmc="; # pkgs.lib.fakeSha256;
         # # url    = "https://isabelle.in.tum.de/website-Isabele2023/dist/Isabelle2023_linux.tar.gz";
         # sha256 = pkgs.lib.fakeSha256; # "1ih4gykkp1an43qdgc5xzyvf30fhs0dah3y0a5ksbmvmjsfnxyp7";
       };
-      desktopItem = newDesktopItem;
-      dirname     = fixVersion old.dirname;
-      patches     = (old.patches or [ ]) ++ [
-        ./patches/VCSE-2024.patch
-      ];
+      desktopItem  = newDesktopItem;
+      dirname      = fixVersion old.dirname;
+      patches      =
+        (old.patches or [ ]) ++ (if include-emacs-lsp-fixes then [ ./patches/VCSE-2024.patch ] else [ ]);
       sourceRoot   = fixVersion old.sourceRoot;
       installPhase = fixVersion (
         builtins.replaceStrings
