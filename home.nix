@@ -81,7 +81,7 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     game-run-wrapper = pkgs.writeScriptBin "game-run" ''
       #!${pkgs.bash}/bin/bash
-      exec ${steam.run}/bin/steam-run "''${@}"
+      exec "${steam.run}/bin/steam-run" "''${@}"
     '';
 
     clementine-pkg = (pkgs.clementine.override (old: old // {
@@ -178,9 +178,25 @@ let wmctrl-pkg = pkgs.wmctrl;
           python3                    = tribler-python;
         });
 
-    isabelle-pkg = import ./isabelle/isabelle.nix {
-      inherit pkgs;
-    };
+    mk-isabelle = include-emacs-lsp-fixes:
+      import ./isabelle/isabelle.nix {
+        inherit pkgs include-emacs-lsp-fixes;
+      };
+
+    isabelle-pkg = mk-isabelle false;
+
+    isabelle-lsp-pkg = mk-isabelle true;
+
+    isabelle-lsp-wrapper =
+
+      pkgs.runCommand "isabelle-emacs-lsp" {
+        buildInptus       = [ isabelle-lsp-pkg ];
+        nativeBuildInputs = [];
+      }
+        ''
+          mkdir -p "$out/bin"
+          ln -s "${isabelle-lsp-pkg}/bin/isabelle" "$out/bin/isabelle-emacs-lsp"
+        '';
 
     emacs-pkg = (pkgs.emacs29.override (_: { withNativeCompilation = true; })).overrideAttrs (old: {
       version               = "30.0.93";
@@ -860,6 +876,7 @@ in
         pkgs.nix-diff
 
         isabelle-pkg
+        isabelle-lsp-wrapper
 
         pkgs.pcsx2
         game-run-wrapper
