@@ -415,6 +415,11 @@
           };
         };
 
+        overlay-unstable = _: _: {
+          unstable  = nixpkgs-unstable.legacyPackages.x86_64-linux;
+          # fresh-ghc = nixpkgs-fresh-ghc.legacyPackages.x86_64-linux;
+        };
+
     in {
 
       # System configs
@@ -426,12 +431,7 @@
           modules = [
 
             ({ config, pkgs, ... }:
-              let
-                overlay-unstable = _: _: {
-                  unstable  = nixpkgs-unstable.legacyPackages.x86_64-linux;
-                  # fresh-ghc = nixpkgs-fresh-ghc.legacyPackages.x86_64-linux;
-                };
-              in {
+              {
                 nixpkgs.overlays = [
                   nur.overlays.default
                   overlay-unstable
@@ -469,8 +469,16 @@
       # Home configs for user
       homeManagerConfigurations = {
         sergey = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs pkgs-pristine;
+          inherit pkgs;
           modules = [
+
+            (_: {
+              nixpkgs.overlays = [
+                nur.overlays.default
+                overlay-unstable
+              ];
+            })
+
             ./home.nix
           ];
           extraSpecialArgs = home-manager-extra-args;
