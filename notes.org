@@ -55,6 +55,7 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
 *** lists
 + Delimited by space: ~[1 2 3]~
 + Concatenation: ~++~
++ Indexing: ~builtins.elemAt [ "hi" "there" ] 0~
 *** functions
 E.g. ~x: x + 1~, ~x: y: x * y~
 
