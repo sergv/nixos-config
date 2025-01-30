@@ -797,6 +797,9 @@ in
   system = {
     nixos.label = "arch-generic";
     autoUpgrade = { enable = false; allowReboot = false; };
+
+    # Include everything required to build every package on the system.
+    # includeBuildDependencies = true;
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
