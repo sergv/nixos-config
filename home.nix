@@ -237,8 +237,8 @@ let wmctrl-pkg = pkgs.wmctrl;
 
       src                   = fetchgit-improved {
         url    = "https://github.com/sergv/emacs.git";
-        rev    = "a3272e003d7a2a456ec4c1dffa2156803d9723bf";
-        sha256 = "sha256-hiR6EZsfQAnBwrS46oAEGmm4evFTcB59yr1fBjfxYU0="; #pkgs.lib.fakeSha256;
+        rev    = "f0e4d6c9f4bd68a827b116de71a0b5b4c72bfe07";
+        sha256 = "sha256-mjZig+19R16oJ8Vu6G49esa4wqgDHJDswsuetLNux08="; #pkgs.lib.fakeSha256;
       };
     });
 
