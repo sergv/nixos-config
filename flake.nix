@@ -78,6 +78,12 @@
       url = "github:nix-community/NUR";
     };
 
+    haskellNix = {
+      url = "github:input-output-hk/haskell.nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
+    };
+
   };
 
   outputs =
@@ -92,6 +98,7 @@
     , impermanence
     , arkenfox
     , nur
+    , haskellNix
     , ...
     }:
     let system = "x86_64-linux";
@@ -337,6 +344,13 @@
               old.haskell.packages.native-bignum.ghc966.cabal2nix);
         };
 
+        use-win32-thread-model-overlay = final: old: {
+          threadsCross = {
+            model = "win32";
+            package = null;
+          };
+        };
+
         # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
         #
         # git-proxy-conf = {
@@ -377,6 +391,16 @@
             fcitx-overlay
             ssh-overlay
             improve-fetchgit-overlay
+          ];
+        };
+
+        pkgs-cross-win = import nixpkgs-unstable {
+          inherit system;
+          inherit (haskellNix) config;
+          overlays = [
+            haskellNix.overlay
+            improve-fetchgit-overlay
+            # use-win32-thread-model-overlay
           ];
         };
 
@@ -434,6 +458,7 @@
           # inherit nixpkgs-fresh-ghc system;
           inherit pkgs-pristine;
           inherit nixpkgs-stable nixpkgs-unstable system arkenfox;
+          inherit pkgs-cross-win;
           inherit git-proxy-conf;
           pinned-pkgs = {
             nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };

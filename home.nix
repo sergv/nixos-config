@@ -1,5 +1,6 @@
 { config
 , pkgs
+, pkgs-cross-win
 , pkgs-pristine
 , pinned-pkgs
 , nixpkgs-stable
@@ -17,7 +18,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     scripts = import ./scripts { inherit pkgs; wmctrl = wmctrl-pkg; };
 
     dev-pkgs = import ./dev-pkgs.nix {
-      inherit pkgs pinned-pkgs system nixpkgs-unstable; #nixpkgs-stable
+      inherit pkgs pkgs-cross-win pinned-pkgs system nixpkgs-unstable; #nixpkgs-stable
     };
 
     cuda-pkgs = import ./cuda-pkgs.nix {
