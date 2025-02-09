@@ -361,6 +361,35 @@
         );
       };
 
+      # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
+      #
+      # git-proxy-conf = {
+      #   proxy           = git-proxy;
+      #   sslCAInfo       = "path";
+      #   sslCAPath       = "path";
+      #   sslverify       = false;
+      #   proxyAuthMethod = "basic";
+      # };
+
+      git-proxy-conf = { };
+
+      # Make git invoked via nixpkgs’s fetchgit work behind proxy.
+      improve-fetchgit-overlay = final: old: {
+        # fetchgit =
+        #   let
+        #     # From https://stackoverflow.com/questions/58169512/call-fetchgit-without-ssl-verify
+        #     fetchgit-improved = old.fetchgit // {
+        #       __functor = self : args :
+        #         (old.fetchgit.__functor self args).overrideAttrs (oldAttrs: {
+        #           GIT_SSL_NO_VERIFY         = true;
+        #           GIT_HTTP_PROXY_AUTHMETHOD = "basic";
+        #           https_proxy               = git-proxy;
+        #         });
+        #     };
+        #
+        #   in fetchgit-improved;
+      };
+
       pkgs-pristine = import nixpkgs-unstable {
         inherit system;
         config = {
@@ -371,6 +400,7 @@
         overlays = [
           fcitx-overlay
           ssh-overlay
+          improve-fetchgit-overlay
         ];
       };
 
@@ -391,6 +421,7 @@
           smaller-haskell-overlay
           haskell-disable-checks-overlay
           zen4-march-overlay
+          improve-fetchgit-overlay
 
           # arch-native-overlay
         ];
@@ -432,6 +463,7 @@
           system
           arkenfox
           ;
+        inherit git-proxy-conf;
         pinned-pkgs = {
           nixpkgs-18-09 = import nixpkgs-18-09 { inherit system; };
           nixpkgs-19-09 = import nixpkgs-19-09 { inherit system; };
