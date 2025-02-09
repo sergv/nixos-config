@@ -40,9 +40,9 @@
 
     home-manager = {
       # # unstable
-      url                    = "github:nix-community/home-manager/release-24.11";
+      url                    = "github:nix-community/home-manager/master";
+      # url                    = "github:nix-community/home-manager/release-24.11";
       # url                    = "github:nix-community/home-manager/release-23.05";
-      # url                    = "github:nix-community/home-manager/master";
       # url                    = "github:nix-community/home-manager/release-22.11";
       # Make home-manager use our version of nixpkgs
       inputs.nixpkgs.follows = "nixpkgs-unstable";
