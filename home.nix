@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  pkgs-cross-win,
   pkgs-pristine,
   pinned-pkgs,
   nixpkgs-stable,
@@ -24,6 +25,7 @@ let
   dev-pkgs = import ./dev-pkgs.nix {
     inherit
       pkgs
+      pkgs-cross-win
       pinned-pkgs
       system
       nixpkgs-unstable
