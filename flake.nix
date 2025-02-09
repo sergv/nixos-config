@@ -21,17 +21,17 @@
 
     nixpkgs-stable = {
       # # unstable
-      # url = "nixpkgs/nixos-unstable";
+      url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
       #url = "/home/sergey/nix/nixpkgs";
       # url = "nixpkgs/nixos-23.05";
-      url = "nixpkgs/nixos-24.11";
+      # url = "nixpkgs/nixos-24.11";
     };
 
     nixpkgs-unstable = {
-      url = "nixpkgs/nixos-24.11";
+      # url = "nixpkgs/nixos-24.11";
       # url = "nixpkgs/nixos-23.05";
-      # url = "nixpkgs/nixos-unstable";
+      url = "nixpkgs/nixos-unstable";
     };
 
     # nixpkgs-fresh-ghc = {
