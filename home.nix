@@ -5,33 +5,12 @@
 , nixpkgs-stable
 , nixpkgs-unstable
 , arkenfox
+, git-proxy-conf
 , system
 , ...
 }:
 
 let wmctrl-pkg = pkgs.wmctrl;
-
-    fetchgit-improved = pkgs.fetchgit;
-
-    # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
-    #
-    # git-proxy-conf = {
-    #   proxy           = git-proxy;
-    #   sslCAInfo       = "path";
-    #   sslCAPath       = "path";
-    #   sslverify       = false;
-    #   proxyAuthMethod = "basic;"
-    # };
-    #
-    # # From https://stackoverflow.com/questions/58169512/call-fetchgit-without-ssl-verify
-    # fetchgit-improved = pkgs.fetchgit // {
-    #   __functor = self : args :
-    #     (pkgs.fetchgit.__functor self args).overrideAttrs (oldAttrs: {
-    #       GIT_SSL_NO_VERIFY         = true;
-    #       GIT_HTTP_PROXY_AUTHMETHOD = "basic";
-    #       https_proxy               = git-proxy;
-    #     });
-    # } ;
 
     my-fonts = import ./fonts { inherit pkgs; };
 
@@ -39,7 +18,6 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     dev-pkgs = import ./dev-pkgs.nix {
       inherit pkgs pinned-pkgs system nixpkgs-unstable; #nixpkgs-stable
-      inherit fetchgit-improved;
     };
 
     cuda-pkgs = import ./cuda-pkgs.nix {
@@ -154,7 +132,7 @@ let wmctrl-pkg = pkgs.wmctrl;
 
                 inherit version;
 
-                src = fetchgit-improved {
+                src = pkgs.fetchgit {
                   url    = "https://github.com/arvidn/libtorrent.git";
                   rev    = "v${version}";
                   sha256 = "sha256-dkjNv40/B1bbY16xtYFXOgbbOFnRSp9G2eG5/6dxfgI="; # pkgs.lib.fakeSha256;
@@ -235,7 +213,7 @@ let wmctrl-pkg = pkgs.wmctrl;
         (pkgs.lib.withFeature false "gc-mark-trace")
       ];
 
-      src                   = fetchgit-improved {
+      src                   = pkgs.fetchgit {
         url    = "https://github.com/sergv/emacs.git";
         rev    = "f0e4d6c9f4bd68a827b116de71a0b5b4c72bfe07";
         sha256 = "sha256-mjZig+19R16oJ8Vu6G49esa4wqgDHJDswsuetLNux08="; #pkgs.lib.fakeSha256;
