@@ -496,13 +496,13 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             '';
         })));
 
-    ghc9121 = build-ghc {
-      base-ghc-to-override = pkgs.haskell.compiler.ghc9101;
-      build-pkgs           = hpkgsCabal; #pkgs.haskell.packages.native-bignum.ghc9101;
-      version              = "9.12.1";
-      rev                  = "daf659b6e3c8f2a84100fbee797cd9d457c00df5";
-      sha256               = "sha256-oSiGEkiQlkmCr7qsFUJ9qpwsU4AumOIpFn6zN4ByMNg="; #pkgs.lib.fakeSha256;
-    };
+    # ghc9121 = build-ghc {
+    #   base-ghc-to-override = pkgs.haskell.compiler.ghc9101;
+    #   build-pkgs           = hpkgsCabal; #pkgs.haskell.packages.native-bignum.ghc9101;
+    #   version              = "9.12.1";
+    #   rev                  = "daf659b6e3c8f2a84100fbee797cd9d457c00df5";
+    #   sha256               = "sha256-oSiGEkiQlkmCr7qsFUJ9qpwsU4AumOIpFn6zN4ByMNg="; #pkgs.lib.fakeSha256;
+    # };
 
     filter-bin = name: keep-these: pkg:
       assert (builtins.isList keep-these);
@@ -548,9 +548,9 @@ in {
 
   ghc9101     = wrap-ghc                          "9.10.1" "9.10"        pkgs.haskell.compiler.native-bignum.ghc9101;
 
-  ghc9121     = wrap-ghc                          "9.12.1" ["9.12" null] ghc9121;
+  ghc9121     = wrap-ghc                          "9.12.1" ["9.12" null] pkgs.haskell.compiler.native-bignum.ghc9121;
 
-  ghc9121-pie = wrap-ghc-rename                   "9.12.1" "9.12-pie"    (relocatable-static-libs-ghc ghc9121);
+  ghc9121-pie = wrap-ghc-rename                   "9.12.1" "9.12-pie"    (relocatable-static-libs-ghc pkgs.haskell.compiler.native-bignum.ghc9121);
 
   # callPackage = newScope {
   #   haskellLib = haskellLibUncomposable.compose;

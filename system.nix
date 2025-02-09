@@ -332,12 +332,13 @@ in
     };
   };
 
+  services.pulseaudio = {
+    enable       = true;
+    support32Bit = true;
+  };
+
   hardware = {
     bluetooth.enable  = false;
-    pulseaudio = {
-      enable       = true;
-      support32Bit = true;
-    };
 
     # OpenGL
     graphics.enable = true;
@@ -513,8 +514,6 @@ in
     enable    = true;
     package   = pkgs.mlocate;
     interval  = "daily";
-    # Silence warning.
-    localuser = null;
   };
 
   services.pipewire = {
