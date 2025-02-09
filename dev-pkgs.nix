@@ -4,7 +4,6 @@ args @
   , nixpkgs-unstable
   , system
   , pkgs
-  , fetchgit-improved
   , ...
   }:
 let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
@@ -452,7 +451,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       };
 
     build-ghc = { base-ghc-to-override, build-pkgs, version, rev, sha256 }:
-      let ghcSrc = fetchgit-improved {
+      let ghcSrc = pkgs.fetchgit {
             url = "https://gitlab.haskell.org/ghc/ghc.git";
             inherit rev sha256;
           };
