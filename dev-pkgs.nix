@@ -4,6 +4,7 @@ args @
   , nixpkgs-unstable
   , system
   , pkgs
+  , pkgs-cross-win
   , ...
   }:
 let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
@@ -525,7 +526,194 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             mkdir -p "$out/bin"
             ${builtins.concatStringsSep "\n" (builtins.map f keep-these)}
           '';
-in {
+
+    cabal-install = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
+
+    ghc-win =
+      let
+        # Defines ‘x86_64-w64-mingw32-ghc’, ‘x86_64-w64-mingw32-ghc-pkg’, and ‘x86_64-w64-mingw32-hsc2hs,
+        win-pkgs = pkgs-cross-win.pkgsCross.mingwW64;
+
+        ghc-win  = win-pkgs.pkgsBuildHost.haskell-nix.compiler.ghc9101; # pkgsBuildHost == buildPackages
+
+        wine-iserv-wrapper-script =
+          let
+            exes                    = win-pkgs.haskell-nix.iserv-proxy-exes.ghc9101;
+            iserv-proxy             = exes.iserv-proxy;
+            iserv-proxy-interpreter = exes.iserv-proxy-interpreter.override (old: {
+              # Without these flags the executable with fail with error
+              # Mingw-w64runtimefailure:
+              # 32 bit pseudo relocation at 00000001401203C6 out of range, targeting 0000000000468160, yielding the value FFFFFFFEC0347D96.
+              setupBuildFlags = ["--ghc-option=-optl-Wl,--disable-dynamicbase,--disable-high-entropy-va,--image-base=0x400000" ];
+            });
+            exe-name                = iserv-proxy-interpreter.exeName;
+            # win-pkgs.windows.pthreads - not needed
+            dllPkgs = [
+              # win-pkgs.libffi
+              # win-pkgs.gmp
+              # win-pkgs.windows.mcfgthreads
+              # win-pkgs.windows.mingw_w64_pthreads
+              # win-pkgs.buildPackages.gcc.cc
+            ];
+          in
+            pkgs.pkgsBuildBuild.writeScriptBin "iserv-wrapper"
+              ''
+                #!${pkgs-cross-win.pkgsBuildBuild.bash}/bin/bash
+
+                set -euo pipefail
+
+                function is_port_open() {
+                    let port="$1"
+                    # Native bash way to test ports.
+                    true &>/dev/null </dev/tcp/127.0.0.1/$port && return 0 || return 1
+                }
+
+                # May lead to a too large environment so best to unset it.
+                unset configureFlags
+
+                PORT=$((5000 + $RANDOM % 5000))
+
+                while is_port_open "$PORT"; do
+                    PORT=$((5000 + $RANDOM % 5000))
+                done
+
+                REMOTE_ISERV=/tmp/iserv-tmpdir
+                if [[ ! -d "$REMOTE_ISERV" ]]; then
+                    mkdir -p "$REMOTE_ISERV/tmp"
+                    ln -s ${iserv-proxy-interpreter}/bin/*.dll "$REMOTE_ISERV"
+
+                    for p in ${pkgs.lib.concatStringsSep " " dllPkgs}; do
+                        find "$p" -iname '*.dll' -exec ln -sf {} $REMOTE_ISERV \;
+                        find "$p" -iname '*.dll.a' -exec ln -sf {} $REMOTE_ISERV \;
+                    done
+
+                    # Some DLLs have a `lib` prefix but we attempt to load them without the prefix.
+                    # This was a problem for `double-conversion` package when used in TH code.
+                    # Creating links from the `X.dll` to `libX.dll` works around this issue.
+                    for dll in "$REMOTE_ISERV"/*.dll; do
+                        small=$(basename "$dll")
+                        ln -s "$dll" "$REMOTE_ISERV/''${small#lib}"
+                    done
+
+                fi
+                (
+                    WINEDLLOVERRIDES="winemac.drv=d" \
+                        WINEDEBUG="warn-all,fixme-all,-menubuilder,-mscoree,-ole,-secur32,-winediag" \
+                        WINEPREFIX="$REMOTE_ISERV/prefix" \
+                        ${pkgs-cross-win.winePackages.minimal}/bin/wine64 \
+                        ${iserv-proxy-interpreter}/bin/${exe-name} \
+                        "$REMOTE_ISERV/tmp" \
+                        "$PORT" ) &
+                PID="$!"
+                ${iserv-proxy}/bin/iserv-proxy "''${@}" 127.0.0.1 "$PORT"
+                kill "$PID"
+              '';
+
+        wine-run-haskell =
+          let dll-path =
+                win-pkgs.lib.strings.concatStringsSep
+                  ";"
+                  (
+                    map (x: "${x}/bin") [win-pkgs.libffi win-pkgs.gmp win-pkgs.windows.mcfgthreads] ++
+                    map (x: "${x}/lib") [win-pkgs.buildPackages.gcc.cc.lib]
+                  );
+          in pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+            name          = "wine-run-haskell";
+            runtimeInputs = [
+            ];
+            text          =
+              ''
+                WINEDLLOVERRIDES="winemac.drv=d" \
+                    WINEDEBUG="-all" \
+                    WINEPATH="${dll-path};''${WINEPATH:-}" \
+                    ${pkgs-cross-win.winePackages.minimal}/bin/wine64 \
+                    "''${@}"
+              '';
+          };
+
+        # "-L${mingw_w64_pthreads}/lib"
+        # "-L${mingw_w64_pthreads}/bin"
+        # "-L${gmp}/lib"
+        wrap-win-ghc = pkg: ghc-exe: new-name:
+          pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+            name          = new-name;
+            runtimeInputs = [
+              pkg
+              # So that ghc and its subcommands will be able to run ‘x86_64-w64-mingw32-gcc’
+              win-pkgs.buildPackages.gcc.cc
+            ];
+            # "-L${win-pkgs.libffi}/bin" \
+            # "-L${win-pkgs.libffi}/lib" \
+            # "-L${win-pkgs.gmp}/bin" \
+            # "-L${win-pkgs.gmp}/lib" \
+            text          =
+              ''
+                ${pkg}/bin/${ghc-exe} \
+                  -fexternal-interpreter \
+                  -pgmi ${wine-iserv-wrapper-script}/bin/iserv-wrapper \
+                  "-L${win-pkgs.windows.mingw_w64_pthreads}/lib" \
+                  "-L${win-pkgs.windows.mingw_w64_pthreads}/bin" \
+                  "-L${win-pkgs.windows.mcfgthreads}/bin" \
+                  "-L${win-pkgs.windows.mcfgthreads}/lib" \
+                  "''${@}"
+              '';
+          };
+
+        wrap-win-ghc-pkg = pkg: exe: new-name:
+          pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+            name          = new-name;
+            runtimeInputs = [pkg];
+            text          =
+              ''
+                ${pkg}/bin/${exe} "''${@}"
+              '';
+          };
+
+        wrap-win-hsc2hs = pkg: exe: new-name:
+          pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+            name          = new-name;
+            runtimeInputs = [pkg];
+            text          =
+              ''
+                ${pkg}/bin/${exe} --cross-compile --via-asm "''${@}"
+              '';
+          };
+
+        ghc-win-wrapped = wrap-win-ghc ghc-win "x86_64-w64-mingw32-ghc" "ghc-9.10-win";
+        ghc-pkg-win-wrapped = wrap-win-ghc-pkg ghc-win "x86_64-w64-mingw32-ghc-pkg" "ghc-pkg-9.10-win";
+        hsc2hs-win-wrapped = wrap-win-hsc2hs ghc-win "x86_64-w64-mingw32-hsc2hs" "hsc2hs-9.10-win";
+
+        cabal-win-wrapped =
+          # builtins.trace ("ghc-win-wrapped.name = " + builtins.toString ghc-win-wrapped.name)
+          # (builtins.trace (builtins.toString (builtins.attrNames win-pkgs.buildPackages.binutils))
+          #   ghc-win-wrapped);
+          pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+            name          = "cabal-win";
+            runtimeInputs = [
+              cabal-install
+              ghc-win-wrapped
+              ghc-pkg-win-wrapped
+              hsc2hs-win-wrapped
+              # For x86_64-w64-mingw32-ld
+              win-pkgs.buildPackages.binutils
+            ];
+            text          =
+              ''
+                cmd="$1"
+                shift
+                CABAL_DIR=~/.cabal-win cabal "$cmd" \
+                  --with-compiler ${ghc-win-wrapped.name} \
+                  --with-hc-pkg ${ghc-pkg-win-wrapped.name} \
+                  --with-hsc2hs ${hsc2hs-win-wrapped.name} \
+                  --with-ld "x86_64-w64-mingw32-ld" \
+                  "''${@}"
+              '';
+          };
+      in {
+        inherit ghc-win-wrapped ghc-pkg-win-wrapped hsc2hs-win-wrapped wine-run-haskell cabal-win-wrapped;
+      };
+
+in ghc-win // {
 
   ghc7103     = wrap-ghc-filter-all               "7.10.3" "7.10"        pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc7103.ghc;
   ghc802      = wrap-ghc-filter-hide-source-paths "8.0.2"  "8.0"         pinned-pkgs.nixpkgs-18-09.haskell.packages.ghc802.ghc;
@@ -576,9 +764,10 @@ in {
   #   # llvmPackages = pkgs.llvmPackages_13;
   # });
 
+  inherit cabal-install;
+
   alex               = hlib.justStaticExecutables hpkgs910.alex;
   happy              = hlib.justStaticExecutables hpkgs910.happy;
-  cabal-install      = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
   doctest            = allowGhcReference (hlib.justStaticExecutables hpkgsDoctest.doctest);
   eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
   fast-tags          = hlib.justStaticExecutables hpkgsFastTags.fast-tags;
