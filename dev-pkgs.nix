@@ -534,6 +534,19 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         # Defines ‘x86_64-w64-mingw32-ghc’, ‘x86_64-w64-mingw32-ghc-pkg’, and ‘x86_64-w64-mingw32-hsc2hs,
         win-pkgs = pkgs-cross-win.pkgsCross.mingwW64;
 
+        versionGE = to-check: target-version:
+          builtins.compareVersions to-check target-version >= 0;
+
+        wine = pkgs-cross-win.winePackages.minimal.overrideAttrs (old: {
+          patches =
+            if (versionGE old.version "9.0")
+            then
+              # This patch is not needed any more, wine 10.0 supports UNC paths natively.
+              builtins.filter (x: !(pkgs-cross-win.lib.strings.hasSuffix "wine-add-dll-directory.patch") x) old.patches
+            else
+              old.patches;
+        });
+
         ghc-win  = win-pkgs.pkgsBuildHost.haskell-nix.compiler.ghc9101; # pkgsBuildHost == buildPackages
 
         wine-iserv-wrapper-script =
@@ -600,7 +613,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
                     WINEDLLOVERRIDES="winemac.drv=d" \
                         WINEDEBUG="warn-all,fixme-all,-menubuilder,-mscoree,-ole,-secur32,-winediag" \
                         WINEPREFIX="$REMOTE_ISERV/prefix" \
-                        ${pkgs-cross-win.winePackages.minimal}/bin/wine64 \
+                        ${wine}/bin/wine64 \
                         ${iserv-proxy-interpreter}/bin/${exe-name} \
                         "$REMOTE_ISERV/tmp" \
                         "$PORT" ) &
@@ -627,7 +640,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
                 WINEDLLOVERRIDES="winemac.drv=d" \
                     WINEDEBUG="-all" \
                     WINEPATH="${dll-path};''${WINEPATH:-}" \
-                    ${pkgs-cross-win.winePackages.minimal}/bin/wine64 \
+                    ${wine}/bin/wine64 \
                     "''${@}"
               '';
           };
