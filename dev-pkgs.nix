@@ -529,6 +529,10 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
     cabal-install = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
 
+    latest-ghc-version       = "9.12.1";
+    latest-ghc-field         = "ghc9121";
+    latest-ghc-short-version = "9.12";
+
     ghc-win =
       let
         # Defines ‘x86_64-w64-mingw32-ghc’, ‘x86_64-w64-mingw32-ghc-pkg’, and ‘x86_64-w64-mingw32-hsc2hs,
@@ -547,11 +551,11 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
               old.patches;
         });
 
-        ghc-win  = win-pkgs.pkgsBuildHost.haskell-nix.compiler.ghc9121; # pkgsBuildHost == buildPackages
+        ghc-win  = win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}"; # pkgsBuildHost == buildPackages
 
         wine-iserv-wrapper-script =
           let
-            exes                    = win-pkgs.haskell-nix.iserv-proxy-exes.ghc9121;
+            exes                    = win-pkgs.haskell-nix.iserv-proxy-exes."${latest-ghc-field}";
             iserv-proxy             = exes.iserv-proxy;
             iserv-proxy-interpreter = exes.iserv-proxy-interpreter.override (old: {
               # Without these flags the executable with fail with error
@@ -693,9 +697,9 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
               '';
           };
 
-        ghc-win-wrapped = wrap-win-ghc ghc-win "x86_64-w64-mingw32-ghc" "ghc-9.10-win";
-        ghc-pkg-win-wrapped = wrap-win-ghc-pkg ghc-win "x86_64-w64-mingw32-ghc-pkg" "ghc-pkg-9.10-win";
-        hsc2hs-win-wrapped = wrap-win-hsc2hs ghc-win "x86_64-w64-mingw32-hsc2hs" "hsc2hs-9.10-win";
+        ghc-win-wrapped     = wrap-win-ghc ghc-win "x86_64-w64-mingw32-ghc" "ghc-${latest-ghc-short-version}-win";
+        ghc-pkg-win-wrapped = wrap-win-ghc-pkg ghc-win "x86_64-w64-mingw32-ghc-pkg" "ghc-pkg-${latest-ghc-short-version}-win";
+        hsc2hs-win-wrapped  = wrap-win-hsc2hs ghc-win "x86_64-w64-mingw32-hsc2hs" "hsc2hs-${latest-ghc-short-version}-win";
 
         cabal-win-wrapped =
           pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
@@ -746,9 +750,9 @@ in ghc-win // {
 
   ghc9101     = wrap-ghc                          "9.10.1" "9.10"        pkgs.haskell.compiler.native-bignum.ghc9101;
 
-  ghc9121     = wrap-ghc                          "9.12.1" ["9.12" null] pkgs.haskell.compiler.native-bignum.ghc9121;
+  ghc9121     = wrap-ghc                          latest-ghc-version [latest-ghc-short-version null] pkgs.haskell.compiler.native-bignum."${latest-ghc-field}";
 
-  ghc9121-pie = wrap-ghc-rename                   "9.12.1" "9.12-pie"    (relocatable-static-libs-ghc pkgs.haskell.compiler.native-bignum.ghc9121);
+  ghc9121-pie = wrap-ghc-rename                   latest-ghc-version "${latest-ghc-short-version}-pie"    (relocatable-static-libs-ghc pkgs.haskell.compiler.native-bignum."${latest-ghc-field}");
 
   # callPackage = newScope {
   #   haskellLib = haskellLibUncomposable.compose;
