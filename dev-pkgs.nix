@@ -547,11 +547,11 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
               old.patches;
         });
 
-        ghc-win  = win-pkgs.pkgsBuildHost.haskell-nix.compiler.ghc9101; # pkgsBuildHost == buildPackages
+        ghc-win  = win-pkgs.pkgsBuildHost.haskell-nix.compiler.ghc9121; # pkgsBuildHost == buildPackages
 
         wine-iserv-wrapper-script =
           let
-            exes                    = win-pkgs.haskell-nix.iserv-proxy-exes.ghc9101;
+            exes                    = win-pkgs.haskell-nix.iserv-proxy-exes.ghc9121;
             iserv-proxy             = exes.iserv-proxy;
             iserv-proxy-interpreter = exes.iserv-proxy-interpreter.override (old: {
               # Without these flags the executable with fail with error
