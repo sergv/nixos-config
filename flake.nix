@@ -368,6 +368,11 @@
         );
       };
 
+      # Remove dependency on mcfgthreads mingw library. If we keep it
+      # then cross-compiling cabal will have a hard time building network
+      # packge because it will try to link executables to see whether all
+      # libraries are available but without properly passed mcfgthreads
+      # the linking will fail.
       use-win32-thread-model-overlay = final: old: {
         threadsCross = {
           model = "win32";
@@ -424,7 +429,7 @@
         overlays = [
           haskellNix.overlay
           improve-fetchgit-overlay
-          # use-win32-thread-model-overlay
+          use-win32-thread-model-overlay
         ];
       };
 
