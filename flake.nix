@@ -263,23 +263,31 @@
           # #   # doCheck = false;
           # # });
 
-          # gsl = old.gsl.overrideAttrs (_: {
-          #   doCheck = false;
-          # });
+          gsl = old.gsl.overrideAttrs (_: {
+            doCheck = false;
+          });
+
+          nodejs = old.nodejs.overrideAttrs (_: {
+            doCheck = false;
+          });
 
           # tzdata = old.tzdata.overrideAttrs (_: {
           #   doCheck = false;
           # });
 
-          # virtualbox = old.virtualbox.overrideAttrs (old2: {
-          #   patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
-          # });
+          redis = old.redis.overrideAttrs (_: {
+            doCheck = false;
+          });
 
-          # libreoffice = old.libreoffice.override (old2: {
-          #   unwrapped = old2.unwrapped.overrideAttrs (_: {
-          #     doCheck = false;
-          #   });
-          # });
+          virtualbox = old.virtualbox.overrideAttrs (old2: {
+            patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
+          });
+
+          libreoffice = old.libreoffice.override (old2: {
+            unwrapped = old2.unwrapped.overrideAttrs (_: {
+              doCheck = false;
+            });
+          });
 
           # python311 = old.python311.override {
           #   packageOverrides = _: old2: {
