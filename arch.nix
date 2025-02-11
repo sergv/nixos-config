@@ -1,7 +1,7 @@
 {
   localSystem = {
-    # gcc.arch      = "znver3";
-    # gcc.tune      = "znver3";
+    gcc.arch      = "znver4";
+    gcc.tune      = "znver4";
     system        = "x86_64-linux";
   };
 
