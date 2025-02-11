@@ -614,7 +614,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
                 win-pkgs.lib.strings.concatStringsSep
                   ";"
                   (
-                    map (x: "${x}/bin") [win-pkgs.libffi win-pkgs.gmp win-pkgs.windows.mcfgthreads] ++
+                    # win-pkgs.windows.mcfgthreads
+                    map (x: "${x}/bin") [win-pkgs.libffi win-pkgs.gmp] ++
                     map (x: "${x}/lib") [win-pkgs.buildPackages.gcc.cc.lib]
                   );
           in pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
@@ -646,15 +647,15 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
             # "-L${win-pkgs.libffi}/lib" \
             # "-L${win-pkgs.gmp}/bin" \
             # "-L${win-pkgs.gmp}/lib" \
+            # "-L${win-pkgs.windows.mingw_w64_pthreads}/lib" \
+            # "-L${win-pkgs.windows.mingw_w64_pthreads}/bin" \
+            # "-L${win-pkgs.windows.mcfgthreads}/bin" \
+            # "-L${win-pkgs.windows.mcfgthreads}/lib" \
             text          =
               ''
                 ${pkg}/bin/${ghc-exe} \
                   -fexternal-interpreter \
                   -pgmi ${wine-iserv-wrapper-script}/bin/iserv-wrapper \
-                  "-L${win-pkgs.windows.mingw_w64_pthreads}/lib" \
-                  "-L${win-pkgs.windows.mingw_w64_pthreads}/bin" \
-                  "-L${win-pkgs.windows.mcfgthreads}/bin" \
-                  "-L${win-pkgs.windows.mcfgthreads}/lib" \
                   "''${@}"
               '';
           };
@@ -684,9 +685,6 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         hsc2hs-win-wrapped = wrap-win-hsc2hs ghc-win "x86_64-w64-mingw32-hsc2hs" "hsc2hs-9.10-win";
 
         cabal-win-wrapped =
-          # builtins.trace ("ghc-win-wrapped.name = " + builtins.toString ghc-win-wrapped.name)
-          # (builtins.trace (builtins.toString (builtins.attrNames win-pkgs.buildPackages.binutils))
-          #   ghc-win-wrapped);
           pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
             name          = "cabal-win";
             runtimeInputs = [
@@ -694,7 +692,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
               ghc-win-wrapped
               ghc-pkg-win-wrapped
               hsc2hs-win-wrapped
-              # For x86_64-w64-mingw32-ld
+              # For ‘x86_64-w64-mingw32-ld’
               win-pkgs.buildPackages.binutils
             ];
             text          =
