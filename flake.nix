@@ -385,6 +385,8 @@
           #   in fetchgit-improved;
         };
 
+        # Mostly for chromium. Never switch to -march=native, the point is to avoid
+        # prohibitively expensive builds.
         pkgs-pristine = import nixpkgs-unstable {
           inherit system;
           config = {
@@ -400,7 +402,8 @@
         };
 
         pkgs-cross-win = import nixpkgs-unstable {
-          inherit system;
+          # inherit system;
+          inherit (arch) localSystem;
           inherit (haskellNix) config;
           overlays = [
             haskellNix.overlay
@@ -495,6 +498,7 @@
                 nixpkgs.overlays = [
                   nur.overlays.default
                   overlay-unstable
+                  # Don’t uncomment, otherwise overlays will be applied one more time.
                   # fcitx-overlay
                   # ssh-overlay
                   # smaller-haskell-overlay
