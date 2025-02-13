@@ -712,8 +712,16 @@ let
       });
 
       ghc-win =
-        hutils.enable-unit-ids-for-newer-ghc
-          win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}"; # pkgsBuildHost == buildPackages
+        (win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}".override (_: {
+          enableNativeBignum = true;
+        })).overrideAttrs
+          (old: {
+            # haskell.nix ghc builder does not expase hadrian argumens so we have to hack
+            # hadrian shell invocation here instead of using hutils.enable-unit-ids-for-newer-ghc :[
+            buildPhase =
+              builtins.replaceStrings [ " --flavour=" ] [ " --hash-unit-ids --flavour=" ]
+                old.buildPhase;
+          }); # pkgsBuildHost == buildPackages
 
       wine-iserv-wrapper-script =
         let
