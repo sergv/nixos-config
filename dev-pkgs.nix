@@ -426,14 +426,17 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       "-fprint-expanded-synonyms"
     ];
 
-    wrap-ghc-rename = version: new-suffix: pkg:
-      pkgs.runCommand ("wrapped-renamed-ghc-" + version) {
+    wrap-ghc-rename = version: new-suffixes: pkg:
+      let f = suffix:
+            assert (builtins.isString suffix && !(suffix == ""));
+            ''ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${suffix}"'';
+      in pkgs.runCommand ("wrapped-renamed-ghc-" + version) {
         # buildInputs = [ pkgs.makeWrapper ];
       }
         ''
           mkdir -p "$out/bin"
           for x in ghc ghci ghc-pkg haddock-ghc runghc; do
-            ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${new-suffix}"
+            ${builtins.concatStringsSep "\n" (builtins.map f new-suffixes)}
           done
         '';
 
@@ -786,7 +789,7 @@ in ghc-win // {
 
   ghc9121     = wrap-ghc                          latest-ghc-version [latest-ghc-short-version null] pkgs.haskell.compiler.native-bignum."${latest-ghc-field}";
 
-  ghc9121-pie = wrap-ghc-rename                   latest-ghc-version "${latest-ghc-short-version}-pie"    (relocatable-static-libs-ghc pkgs.haskell.compiler.native-bignum."${latest-ghc-field}");
+  ghc9121-pie = wrap-ghc-rename latest-ghc-version ["${latest-ghc-short-version}-pie" "pie"] (relocatable-static-libs-ghc pkgs.haskell.compiler.native-bignum."${latest-ghc-field}");
 
   # callPackage = newScope {
   #   haskellLib = haskellLibUncomposable.compose;
