@@ -59,10 +59,10 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     # Doesn’t work but could be cool: static executables
     # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
-    # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
-    hpkgs96 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc966;
+    # hpkgs948 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc948;
+    hpkgs96 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc966;
     hpkgs910 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9101;
-    # hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
+    # hpkgs981 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc981;
 
     overrideCabal = revision: editedSha: pkg:
       hlib.overrideCabal pkg {
@@ -133,7 +133,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     hpkgsCabal = hpkgs910.extend (new: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller
         (old // {
-        ghc = hutils.smaller-ghc(old.ghc);
+        # ghc = hutils.smaller-ghc(old.ghc);
 
         # builtins.mapAttrs (_name: value: hlib.doJailbreak value) old //
         Cabal = old.callCabal2nix
@@ -292,13 +292,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     #   pkgs.zlib
     # ];
 
-    disable-docs = ghc:
-      ghc.override (oldAttrs: oldAttrs // {
-        enableDocs = false;
-      });
-
     relocatable-static-libs-ghc = ghc-pkg:
-      ghc-pkg.override (oldAttrs: oldAttrs // {
+      ghc-pkg.override (_: {
         enableRelocatedStaticLibs = true;
       });
 
@@ -496,7 +491,10 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           ghc-toolchain-pkg = callPackage' ghc-toolchain { ghc-platform = ghc-platform-pkg; };
 
       in
-        disableAllHardening (hutils.smaller-ghc ((ghc'.override (old: old // {
+        disableAllHardening ((ghc'.override (old: old // {
+          enableNativeBignum = true;
+          enableDocs         = false;
+
           bootPkgs = build-pkgs;
           hadrian  = hlib.doJailbreak (ghc'.hadrian.override (old2: old2 // {
             inherit ghcSrc;
@@ -520,7 +518,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
               echo ${rev} > GIT_COMMIT_ID
               ./boot
             '';
-        })));
+        }));
 
     # ghc9121 = build-ghc {
     #   base-ghc-to-override = pkgs.haskell.compiler.ghc9101;
@@ -577,7 +575,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
               old.patches;
         });
 
-        ghc-win  = win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}"; # pkgsBuildHost == buildPackages
+        ghc-win = hutils.enable-unit-ids-for-newer-ghc win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}"; # pkgsBuildHost == buildPackages
 
         wine-iserv-wrapper-script =
           let
