@@ -318,27 +318,48 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           makeWrapper "${pkg}/bin/cabal" "$out/bin/cabal" --suffix "PKG_CONFIG_PATH" ":" "${pkgs.lib.makeSearchPathOutput "dev" "lib/pkgconfig" bakedInNativeDeps}"
         '';
 
-    wrap-ghc = version: alias-versions: pkg:
-      let f = alias-version:
+    symlink-exe-to = pkg: source: dests:
+      assert (builtins.isString source);
+      let f = dest:
+            assert (builtins.isString dest || builtins.isNull dest);
+            let suffix = if builtins.isNull dest then "" else "-${dest}";
+            in ''ln -s "${pkg}/bin/${source}" "$out/bin/${dest}"'';
+      in
+        pkgs.runCommand ("wrapped-" + source) {
+          nativeBuildInputs = [];
+        }
+          ''
+            mkdir -p "$out/bin"
+            ${if builtins.isList dests
+              then builtins.concatStringsSep "\n" (builtins.map f dests)
+              else f dests}
+          '';
+
+    wrap-ghc-arch = old-arch-prefix: new-arch-prefix: old-version: new-version: alias-versions: pkg:
+      assert (builtins.isString old-version);
+      let old-prefix         = if builtins.isNull old-arch-prefix then "" else "${old-arch-prefix}-";
+          new-prefix         = if builtins.isNull new-arch-prefix then "" else "${new-arch-prefix}-";
+          new-version-suffix = if builtins.isNull new-version     then "" else "-${new-version}";
+          f                  = alias-version:
             assert (builtins.isString alias-version || builtins.isNull alias-version);
             let suffix = if builtins.isNull alias-version then "" else "-${alias-version}";
-            in ''ln -s "$out/bin/$x-${version}" "$out/bin/$x${suffix}"'';
+            in ''ln -s "$out/bin/${old-prefix}$x-${old-version}" "$out/bin/${new-prefix}$x${suffix}"'';
       in
-        pkgs.runCommand ("wrapped-ghc-" + version) {
+        pkgs.runCommand ("wrapped-ghc-" + old-version) {
           nativeBuildInputs = [];
         }
           # ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
+          # makeWrapper "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}" --suffix "LD_LIBRARY_PATH" ":" "${pkgs.lib.makeLibraryPath bakedInNativeDeps}"
           ''
             mkdir -p "$out/bin"
             for x in ghc ghci ghc-pkg haddock hpc runghc; do
-              # makeWrapper "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}" --suffix "LD_LIBRARY_PATH" ":" "${pkgs.lib.makeLibraryPath bakedInNativeDeps}"
 
-              if [[ -f "${pkg}/bin/$x-${version}" ]]; then
-                ln -s "${pkg}/bin/$x-${version}" "$out/bin/$x-${version}"
-              elif [[ -f "${pkg}/bin/$x-ghc-${version}" ]]; then
-                ln -s "${pkg}/bin/$x-ghc-${version}" "$out/bin/$x-${version}"
-              elif [[ -f "${pkg}/bin/$x" ]]; then
-                ln -s "${pkg}/bin/$x" "$out/bin/$x-${version}"
+              if [[ -f "${pkg}/bin/${old-prefix}$x-${old-version}" ]]; then
+                ln -s "${pkg}/bin/${old-prefix}$x-${old-version}" "$out/bin/${new-prefix}$x${new-version-suffix}"
+              elif [[ -f "${pkg}/bin/${old-prefix}$x-ghc-${old-version}" ]]; then
+                ln -s "${pkg}/bin/${old-prefix}$x-ghc-${old-version}" "$out/bin/${new-prefix}$x${new-version-suffix}"
+              elif [[ -f "${pkg}/bin/${old-prefix}$x" ]]; then
+                ln -s "${pkg}/bin/${old-prefix}$x" "$out/bin/${new-prefix}$x${new-version-suffix}"
               else
                 echo "Cannot find source for ‘$x’ in ‘${pkg}/bin’" >&2
                 exit 1
@@ -349,6 +370,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
                 else f alias-versions}
             done
           '';
+
+    wrap-ghc = version: alias-versions: pkg: wrap-ghc-arch null null version version alias-versions pkg;
 
     wrap-ghc-filter-selected-args = filtered-args: version: alias-version: pkg:
       let wrapped-ghc = pkgs.writeShellScript ("filtering-ghc-" + version)
@@ -652,54 +675,64 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         # "-L${mingw_w64_pthreads}/lib"
         # "-L${mingw_w64_pthreads}/bin"
         # "-L${gmp}/lib"
-        wrap-win-ghc = pkg: ghc-exe: new-name:
-          pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
-            name          = new-name;
-            runtimeInputs = [
-              pkg
-              # So that ghc and its subcommands will be able to run ‘x86_64-w64-mingw32-gcc’
-              win-pkgs.buildPackages.gcc.cc
-            ];
-            # "-L${win-pkgs.libffi}/bin" \
-            # "-L${win-pkgs.libffi}/lib" \
-            # "-L${win-pkgs.gmp}/bin" \
-            # "-L${win-pkgs.gmp}/lib" \
-            # "-L${win-pkgs.windows.mingw_w64_pthreads}/lib" \
-            # "-L${win-pkgs.windows.mingw_w64_pthreads}/bin" \
-            # "-L${win-pkgs.windows.mcfgthreads}/bin" \
-            # "-L${win-pkgs.windows.mcfgthreads}/lib" \
-            text          =
-              ''
+        wrap-win-ghc = pkg: ghc-exe: new-names:
+          let wrapped =
+                pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+                  name          = ghc-exe + "-wrapped";
+                  runtimeInputs = [
+                    pkg
+                    # So that ghc and its subcommands will be able to run ‘x86_64-w64-mingw32-gcc’
+                    win-pkgs.buildPackages.gcc.cc
+                  ];
+                  # "-L${win-pkgs.libffi}/bin" \
+                  # "-L${win-pkgs.libffi}/lib" \
+                  # "-L${win-pkgs.gmp}/bin" \
+                  # "-L${win-pkgs.gmp}/lib" \
+                  # "-L${win-pkgs.windows.mingw_w64_pthreads}/lib" \
+                  # "-L${win-pkgs.windows.mingw_w64_pthreads}/bin" \
+                  # "-L${win-pkgs.windows.mcfgthreads}/bin" \
+                  # "-L${win-pkgs.windows.mcfgthreads}/lib" \
+                  text          =
+                    ''
                 ${pkg}/bin/${ghc-exe} \
                   -fexternal-interpreter \
                   -pgmi ${wine-iserv-wrapper-script}/bin/iserv-wrapper \
                   "''${@}"
               '';
-          };
+                };
+          in symlink-exe-to wrapped wrapped.name new-names;
 
-        wrap-win-ghc-pkg = pkg: exe: new-name:
-          pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
-            name          = new-name;
-            runtimeInputs = [pkg];
-            text          =
-              ''
+        wrap-win-ghc-pkg = pkg: exe: new-names:
+          let wrapped =
+                pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+                  name          = exe + "-wrapped";
+                  runtimeInputs = [pkg];
+                  text          =
+                    ''
                 ${pkg}/bin/${exe} "''${@}"
               '';
-          };
+                };
+          in symlink-exe-to wrapped wrapped.name new-names;
 
-        wrap-win-hsc2hs = pkg: exe: new-name:
-          pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
-            name          = new-name;
-            runtimeInputs = [pkg];
-            text          =
-              ''
+        wrap-win-hsc2hs = pkg: exe: new-names:
+          let wrapped =
+                pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+                  name          = exe + "-wrapped";
+                  runtimeInputs = [pkg];
+                  text          =
+                    ''
                 ${pkg}/bin/${exe} --cross-compile --via-asm "''${@}"
               '';
-          };
+                };
+          in symlink-exe-to wrapped wrapped.name new-names;
 
-        ghc-win-wrapped     = wrap-win-ghc ghc-win "x86_64-w64-mingw32-ghc" "ghc-${latest-ghc-short-version}-win";
-        ghc-pkg-win-wrapped = wrap-win-ghc-pkg ghc-win "x86_64-w64-mingw32-ghc-pkg" "ghc-pkg-${latest-ghc-short-version}-win";
-        hsc2hs-win-wrapped  = wrap-win-hsc2hs ghc-win "x86_64-w64-mingw32-hsc2hs" "hsc2hs-${latest-ghc-short-version}-win";
+        ghc-win-exe-name     = "ghc-win";
+        ghc-pkg-win-exe-name = "ghc-pkg-win";
+        hsc2hs-win-exe-name  = "hsc2hs-win";
+
+        ghc-win-wrapped     = wrap-win-ghc ghc-win "x86_64-w64-mingw32-ghc" ["ghc-${latest-ghc-short-version}-win" ghc-win-exe-name];
+        ghc-pkg-win-wrapped = wrap-win-ghc-pkg ghc-win "x86_64-w64-mingw32-ghc-pkg" ["ghc-pkg-${latest-ghc-short-version}-win" ghc-pkg-win-exe-name];
+        hsc2hs-win-wrapped  = wrap-win-hsc2hs ghc-win "x86_64-w64-mingw32-hsc2hs" ["hsc2hs-${latest-ghc-short-version}-win" hsc2hs-win-exe-name];
 
         cabal-win-wrapped =
           pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
@@ -716,10 +749,11 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
               ''
                 cmd="$1"
                 shift
-                CABAL_DIR=~/.cabal-win cabal "$cmd" \
-                  --with-compiler ${ghc-win-wrapped.name} \
-                  --with-hc-pkg ${ghc-pkg-win-wrapped.name} \
-                  --with-hsc2hs ${hsc2hs-win-wrapped.name} \
+                export CABAL_DIR=~/.cabal-win
+                cabal "$cmd" \
+                  --with-compiler ${ghc-win-exe-name} \
+                  --with-hc-pkg ${ghc-pkg-win-exe-name} \
+                  --with-hsc2hs ${hsc2hs-win-exe-name} \
                   --with-ld "x86_64-w64-mingw32-ld" \
                   "''${@}"
               '';
