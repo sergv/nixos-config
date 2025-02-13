@@ -126,8 +126,18 @@
         #   stdenv = old.impureUseNativeOptimizations new.stdenv;
         # };
 
+        enable-ghc-unit-ids-overlay =
+          new: old: {
+            haskell = old.haskell // {
+              compiler =
+                builtins.mapAttrs (_: hutils.enable-unit-ids-for-newer-ghc) old.haskell.compiler // {
+                  native-bignum = builtins.mapAttrs (_: hutils.enable-unit-ids-for-newer-ghc) old.haskell.compiler.native-bignum;
+                };
+            };
+          };
+
         smaller-haskell-overlay = new: old: {
-          haskellPackages                = hutils.fixedExtend (hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc966) (_: old2: {
+          haskellPackages = hutils.fixedExtend (hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc966) (_: old2: {
             # Make everything smaller at the core by altering arguments to mkDerivation.
             # This is hacky but is needed because Isabelle’s naproche dependency cannot
             # be coerced to not do e.g. profiling by standard Haskell infrastructure
@@ -143,64 +153,8 @@
           });
 
           haskell = old.haskell // {
-            compiler = old.haskell.compiler // {
-              ghc92         = builtins.abort "GHC 9.2 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc92;
-              ghc928        = builtins.abort "GHC 9.2.8 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc928;
-              ghc94         = builtins.abort "GHC 9.4 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc94;
-              ghc947        = builtins.abort "GHC 9.4.7 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc947;
-              ghc948        = builtins.abort "GHC 9.4.8 not functional because it segfaults during bootstrap"; # hutils.smaller-ghc old.haskell.compiler.ghc948;
-              ghc96         = hutils.smaller-ghc old.haskell.compiler.ghc96;
-              ghc963        = hutils.smaller-ghc old.haskell.compiler.ghc963;
-              ghc964        = hutils.smaller-ghc old.haskell.compiler.ghc964;
-              ghc965        = hutils.smaller-ghc old.haskell.compiler.ghc965;
-              ghc966        = hutils.smaller-ghc old.haskell.compiler.ghc966;
-              ghc98         = hutils.smaller-ghc old.haskell.compiler.ghc98;
-              ghc981        = hutils.smaller-ghc old.haskell.compiler.ghc981;
-
-              native-bignum = old.haskell.compiler.native-bignum // {
-                ghc92         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc92;
-                ghc928        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc928;
-                ghc94         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc94;
-                ghc947        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc947;
-                ghc948        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc948;
-                ghc96         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc96;
-                ghc963        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc963;
-                ghc964        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc964;
-                ghc965        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc965;
-                ghc966        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc966;
-                ghc98         = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc98;
-                ghc981        = hutils.smaller-ghc old.haskell.compiler.native-bignum.ghc981;
-              };
-            };
-
-            packages = old.haskell.packages // {
-              ghc92         = hutils.smaller-hpkgs old.haskell.packages.ghc92;
-              ghc928        = hutils.smaller-hpkgs old.haskell.packages.ghc928;
-              ghc94         = hutils.smaller-hpkgs old.haskell.packages.ghc94;
-              ghc947        = hutils.smaller-hpkgs old.haskell.packages.ghc947;
-              ghc948        = hutils.smaller-hpkgs old.haskell.packages.ghc948;
-              ghc96         = hutils.smaller-hpkgs old.haskell.packages.ghc96;
-              ghc963        = hutils.smaller-hpkgs old.haskell.packages.ghc963;
-              ghc964        = hutils.smaller-hpkgs old.haskell.packages.ghc964;
-              ghc965        = hutils.smaller-hpkgs old.haskell.packages.ghc965;
-              ghc966        = hutils.smaller-hpkgs old.haskell.packages.ghc966;
-              ghc98         = hutils.smaller-hpkgs old.haskell.packages.ghc98;
-              ghc981        = hutils.smaller-hpkgs old.haskell.packages.ghc981;
-
-              native-bignum = old.haskell.packages.native-bignum // {
-                ghc92         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc92;
-                ghc928        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc928;
-                ghc94         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc94;
-                ghc947        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc947;
-                ghc948        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc948;
-                ghc96         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc96;
-                ghc963        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc963;
-                ghc964        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc964;
-                ghc965        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc965;
-                ghc966        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc966;
-                ghc98         = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc98;
-                ghc981        = hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc981;
-              };
+            packages = builtins.mapAttrs (_: hutils.smaller-hpkgs-no-ghc) old.haskell.packages // {
+              native-bignum = builtins.mapAtrs (_: hutils.smaller-hpkgs-no-ghc) old.haskell.packages.native-bignum;
             };
           };
         };
@@ -407,6 +361,7 @@
           inherit (haskellNix) config;
           overlays = [
             haskellNix.overlay
+            enable-ghc-unit-ids-overlay
             improve-fetchgit-overlay
             use-win32-thread-model-overlay
           ];
@@ -426,7 +381,8 @@
           overlays = [
             fcitx-overlay
             ssh-overlay
-            smaller-haskell-overlay
+            enable-ghc-unit-ids-overlay
+            # smaller-haskell-overlay
             haskell-disable-checks-overlay
             zen4-march-overlay
             improve-fetchgit-overlay
