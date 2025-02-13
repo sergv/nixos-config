@@ -60,10 +60,10 @@ let
   # Doesn’t work but could be cool: static executables
   # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
-  # hpkgs948 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc948;
-  hpkgs96 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc966;
+  # hpkgs948 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc948;
+  hpkgs96 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc966;
   hpkgs910 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9101;
-  # hpkgs981 = hutils.smaller-hpkgs pkgs.haskell.packages.native-bignum.ghc981;
+  # hpkgs981 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc981;
 
   overrideCabal =
     revision: editedSha: pkg:
@@ -168,7 +168,7 @@ let
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        ghc = hutils.smaller-ghc (old.ghc);
+        # ghc = hutils.smaller-ghc(old.ghc);
 
         # builtins.mapAttrs (_name: value: hlib.doJailbreak value) old //
         Cabal = old.callCabal2nix "Cabal" (cabal-repo + "/Cabal") { };
@@ -328,25 +328,11 @@ let
   #   pkgs.zlib
   # ];
 
-  disable-docs =
-    ghc:
-    ghc.override (
-      oldAttrs:
-      oldAttrs
-      // {
-        enableDocs = false;
-      }
-    );
-
   relocatable-static-libs-ghc =
     ghc-pkg:
-    ghc-pkg.override (
-      oldAttrs:
-      oldAttrs
-      // {
-        enableRelocatedStaticLibs = true;
-      }
-    );
+    ghc-pkg.override (_: {
+      enableRelocatedStaticLibs = true;
+    });
 
   # So that I won’t need to litter everywhere with those pesky trivial flake.nix & flak.lock files
   # that only enable zlib. Locks also require regular maintenance, which is unbearable.
@@ -616,47 +602,48 @@ let
 
     in
     disableAllHardening (
-      hutils.smaller-ghc (
-        (ghc'.override (
-          old:
-          old
-          // {
-            bootPkgs = build-pkgs;
-            hadrian = hlib.doJailbreak (
-              ghc'.hadrian.override (
-                old2:
-                old2
-                // {
-                  inherit ghcSrc;
-                  ghc-platform = hutils.makeHaskellPackageSmaller ghc-platform-pkg;
-                  ghc-toolchain = hutils.makeHaskellPackageSmaller ghc-toolchain-pkg;
-                  ghcVersion = version;
-                }
-              )
-            );
-            inherit ghcSrc;
-          }
-        )).overrideAttrs
-          (old: {
-            inherit version;
+      (ghc'.override (
+        old:
+        old
+        // {
+          enableNativeBignum = true;
+          enableDocs = false;
 
-            postInstall =
-              builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ]
-                old.postInstall;
+          bootPkgs = build-pkgs;
+          hadrian = hlib.doJailbreak (
+            ghc'.hadrian.override (
+              old2:
+              old2
+              // {
+                inherit ghcSrc;
+                ghc-platform = hutils.makeHaskellPackageSmaller ghc-platform-pkg;
+                ghc-toolchain = hutils.makeHaskellPackageSmaller ghc-toolchain-pkg;
+                ghcVersion = version;
+              }
+            )
+          );
+          inherit ghcSrc;
+        }
+      )).overrideAttrs
+        (old: {
+          inherit version;
 
-            preConfigure =
-              old.preConfigure
-              +
-              # builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ] old.preConfigure +
+          postInstall =
+            builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ]
+              old.postInstall;
 
-              # Do this if taking sources from git directly.
-              ''
-                echo ${version} > VERSION
-                echo ${rev} > GIT_COMMIT_ID
-                ./boot
-              '';
-          })
-      )
+          preConfigure =
+            old.preConfigure
+            +
+            # builtins.replaceStrings [ base-ghc-to-override.version ] [ "${version}" ] old.preConfigure +
+
+            # Do this if taking sources from git directly.
+            ''
+              echo ${version} > VERSION
+              echo ${rev} > GIT_COMMIT_ID
+              ./boot
+            '';
+        })
     );
 
   # ghc9121 = build-ghc {
@@ -724,7 +711,9 @@ let
             old.patches;
       });
 
-      ghc-win = win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}"; # pkgsBuildHost == buildPackages
+      ghc-win =
+        hutils.enable-unit-ids-for-newer-ghc
+          win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}"; # pkgsBuildHost == buildPackages
 
       wine-iserv-wrapper-script =
         let

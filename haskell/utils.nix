@@ -38,26 +38,38 @@ let
       # builtins.trace { inherit name; type = builtins.typeOf x; }
       (makeHaskellPackageSmaller x);
 
-  smaller-ghc =
-    ghc-pkg:
-    ghc-pkg.override (
-      oldAttrs:
-      oldAttrs
-      // {
-        enableNativeBignum = true;
-        enableDocs = false;
-      }
-    );
+  ghc-version-ge =
+    ghc-pkg: target-version:
+    let
+      versionGE = to-check: target-version: builtins.compareVersions to-check target-version >= 0;
+    in
+    (ghc-pkg ? version) && versionGE ghc-pkg.version target-version;
 
-  enable-ghc-docs =
+  # smaller-ghc = ghc-pkg:
+  #   if ghc-version-ge ghc-pkg "9.6"
+  #   then
+  #     let args = pkgs.lib.functionArgs ghc-pkg.override;
+  #         is-non-bin-distribution = args ? enableNativeBignum || args ? enableDocs;
+  #     in
+  #       if is-non-bin-distribution
+  #       then ghc-pkg.override (_: {
+  #         enableNativeBignum = true;
+  #         enableDocs         = false;
+  #       })
+  #       else ghc-pkg
+  #   else
+  #     # Don’t bother with older ghcs.
+  #     ghc-pkg;
+
+  enable-unit-ids-for-newer-ghc =
     ghc-pkg:
-    ghc-pkg.override (
-      oldAttrs:
-      oldAttrs
-      // {
-        enableDocs = true;
-      }
-    );
+    if ghc-version-ge ghc-pkg "9.8" then
+      ghc-pkg.overrideAttrs (old: {
+        hadrianFlags = (old.hadrianFlags or [ ]) ++ [ "--hash-unit-ids" ];
+        hadrianArgs = (old.hadrianArgs or [ ]) ++ [ "--hash-unit-ids" ];
+      })
+    else
+      ghc-pkg;
 
   # Regular extend doesn’t work with haskell packages - it nukes .override
   # thus preventing further calls to .override.
@@ -75,23 +87,21 @@ in
   inherit
     makeHaskellPackageSmaller
     makeHaskellPackageAttribSmaller
-    smaller-ghc
     fixedExtend
+    ghc-version-ge
     ;
+
+  inherit enable-unit-ids-for-newer-ghc;
 
   smaller-hpkgs-no-ghc =
     hpkgs: fixedExtend hpkgs (_: old: builtins.mapAttrs makeHaskellPackageAttribSmaller old);
 
-  smaller-hpkgs =
-    hpkgs:
-    # builtins.trace (builtins.attrNames hpkgs)
-    (fixedExtend hpkgs (
-      _: old:
-      builtins.mapAttrs makeHaskellPackageAttribSmaller (
-        old
-        // {
-          ghc = smaller-ghc old.ghc;
-        }
-      )
-    ));
+  # inherit smaller-ghc;
+  #
+  # smaller-hpkgs = hpkgs:
+  #   # builtins.trace (builtins.attrNames hpkgs)
+  #     (fixedExtend hpkgs (_: old:
+  #       builtins.mapAttrs makeHaskellPackageAttribSmaller (old // {
+  #         ghc = smaller-ghc old.ghc;
+  #       })));
 }
