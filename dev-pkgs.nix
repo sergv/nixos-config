@@ -698,6 +698,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
                 ${pkg}/bin/${ghc-exe} \
                   -fexternal-interpreter \
                   -pgmi ${wine-iserv-wrapper-script}/bin/iserv-wrapper \
+                  -optc-Wno-incompatible-pointer-types \
                   "''${@}"
               '';
                 };
