@@ -569,8 +569,10 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           patches =
             if (versionGE old.version "9.0")
             then
-              # This patch is not needed any more, wine 10.0 supports UNC paths natively.
-              builtins.filter (x: !(pkgs-cross-win.lib.strings.hasSuffix "wine-add-dll-directory.patch") x) old.patches
+              # This patch is still needed even though wine 10.0 supports UNC paths natively.
+              # Loading dlls by UNC paths is not supported in Wine 10.
+              builtins.filter (x: !(pkgs-cross-win.lib.strings.hasSuffix "wine-add-dll-directory.patch") x) old.patches ++
+              [ ./patches/wine10-add-dll-directory.patch ]
             else
               old.patches;
         });
