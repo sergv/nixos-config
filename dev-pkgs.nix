@@ -707,6 +707,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
                   -fexternal-interpreter \
                   -pgmi ${wine-iserv-wrapper-script}/bin/iserv-wrapper \
                   -optc-Wno-incompatible-pointer-types \
+                  -L${win-pkgs.windows.mingw_w64_pthreads}/lib \
+                  -L${win-pkgs.windows.mingw_w64_pthreads}/bin \
                   "''${@}"
               '';
                 };
