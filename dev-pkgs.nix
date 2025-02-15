@@ -913,7 +913,6 @@ let
         text = ''
           cmd="$1"
           shift
-          export CABAL_DIR=~/.cabal-win
           cabal "$cmd" \
             --with-compiler ${ghc-win-exe-name} \
             --with-hc-pkg ${ghc-pkg-win-exe-name} \
