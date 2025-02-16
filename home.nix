@@ -563,6 +563,7 @@ in
     "d /tmp/windows-shared             0755 sergey users - -"
     "d /home/sergey/.config            -    -      -     - -"
     "d /home/sergey/.local             -    -      -     - -"
+    "d /home/sergey/.java              -    -      -     - -"
     "d /home/sergey/Desktop            -    -      -     - -"
 
     # Forcefully symlink, removing destination if it exists.
@@ -591,6 +592,8 @@ in
         ".config/PCSX2"
         ".config/QtProject.conf"
         ".config/Triblerrc"
+
+        ".java/.userPrefs"
 
         ".local/ghci.conf"
         ".local/share/krunnerstaterc"
