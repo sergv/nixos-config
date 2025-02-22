@@ -838,6 +838,8 @@ let
               pkg
               # So that ghc and its subcommands will be able to run ‘x86_64-w64-mingw32-gcc’
               win-pkgs.buildPackages.gcc.cc
+              # For ‘x86_64-w64-mingw32-windres’
+              win-pkgs.buildPackages.binutils
             ];
             # "-L${win-pkgs.libffi}/bin" \
             # "-L${win-pkgs.libffi}/lib" \
