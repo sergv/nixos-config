@@ -47,8 +47,8 @@ let
   fast-tags-repo = pkgs.fetchFromGitHub {
     owner = "sergv";
     repo = "fast-tags";
-    rev = "3e44dbcc3da564ed7dd057ba2563752065985486";
-    sha256 = "sha256-b/2j3qob6+cqhWT312N2rWCmq2VB2x/chfkOYV8qZbM="; # pkgs.lib.fakeSha256;
+    rev = "6d37e45680bd306c6eca7c4f79eabd64bf649190";
+    sha256 = "sha256-8QH3p2dQYNd0g0YKgtrRLrYPNLcE8YqIA7pLVXmJ6PI="; # pkgs.lib.fakeSha256;
   };
 
   # hpkgs = pkgs.haskell.packages.ghc945;
@@ -63,6 +63,7 @@ let
   # hpkgs948 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc948;
   hpkgs96 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc966;
   hpkgs910 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9101;
+  hpkgs912 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9121;
   # hpkgs981 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc981;
 
   overrideCabal =
@@ -76,12 +77,14 @@ let
 
   hashable-pkg =
     pkgs:
-    hlib.dontCheck (
-      pkgs.callHackageDirect {
-        pkg = "hashable";
-        ver = "1.5.0.0";
-        sha256 = "sha256-IYAGl8K4Fo1DGSE2kok3HMtwUOJ/mwGHzVJfNYQTAsI="; # pkgs.lib.fakeSha256;
-      } { }
+    hlib.doJailbreak (
+      hlib.dontCheck (
+        pkgs.callHackageDirect {
+          pkg = "hashable";
+          ver = "1.5.0.0";
+          sha256 = "sha256-IYAGl8K4Fo1DGSE2kok3HMtwUOJ/mwGHzVJfNYQTAsI="; # pkgs.lib.fakeSha256;
+        } { }
+      )
     );
 
   allowGhcReference =
@@ -263,12 +266,12 @@ let
     )
   );
 
-  hpkgsFastTags = hpkgs910.extend (
+  hpkgsFastTags = hpkgs912.extend (
     _: old:
     builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (
       old
       // {
-        fast-tags = hlib.dontCheck (hlib.doJailbreak (old.callCabal2nix "fast-tags" fast-tags-repo { }));
+        fast-tags = hlib.dontCheck (old.callCabal2nix "fast-tags" fast-tags-repo { });
 
         # Curse him who put os-string, a boot package, in the package set for
         # 9.10.1!
