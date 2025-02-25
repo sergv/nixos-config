@@ -261,7 +261,7 @@ let
       withNativeCompilation = false;
     })).overrideAttrs
       (_: {
-        patchess = [ ];
+        patches = [ ];
         withNativeCompilation = false;
         withTreeSitter = true;
       });
