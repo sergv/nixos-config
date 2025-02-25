@@ -177,9 +177,26 @@ let wmctrl-pkg = pkgs.wmctrl;
           ln -s "${isabelle-lsp-pkg}/bin/isabelle" "$out/bin/isabelle-emacs-lsp"
         '';
 
-    emacs-pkg = (pkgs.emacs29.override (_: { withNativeCompilation = true; })).overrideAttrs (old: {
-      version               = "30.0.93";
-      patches               = [
+    emacs-base = pkgs.emacs30.overrideAttrs (old: {
+      version        = "30.1";
+      withGTK3       = true;
+      withSQLite3    = true;
+      withTreeSitter = true;
+
+      configureFlags = old.configureFlags ++ [
+        (pkgs.lib.withFeature false "gc-mark-trace")
+      ];
+
+      src            = pkgs.fetchgit {
+        url    = "https://github.com/sergv/emacs.git";
+        rev    = "63a212f2530105431879a1c944a98c84b9159408";
+        sha256 = "sha256-nWybAqeWB2Xhhfcxax2B7JE7R1rdhckwBRtVwbfllAc="; #pkgs.lib.fakeSha256;
+      };
+    });
+
+    emacs-native-pkg = (emacs-base.override (_: { withNativeCompilation = true; })).overrideAttrs (old: {
+      withNativeCompilation = true;
+      patches = (old.patches or []) ++ [
         (pkgs.substituteAll {
           src = ./patches/native-comp-driver-options-30.patch;
 
@@ -191,40 +208,24 @@ let wmctrl-pkg = pkgs.wmctrl;
                   "${pkgs.lib.getLib pkgs.stdenv.cc.cc.lib.libgcc}/lib"
                 ];
             in
-            pkgs.lib.concatStringsSep " "
-              (builtins.map
-                (x: ''"-B${x}"'')
-                ([
-                  # Paths necessary so the JIT compiler finds its libraries:
-                  "${pkgs.lib.getLib pkgs.libgccjit}/lib"
-                ] ++ libGccJitLibraryPaths ++ [
-                  # Executable paths necessary for compilation (ld, as):
-                  "${pkgs.lib.getBin pkgs.stdenv.cc.cc}/bin"
-                  "${pkgs.lib.getBin pkgs.stdenv.cc.bintools}/bin"
-                  "${pkgs.lib.getBin pkgs.stdenv.cc.bintools.bintools}/bin"
-                ]));
+              pkgs.lib.concatStringsSep " "
+                (builtins.map
+                  (x: ''"-B${x}"'')
+                  ([
+                    # Paths necessary so the JIT compiler finds its libraries:
+                    "${pkgs.lib.getLib pkgs.libgccjit}/lib"
+                  ] ++ libGccJitLibraryPaths ++ [
+                    # Executable paths necessary for compilation (ld, as):
+                    "${pkgs.lib.getBin pkgs.stdenv.cc.cc}/bin"
+                    "${pkgs.lib.getBin pkgs.stdenv.cc.bintools}/bin"
+                    "${pkgs.lib.getBin pkgs.stdenv.cc.bintools.bintools}/bin"
+                  ]));
         })
       ];
-      withNativeCompilation = true;
-      withGTK3              = true;
-      withSQLite3           = true;
-      withTreeSitter        = true;
-
-      configureFlags = old.configureFlags ++ [
-        (pkgs.lib.withFeature false "gc-mark-trace")
-      ];
-
-      src                   = pkgs.fetchgit {
-        url    = "https://github.com/sergv/emacs.git";
-        rev    = "f0e4d6c9f4bd68a827b116de71a0b5b4c72bfe07";
-        sha256 = "sha256-mjZig+19R16oJ8Vu6G49esa4wqgDHJDswsuetLNux08="; #pkgs.lib.fakeSha256;
-      };
     });
 
-    emacs-bytecode-pkg = (emacs-pkg.override (_: { withNativeCompilation = false; })).overrideAttrs (_: {
-      patches               = [];
+    emacs-bytecode-pkg = (emacs-base.override (_: { withNativeCompilation = false; })).overrideAttrs (_: {
       withNativeCompilation = false;
-      withTreeSitter        = true;
     });
 
     emacs-debug-pkg = pkgs.enableDebugging emacs-bytecode-pkg;
@@ -245,11 +246,11 @@ let wmctrl-pkg = pkgs.wmctrl;
         fi
       '';
 
-    emacs-wrapped = mk-emacs-pkg "emacs" emacs-pkg "";
+    emacs-native-wrapped = mk-emacs-pkg "emacs-native" emacs-native-pkg "";
+
+    emacs-bytecode-wrapped = mk-emacs-pkg "emacs" emacs-bytecode-pkg "";
 
     emacs-debug-wrapped = mk-emacs-pkg "emacs-debug" emacs-debug-pkg "gdb -ex='set confirm on' -ex=run -ex=quit --args ";
-
-    emacs-bytecode-wrapped = mk-emacs-pkg "emacs-bytecode" emacs-bytecode-pkg "";
 
     emacsDesktopItem = pkgs.lib.generators.toINI {} {
       "Desktop Entry" = {
@@ -866,7 +867,7 @@ in
         tex-pkg
         wmctrl-pkg
 
-        emacs-wrapped
+        # emacs-native-wrapped
         emacs-bytecode-wrapped
         emacs-debug-wrapped
         pkgs.tree-sitter
