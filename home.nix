@@ -222,7 +222,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     });
 
     emacs-bytecode-pkg = (emacs-pkg.override (_: { withNativeCompilation = false; })).overrideAttrs (_: {
-      patchess              = [];
+      patches               = [];
       withNativeCompilation = false;
       withTreeSitter        = true;
     });
