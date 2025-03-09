@@ -728,27 +728,30 @@ let
                 old.buildPhase;
           }); # pkgsBuildHost == buildPackages
 
+      haskell-win-runner-dll-pkgs = [
+        # win-pkgs.libffi
+        # win-pkgs.gmp
+        # win-pkgs.windows.mcfgthreads
+        # win-pkgs.windows.mingw_w64_pthreads
+        # win-pkgs.buildPackages.gcc.cc
+      ];
+
+      win-exes = win-pkgs.haskell-nix.iserv-proxy-exes."${latest-ghc-field}";
+
+      win-iserv-proxy-interpreter = win-exes.iserv-proxy-interpreter.override (old: {
+        # Without these flags the executable with fail with error
+        # Mingw-w64runtimefailure:
+        # 32 bit pseudo relocation at 00000001401203C6 out of range, targeting 0000000000468160, yielding the value FFFFFFFEC0347D96.
+        setupBuildFlags = [
+          "--ghc-option=-optl-Wl,--disable-dynamicbase,--disable-high-entropy-va,--image-base=0x400000"
+        ];
+      });
+
       wine-iserv-wrapper-script =
         let
-          exes = win-pkgs.haskell-nix.iserv-proxy-exes."${latest-ghc-field}";
-          iserv-proxy = exes.iserv-proxy;
-          iserv-proxy-interpreter = exes.iserv-proxy-interpreter.override (old: {
-            # Without these flags the executable with fail with error
-            # Mingw-w64runtimefailure:
-            # 32 bit pseudo relocation at 00000001401203C6 out of range, targeting 0000000000468160, yielding the value FFFFFFFEC0347D96.
-            setupBuildFlags = [
-              "--ghc-option=-optl-Wl,--disable-dynamicbase,--disable-high-entropy-va,--image-base=0x400000"
-            ];
-          });
-          exe-name = iserv-proxy-interpreter.exeName;
+          iserv-proxy = win-exes.iserv-proxy;
+          exe-name = win-iserv-proxy-interpreter.exeName;
           # win-pkgs.windows.pthreads - not needed
-          dllPkgs = [
-            # win-pkgs.libffi
-            # win-pkgs.gmp
-            # win-pkgs.windows.mcfgthreads
-            # win-pkgs.windows.mingw_w64_pthreads
-            # win-pkgs.buildPackages.gcc.cc
-          ];
         in
         pkgs.pkgsBuildBuild.writeScriptBin "iserv-wrapper" ''
           #!${pkgs-cross-win.pkgsBuildBuild.bash}/bin/bash
@@ -773,9 +776,9 @@ let
           REMOTE_ISERV=/tmp/iserv-tmpdir
           if [[ ! -d "$REMOTE_ISERV" ]]; then
               mkdir -p "$REMOTE_ISERV/tmp"
-              ln -s ${iserv-proxy-interpreter}/bin/*.dll "$REMOTE_ISERV"
+              ln -s ${win-iserv-proxy-interpreter}/bin/*.dll "$REMOTE_ISERV"
 
-              for p in ${pkgs.lib.concatStringsSep " " dllPkgs}; do
+              for p in ${pkgs.lib.concatStringsSep " " haskell-win-runner-dll-pkgs}; do
                   find "$p" -iname '*.dll' -exec ln -sf {} $REMOTE_ISERV \;
                   find "$p" -iname '*.dll.a' -exec ln -sf {} $REMOTE_ISERV \;
               done
@@ -794,7 +797,7 @@ let
                   WINEDEBUG="warn-all,fixme-all,-menubuilder,-mscoree,-ole,-secur32,-winediag" \
                   WINEPREFIX="$REMOTE_ISERV/prefix" \
                   ${wine}/bin/wine64 \
-                  ${iserv-proxy-interpreter}/bin/${exe-name} \
+                  ${win-iserv-proxy-interpreter}/bin/${exe-name} \
                   "$REMOTE_ISERV/tmp" \
                   "$PORT" ) &
           PID="$!"
@@ -905,27 +908,67 @@ let
         hsc2hs-win-exe-name
       ];
 
-      cabal-win-wrapped = pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
-        name = "cabal-win";
-        runtimeInputs = [
-          cabal-install
-          ghc-win-wrapped
-          ghc-pkg-win-wrapped
-          hsc2hs-win-wrapped
-          # For ‘x86_64-w64-mingw32-ld’
-          win-pkgs.buildPackages.binutils
-        ];
-        text = ''
-          cmd="$1"
-          shift
-          cabal "$cmd" \
-            --with-compiler ${ghc-win-exe-name} \
-            --with-hc-pkg ${ghc-pkg-win-exe-name} \
-            --with-hsc2hs ${hsc2hs-win-exe-name} \
-            --with-ld "x86_64-w64-mingw32-ld" \
-            "''${@}"
-        '';
-      };
+      cabal-win-wrapped =
+        let
+          test-wrapper =
+            #win-pkgs.pkgsBuildBuild.winePackages.minimal
+            win-pkgs.pkgsBuildBuild.writeScriptBin "cabal-win-test-wrapper" ''
+              #!${win-pkgs.pkgsBuildBuild.stdenv.shell}
+              set -euo pipefail
+              # Link all the DLLs we might need into one place so we can add
+              # just that one location to WINEPATH.
+
+              PREFIX="/tmp/cabal-win-test-runner-wine-prefix"
+              if [[ ! -d "$PREFIX" ]]; then
+                mkdir -p "$PREFIX"
+
+                ln -s ${win-iserv-proxy-interpreter}/bin/*.dll "$PREFIX"
+
+                for p in ${win-pkgs.lib.concatStringsSep " " haskell-win-runner-dll-pkgs}; do
+                  find "$p" -iname '*.dll' -exec ln -sf {} $PREFIX \;
+                  find "$p" -iname '*.dll.a' -exec ln -sf {} $PREFIX \;
+                done
+
+                # Some DLLs have a `lib` prefix but we attempt to load them without the prefix.
+                # This was a problem for `double-conversion` package when used in TH code.
+                # Creating links from the `X.dll` to `libX.dll` works around this issue.
+                (
+                  cd $PREFIX
+                  for l in lib*.dll; do
+                    ln -s "$l" "''${l#lib}"
+                  done
+                  )
+              fi
+              WINEPATH=$PREFIX \
+                WINEDLLOVERRIDES="winemac.drv=d" \
+                WINEDEBUG=warn-all,fixme-all,-menubuilder,-mscoree,-ole,-secur32,-winediag \
+                WINEPREFIX=$PREFIX \
+                ${wine}/bin/wine64 \
+                "''${@}"
+            '';
+        in
+        pkgs-cross-win.pkgsBuildBuild.writeShellApplication {
+          name = "cabal-win";
+          runtimeInputs = [
+            cabal-install
+            ghc-win-wrapped
+            ghc-pkg-win-wrapped
+            hsc2hs-win-wrapped
+            # For ‘x86_64-w64-mingw32-ld’
+            win-pkgs.buildPackages.binutils
+          ];
+          text = ''
+            cmd="$1"
+            shift
+            cabal "$cmd" \
+              --with-compiler ${ghc-win-exe-name} \
+              --with-hc-pkg ${ghc-pkg-win-exe-name} \
+              --with-hsc2hs ${hsc2hs-win-exe-name} \
+              --with-ld "x86_64-w64-mingw32-ld" \
+              --test-wrapper "${test-wrapper}/bin/cabal-win-test-wrapper" \
+              "''${@}"
+          '';
+        };
     in
     {
       inherit
