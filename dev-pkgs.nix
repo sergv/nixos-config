@@ -555,9 +555,17 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
     cabal-install = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
 
-    latest-ghc-version       = "9.12.1";
+    latest-ghc-version       = "9.12.2";
     latest-ghc-field         = "ghc9121";
     latest-ghc-short-version = "9.12";
+
+    latest-ghc-pkg = build-ghc {
+      base-ghc-to-override = pkgs.haskell.compiler.native-bignum."${latest-ghc-field}";
+      build-pkgs           = hpkgsCabal; #pkgs.haskell.packages.native-bignum.ghc9101;
+      version              = "9.12.2";
+      rev                  = "383be28ffdddf65b57b7b111bfc89808b4229ebc";
+      sha256               = "sha256-CsUKRGjJ68QFiLPqQkqhOVMnUbTm1BEz01hnNeZqctc="; #pkgs.lib.fakeSha256;
+    };
 
     ghc-win =
       let
@@ -841,9 +849,9 @@ in ghc-win // {
 
   ghc9101     = wrap-ghc                          "9.10.1" "9.10"        pkgs.haskell.compiler.native-bignum.ghc9101;
 
-  ghc9121     = wrap-ghc                          latest-ghc-version [latest-ghc-short-version null] pkgs.haskell.compiler.native-bignum."${latest-ghc-field}";
+  ghc9122     = wrap-ghc                          latest-ghc-version [latest-ghc-short-version null] latest-ghc-pkg;
 
-  ghc9121-pie = wrap-ghc-rename latest-ghc-version ["${latest-ghc-short-version}-pie" "pie"] (relocatable-static-libs-ghc pkgs.haskell.compiler.native-bignum."${latest-ghc-field}");
+  ghc9122-pie = wrap-ghc-rename latest-ghc-version ["${latest-ghc-short-version}-pie" "pie"] (relocatable-static-libs-ghc latest-ghc-pkg);
 
   # callPackage = newScope {
   #   haskellLib = haskellLibUncomposable.compose;
