@@ -811,7 +811,7 @@ in
         pkgs.mc
         pkgs.mplayer
         pkgs.nix-index
-        pinned-pkgs.nixpkgs-22-11.nyx
+        # pinned-pkgs.nixpkgs-22-11.nyx
         pkgs.oxygen-icons5
         pkgs.p7zip
         pkgs.pavucontrol
