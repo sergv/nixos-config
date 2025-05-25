@@ -541,8 +541,8 @@ in
     };
   };
 
-  # services.displayManager.defaultSession = "plasmax11";
-  services.displayManager.defaultSession = "plasma";
+  services.displayManager.defaultSession = "plasmax11";
+  # services.displayManager.defaultSession = "plasma";
 
   # Enable the X11 windowing system.
   services.xserver = {
