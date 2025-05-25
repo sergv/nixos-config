@@ -288,7 +288,6 @@ in
       # pkgs.ocaml
       # pkgs.octaveFull
       pkgs.pciutils
-      pkgs.plasma-systemmonitor
       # pkgs.python36Packages.ipython
       # pkgs.python36Packages.jupyter
       # pkgs.python36Packages.jupyter_client
@@ -542,6 +541,7 @@ in
     };
   };
 
+  # services.displayManager.defaultSession = "plasmax11";
   services.displayManager.defaultSession = "plasma";
 
   # Enable the X11 windowing system.
@@ -576,19 +576,20 @@ in
     #KDE
     #displayManager.sddm.enable = false;
 
-    desktopManager = {
-      plasma5 = {
-        phononBackend = "vlc";
-        enable        = true;
-      };
-      # xfce                  = {
-      #   enable            = true;
-      #   enableScreensaver = false;
-      # };
-    };
     displayManager = {
       lightdm.enable = true;
     };
+  };
+
+  services.desktopManager = {
+    plasma6 = {
+      # phononBackend = "vlc";
+      enable        = true;
+    };
+    # xfce                  = {
+    #   enable            = true;
+    #   enableScreensaver = false;
+    # };
   };
 
   environment.etc."xdg/kwinrc".text = pkgs.lib.generators.toINI {} {
@@ -613,6 +614,14 @@ in
     pkgs.plasma5Packages.kwallet-pam
     pkgs.plasma5Packages.kwalletmanager
     pkgs.plasma5Packages.milou
+  ];
+
+  environment.plasma6.excludePackages = [
+    pkgs.kdePackages.kpeople
+    pkgs.kdePackages.kwallet
+    pkgs.kdePackages.kwallet-pam
+    pkgs.kdePackages.kwalletmanager
+    pkgs.kdePackages.milou
   ];
 
   # Enable automounting in Thunar

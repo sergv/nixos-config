@@ -20,8 +20,9 @@
     };
 
     nixpkgs-stable = {
+      url = "nixpkgs/nixos-25.05";
       # # unstable
-      url = "nixpkgs/nixos-unstable";
+      # url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
       #url = "/home/sergey/nix/nixpkgs";
       # url = "nixpkgs/nixos-23.05";
@@ -31,7 +32,8 @@
     nixpkgs-unstable = {
       # url = "nixpkgs/nixos-24.11";
       # url = "nixpkgs/nixos-23.05";
-      url = "nixpkgs/nixos-unstable";
+      # url = "nixpkgs/nixos-unstable";
+      url = "nixpkgs/nixos-25.05";
     };
 
     # nixpkgs-fresh-ghc = {
@@ -40,7 +42,8 @@
 
     home-manager = {
       # # unstable
-      url                    = "github:nix-community/home-manager/master";
+      url                    = "github:nix-community/home-manager/release-25.05";
+      # url                    = "github:nix-community/home-manager/master";
       # url                    = "github:nix-community/home-manager/release-24.11";
       # url                    = "github:nix-community/home-manager/release-23.05";
       # url                    = "github:nix-community/home-manager/release-22.11";
@@ -137,7 +140,7 @@
           };
 
         smaller-haskell-overlay = new: old: {
-          haskellPackages = hutils.fixedExtend (hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc966) (_: old2: {
+          haskellPackages = hutils.fixedExtend (hutils.smaller-hpkgs old.haskell.packages.native-bignum.ghc967) (_: old2: {
             # Make everything smaller at the core by altering arguments to mkDerivation.
             # This is hacky but is needed because Isabelle’s naproche dependency cannot
             # be coerced to not do e.g. profiling by standard Haskell infrastructure
@@ -294,8 +297,8 @@
 
           # To avoid infinite recursion
           cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables
-            (old.haskell.packages.native-bignum.ghc966.generateOptparseApplicativeCompletions ["cabal2nix"]
-              old.haskell.packages.native-bignum.ghc966.cabal2nix);
+            (old.haskell.packages.native-bignum.ghc967.generateOptparseApplicativeCompletions ["cabal2nix"]
+              old.haskell.packages.native-bignum.ghc967.cabal2nix);
         };
 
         # Remove dependency on mcfgthreads mingw library. If we keep it
