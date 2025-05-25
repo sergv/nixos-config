@@ -597,10 +597,10 @@ in
   };
 
   services.gpg-agent = {
-    enable          = true;
-    defaultCacheTtl = 3600000000;
-    maxCacheTtl     = 3600000000;
-    pinentryPackage = pkgs.pinentry-qt;
+    enable           = true;
+    defaultCacheTtl  = 3600000000;
+    maxCacheTtl      = 3600000000;
+    pinentry.package = pkgs.pinentry-qt;
   };
 
   services.sxhkd = {
@@ -766,7 +766,7 @@ in
   # };
 
   programs.firefox = import ./firefox.nix {
-    inherit pkgs;
+    inherit pkgs pkgs-pristine;
     firefox-addons = pkgs.nur.repos.rycee.firefox-addons;
   };
 
@@ -838,7 +838,6 @@ in
     in
     [
       pkgs.anki
-      pkgs.ark
       (pkgs.aspellWithDicts (d: [
         d.en
         d.en-computers
@@ -870,8 +869,10 @@ in
       pkgs.imagemagick
       #pkgs.inkscape
       pkgs.iotop
-      pkgs.okular
-      pkgs.libreoffice
+      pkgs.kdePackages.ark
+      pkgs.kdePackages.okular
+      pkgs.kdePackages.oxygen-icons
+      pkgs.kdePackages.plasma-systemmonitor
       pkgs.lsof
       pkgs.lzip
       pkgs.lzop
@@ -879,9 +880,9 @@ in
       pkgs.mplayer
       pkgs.nix-index
       # pinned-pkgs.nixpkgs-22-11.nyx
-      pkgs.oxygen-icons5
       pkgs.p7zip
       pkgs.pavucontrol
+
       # pkgs.pmutils
       pkgs.pv
       # for shsplit
@@ -890,7 +891,6 @@ in
       pkgs.sshfs
       pkgs.telegram-desktop
       pkgs.tdesktop
-      pkgs.thunderbird
       pkgs.unzip
       pkgs.usbutils
       pkgs.vlc
@@ -902,6 +902,11 @@ in
       # pkgs.yasm
       pkgs.zstd
       # pkgs.z3
+
+      # Take from pristine so that it will be picked up from cache. Building thunderbird
+      # is almost impossible - linking consumes too much memory.
+      pkgs-pristine.thunderbird
+      pkgs-pristine.libreoffice
 
       # Music
       pkgs.audacious
@@ -925,8 +930,8 @@ in
 
       pkgs.nix-diff
 
-      isabelle-pkg
-      isabelle-lsp-wrapper
+      # isabelle-pkg
+      # isabelle-lsp-wrapper
 
       pkgs.pcsx2
       game-run-wrapper
