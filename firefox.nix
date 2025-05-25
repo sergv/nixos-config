@@ -1,4 +1,4 @@
-{ pkgs, firefox-addons }:
+{ pkgs, pkgs-pristine, firefox-addons }:
 
 let addons = firefox-addons;
 
@@ -13,7 +13,7 @@ in {
   # package = pkgs.firefox;
   enable = true;
 
-  package = pkgs.wrapFirefox pkgs.firefox-esr-unwrapped {
+  package = pkgs.wrapFirefox pkgs-pristine.firefox-esr-unwrapped {
     nativeMessagingHosts = [ pkgs.vdhcoapp ];
   };
 

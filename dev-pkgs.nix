@@ -18,15 +18,15 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     cabal-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "cabal";
-      rev    = "2e56cb8321159141c8c0c8eab8555e005696c8b1"; # "dev";
-      sha256 = "sha256-HP0N7lfhwtVgctTcHRDqlgf3AO2apI+E3sAbwBZnAkI="; #pkgs.lib.fakeSha256;
+      rev    = "a54598d57c4ad413cb4d7d207b789e20021f8e07"; # "dev";
+      sha256 = "sha256-c7uSfIhqEZmdjLJr3fE0qbg7XMvh/27aqnJfA0L5i+w="; #pkgs.lib.fakeSha256;
     };
 
     doctest-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "doctest";
-      rev    = "b996c217e72b9b53f8315933d12e41eef5692455";
-      sha256 = "sha256-UIPzjWJeKYGEKlcrSEv8ey7Ln40lxIxTneQPjAqFraY="; #pkgs.lib.fakeSha256;
+      rev    = "b2f6d077474bc9fa77e8f83cf0ce7213d1c67faf";
+      sha256 = "sha256-liYoSonwDDWt40Oa7SpZn3SqThTDp5bw6e2Duk+sf0s="; #pkgs.lib.fakeSha256;
     };
 
     ghc-events-analyze-repo = pkgs.fetchFromGitHub {
@@ -60,9 +60,9 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     # hpkgs948 = pkgs.pkgsStatic.haskell.packages.ghc945.override {
 
     # hpkgs948 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc948;
-    hpkgs96 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc966;
-    hpkgs910 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9101;
-    hpkgs912 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9121;
+    hpkgs96 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc967;
+    hpkgs910 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9102;
+    hpkgs912 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc9122;
     # hpkgs981 = hutils.smaller-hpkgs-no-ghc pkgs.haskell.packages.native-bignum.ghc981;
 
     overrideCabal = revision: editedSha: pkg:
@@ -86,7 +86,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
 
     allowGhcReference = x: hlib.overrideCabal x (drv: { disallowGhcReference = false; });
 
-    hpkgsDoctest = hpkgs910.extend (_: old:
+    hpkgsDoctest = hpkgs912.extend (_: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller (old // {
         doctest =
           hlib.dontCheck ((old.callCabal2nix "doctest" doctest-repo {}).overrideAttrs (oldAttrs: oldAttrs // {
@@ -132,7 +132,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       }));
 
     # pkgs.haskell.packages.ghc961
-    hpkgsCabal = hpkgs910.extend (new: old:
+    hpkgsCabal = hpkgs912.extend (new: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller
         (old // {
         # ghc = hutils.smaller-ghc(old.ghc);
@@ -171,56 +171,56 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff Cabal-tests;
           });
 
-        hackage-security = hlib.doJailbreak
-          (old.callHackage "hackage-security" "0.6.2.6" {});
+        # hackage-security = hlib.doJailbreak
+        #   (old.callHackage "hackage-security" "0.6.2.6" {});
 
         # semaphore-compat = hlib.markUnbroken old.semaphore-compat;
 
-        # Force reinstall
-        semaphore-compat = old.callHackage "semaphore-compat" "1.0.0" {};
+        # # Force reinstall
+        # semaphore-compat = old.callHackage "semaphore-compat" "1.0.0" {};
 
         # Disable tests which take around 1 hour!
         statistics = hlib.dontCheck old.statistics;
 
-        async = hlib.dontCheck old.async;
-        vector = hlib.dontCheck old.vector;
-
-        file-io = hlib.dontCheck old.file-io;
-
-        uuid-types = hlib.doJailbreak old.uuid-types;
-        strict = hlib.doJailbreak old.strict;
+        # async = hlib.dontCheck old.async;
+        # vector = hlib.dontCheck old.vector;
+        #
+        # # file-io = hlib.dontCheck old.file-io;
+        #
+        # uuid-types = hlib.doJailbreak old.uuid-types;
+        # strict = hlib.doJailbreak old.strict;
 
         hashable = hashable-pkg old;
 
-        unix = hlib.dontCheck
-          (old.callHackageDirect
-            {
-              pkg    = "unix";
-              ver    = "2.8.6.0";
-              sha256 = "sha256-Tnkda3SJu5R2O9bYbrw+Fy/OQNxqOfWBP+Zv0jqDI6Q="; #pkgs.lib.fakeSha256;
-            }
-            {});
+        # unix = hlib.dontCheck
+        #   (old.callHackageDirect
+        #     {
+        #       pkg    = "unix";
+        #       ver    = "2.8.6.0";
+        #       sha256 = "sha256-Tnkda3SJu5R2O9bYbrw+Fy/OQNxqOfWBP+Zv0jqDI6Q="; #pkgs.lib.fakeSha256;
+        #     }
+        #     {});
 
-        tasty = hlib.dontCheck
-          (old.callHackageDirect
-            {
-              pkg    = "tasty";
-              ver    = "1.5.2";
-              sha256 = "sha256-ikV62VQAAxsekESCxp7vldxopYiQGoYTCANsvGJlGcs="; #pkgs.lib.fakeSha256;
-            }
-            {});
+        # tasty = hlib.dontCheck
+        #   (old.callHackageDirect
+        #     {
+        #       pkg    = "tasty";
+        #       ver    = "1.5.2";
+        #       sha256 = "sha256-ikV62VQAAxsekESCxp7vldxopYiQGoYTCANsvGJlGcs="; #pkgs.lib.fakeSha256;
+        #     }
+        #     {});
 
         # ghc-lib-parser = hlib.markBroken old.ghc-lib-parser;
         # ghc-prof = hlib.doJailbreak old.ghc-prof;
 
-        witherable = hlib.dontCheck
-          (old.callHackage "witherable" "0.5" {});
-
-        process = hlib.dontCheck
-          (old.callHackage "process" "1.6.25.0" {});
-
-        directory = hlib.dontCheck
-          (old.callHackage "directory" "1.3.9.0" {});
+        # witherable = hlib.dontCheck
+        #   (old.callHackage "witherable" "0.5" {});
+        #
+        # process = hlib.dontCheck
+        #   (old.callHackage "process" "1.6.25.0" {});
+        #
+        # directory = hlib.dontCheck
+        #   (old.callHackage "directory" "1.3.9.0" {});
 
         # tar = hlib.doJailbreak old.tar;
         # ed25519 = hlib.doJailbreak old.ed25519;
@@ -269,7 +269,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         optparse-applicative = hlib.dontCheck old.optparse-applicative;
         hspec-expectations   = hlib.dontCheck old.hspec-expectations;
         pcre-light           = hlib.dontCheck old.pcre-light;
-        file-io              = hlib.dontCheck old.file-io;
+        # file-io              = hlib.dontCheck old.file-io;
         syb                  = hlib.dontCheck old.syb;
         hspec-discover       = hlib.dontCheck old.hspec-discover;
         tasty-quickcheck     = hlib.dontCheck old.tasty-quickcheck;
@@ -556,16 +556,18 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     cabal-install = wrap-cabal (hlib.justStaticExecutables hpkgsCabal.cabal-install);
 
     latest-ghc-version       = "9.12.2";
-    latest-ghc-field         = "ghc9121";
+    latest-ghc-field         = "ghc9122";
     latest-ghc-short-version = "9.12";
 
-    latest-ghc-pkg = build-ghc {
-      base-ghc-to-override = pkgs.haskell.compiler.native-bignum."${latest-ghc-field}";
-      build-pkgs           = hpkgsCabal; #pkgs.haskell.packages.native-bignum.ghc9101;
-      version              = "9.12.2";
-      rev                  = "383be28ffdddf65b57b7b111bfc89808b4229ebc";
-      sha256               = "sha256-CsUKRGjJ68QFiLPqQkqhOVMnUbTm1BEz01hnNeZqctc="; #pkgs.lib.fakeSha256;
-    };
+    latest-ghc-pkg = pkgs.haskell.compiler.native-bignum."${latest-ghc-field}";
+
+    # latest-ghc-pkg = build-ghc {
+    #   base-ghc-to-override = pkgs.haskell.compiler.native-bignum."${latest-ghc-field}";
+    #   build-pkgs           = hpkgsCabal; #pkgs.haskell.packages.native-bignum.ghc9101;
+    #   version              = "9.12.2";
+    #   rev                  = "383be28ffdddf65b57b7b111bfc89808b4229ebc";
+    #   sha256               = "sha256-CsUKRGjJ68QFiLPqQkqhOVMnUbTm1BEz01hnNeZqctc="; #pkgs.lib.fakeSha256;
+    # };
 
     ghc-win =
       let
@@ -575,19 +577,9 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
         versionGE = to-check: target-version:
           builtins.compareVersions to-check target-version >= 0;
 
-        wine = pkgs-cross-win.winePackages.minimal.overrideAttrs (old: {
-          patches =
-            if (versionGE old.version "9.0")
-            then
-              # This patch is still needed even though wine 10.0 supports UNC paths natively.
-              # Loading dlls by UNC paths is not supported in Wine 10.
-              builtins.filter (x: !(pkgs-cross-win.lib.strings.hasSuffix "wine-add-dll-directory.patch") x) old.patches ++
-              [ ./patches/wine10-add-dll-directory.patch ]
-            else
-              old.patches;
-        });
+        wine = pkgs-cross-win.winePackages.minimal;
 
-        ghc-win = (win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}".override(_: {
+        ghc-win = (win-pkgs.pkgsBuildHost.haskell-nix.compiler."${latest-ghc-field}".override (_: {
           enableNativeBignum = true;
         })).overrideAttrs(old: {
           # haskell.nix ghc builder does not expase hadrian argumens so we have to hack
@@ -844,10 +836,12 @@ in ghc-win // {
   ghc928      = wrap-ghc                          "9.2.8"  "9.2"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc928.ghc;
   ghc948      = wrap-ghc                          "9.4.8"  "9.4"         pinned-pkgs.nixpkgs-23-11.haskell.packages.ghc948.ghc;
 
-  ghc966      = wrap-ghc                          "9.6.6"  "9.6"         pkgs.haskell.compiler.native-bignum.ghc966;
-  ghc982      = wrap-ghc                          "9.8.2"  "9.8"         pkgs.haskell.compiler.native-bignum.ghc982;
+  ghc967      = wrap-ghc                          "9.6.7"  "9.6"         pkgs.haskell.compiler.native-bignum.ghc967;
+  ghc984      = wrap-ghc                          "9.8.4"  "9.8"         pkgs.haskell.compiler.native-bignum.ghc984;
 
-  ghc9101     = wrap-ghc                          "9.10.1" "9.10"        pkgs.haskell.compiler.native-bignum.ghc9101;
+  ghc9102     = wrap-ghc                          "9.10.2" "9.10"        pkgs.haskell.compiler.native-bignum.ghc9102;
+
+  # ghc9121     = wrap-ghc                          "9.12.2" "9.12"        pkgs.haskell.compiler.native-bignum.ghc9122;
 
   ghc9122     = wrap-ghc                          latest-ghc-version [latest-ghc-short-version null] latest-ghc-pkg;
 
@@ -880,8 +874,8 @@ in ghc-win // {
 
   inherit cabal-install;
 
-  alex               = hlib.justStaticExecutables hpkgs910.alex;
-  happy              = hlib.justStaticExecutables hpkgs910.happy;
+  alex               = hlib.justStaticExecutables hpkgs912.alex;
+  happy              = hlib.justStaticExecutables hpkgs912.happy;
   doctest            = allowGhcReference (hlib.justStaticExecutables hpkgsDoctest.doctest);
   eventlog2html      = hlib.justStaticExecutables hpkgsEventlog2html.eventlog2html;
   fast-tags          = hlib.justStaticExecutables hpkgsFastTags.fast-tags;
