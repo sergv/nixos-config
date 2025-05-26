@@ -802,10 +802,14 @@ in
         pkgs.imagemagick
         #pkgs.inkscape
         pkgs.iotop
-        pkgs.kdePackages.ark
-        pkgs.kdePackages.okular
-        pkgs.kdePackages.oxygen-icons
-        pkgs.kdePackages.plasma-systemmonitor
+        #pkgs.kdePackages.ark
+        #pkgs.kdePackages.okular
+        #pkgs.kdePackages.oxygen-icons
+        #pkgs.kdePackages.plasma-systemmonitor
+        pkgs.libsForQt5.ark
+        pkgs.libsForQt5.okular
+        pkgs.libsForQt5.oxygen-icons
+        pkgs.libsForQt5.plasma-systemmonitor
         pkgs.lsof
         pkgs.lzip
         pkgs.lzop
