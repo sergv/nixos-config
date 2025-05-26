@@ -1,0 +1,114 @@
+diff --git a/lib/scripts/getsettings b/lib/scripts/getsettings
+index b9be9f53ca..4c37df8984 100755
+--- a/lib/scripts/getsettings
++++ b/lib/scripts/getsettings
+@@ -73,9 +73,12 @@ then
+   ISABELLE_IDENTIFIER="$(cat "$ISABELLE_HOME/etc/ISABELLE_IDENTIFIER")"
+ fi
+ 
++ISABELLE_ID="Isabelle2025"
++ISABELLE_IDENTIFIER="${ISABELLE_ID}-vsce"
++
+ ISABELLE_NAME="${ISABELLE_IDENTIFIER:-Isabelle}"
+ 
+-ISABELLE_HOSTNAME="$(hostname -s 2>/dev/null || uname -n)"
++ISABELLE_HOSTNAME="$(hostname -s)"
+ 
+ 
+ # components
+diff --git a/src/Tools/VSCode/src/language_server.scala b/src/Tools/VSCode/src/language_server.scala
+index 64fe5c3782..85b9af06ea 100644
+--- a/src/Tools/VSCode/src/language_server.scala
++++ b/src/Tools/VSCode/src/language_server.scala
+@@ -417,6 +417,32 @@ class Language_Server(
+     channel.write(LSP.DocumentHighlights.reply(id, result))
+   }
+ 
++  /* progress reports */
++  def session_progress() : isabelle.JSON.T = {
++    val snapshot = session.snapshot()
++    val nodes = snapshot.version.nodes
++
++    var nodes_status1 : Map[isabelle.Document.Node.Name, isabelle.Document_Status.Node_Status] = Map.empty
++    for (name <- nodes.domain.iterator) {
++      if (resources.session_base.loaded_theory(name) ||
++        nodes(name).is_empty) ()
++      else {
++        val st = isabelle.Document_Status.Node_Status.make(snapshot.state, snapshot.version, name)
++        nodes_status1 = nodes_status1 + (name -> st)
++      }
++    }
++
++    val nodes_status2 =
++      nodes_status1 -- nodes_status1.keysIterator.filter(nodes.is_suppressed(_))
++
++    val sorted_nodes = nodes.topological_order.filter(nodes_status1.isDefinedAt(_))
++      .map{x => LSP.Progress_Node(x.path.implode, nodes_status1(x))}
++    log("## progress = " + sorted_nodes)
++
++
++    LSP.Progress_Nodes(sorted_nodes)
++  }
++
+ 
+   /* code actions */
+ 
+@@ -534,6 +560,7 @@ class Language_Server(
+           case LSP.Symbols_Convert_Request(id, text, boolean) =>
+             symbols_convert_request(id, text, boolean)
+           case LSP.Preview_Request(file, column) => preview_request(file, column)
++          case LSP.Progress_Node_Request(()) => channel.write(session_progress())
+           case _ => if (!LSP.ResponseMessage.is_empty(json)) log("### IGNORED")
+         }
+       }
+diff --git a/src/Tools/VSCode/src/lsp.scala b/src/Tools/VSCode/src/lsp.scala
+index 9ca5dd3d07..0a834d2d3c 100644
+--- a/src/Tools/VSCode/src/lsp.scala
++++ b/src/Tools/VSCode/src/lsp.scala
+@@ -737,4 +737,46 @@ object LSP {
+           "label" -> label,
+           "content" -> content))
+   }
++
++  /* Progress indication */
++  object Progress_Node
++  {
++    def apply(name : String, node_status: isabelle.Document_Status.Node_Status): JSON.Object.T =
++    {
++
++      node_status match {
++        case isabelle.Document_Status.Node_Status(is_suppressed, unprocessed, running, warned,
++          failed, finished, canceled, terminated, initialized, finalized, consolidated) =>
++          JSON.Object(
++            "name" -> name,
++            "unprocessed" -> unprocessed,
++            "running" -> running,
++            "warned" -> warned,
++            "failed" -> failed,
++            "finished" -> finished,
++            "initialized" -> initialized,
++            "consolidated" -> consolidated,
++            "canceled" -> canceled,
++            "terminated" -> terminated
++          )
++      }
++    }
++  }
++
++  object Progress_Nodes
++  {
++    def apply(nodes_status: List[JSON.Object.T]): JSON.T =
++    {
++      Notification("PIDE/progress", JSON.Object("nodes-status" -> nodes_status))
++    }
++  }
++
++  object Progress_Node_Request
++  {
++    def unapply(json: JSON.T): Option[Unit] =
++      for {
++        method <- JSON.string(json, "method")
++        if method == "PIDE/progress_request"
++      } yield ()
++  }
+ }
