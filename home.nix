@@ -123,6 +123,10 @@ let
       });
 
   qbittorrent-pkg =
+    let
+      scale = "1.5";
+      #scale = "1.0";
+    in
     (pkgs.qbittorrent.override {
       webuiSupport = false;
       trackerSearch = false;
@@ -130,7 +134,7 @@ let
       (old: {
 
         postInstall = old.postInstall + ''
-          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=1.5 \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
+          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=${scale} \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
         '';
       });
 
