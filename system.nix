@@ -541,7 +541,8 @@ in
     };
   };
 
-  services.displayManager.defaultSession = "plasmax11";
+  services.displayManager.defaultSession = "plasma";
+  #services.displayManager.defaultSession = "plasmax11";
   # services.displayManager.defaultSession = "plasma";
 
   # Enable the X11 windowing system.
@@ -579,17 +580,21 @@ in
     displayManager = {
       lightdm.enable = true;
     };
-  };
 
-  services.desktopManager = {
-    plasma6 = {
-      # phononBackend = "vlc";
-      enable        = true;
+    desktopManager = {
+      plasma5 = {
+        # phononBackend = "vlc";
+        enable        = true;
+      };
+      #plasma6 = {
+      #  # phononBackend = "vlc";
+      #  enable        = true;
+      #};
+      # xfce                  = {
+      #   enable            = true;
+      #   enableScreensaver = false;
+      # };
     };
-    # xfce                  = {
-    #   enable            = true;
-    #   enableScreensaver = false;
-    # };
   };
 
   environment.etc."xdg/kwinrc".text = pkgs.lib.generators.toINI {} {
