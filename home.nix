@@ -104,16 +104,20 @@ let wmctrl-pkg = pkgs.wmctrl;
       ];
     });
 
-    qbittorrent-pkg = (pkgs.qbittorrent.override {
-      webuiSupport  = false;
-      trackerSearch = false;
-    }).overrideAttrs (old: {
+    qbittorrent-pkg =
+      let scale = "1.5";
+          #scale = "1.0";
+      in
+        (pkgs.qbittorrent.override {
+          webuiSupport  = false;
+          trackerSearch = false;
+        }).overrideAttrs (old: {
 
-      postInstall = old.postInstall +
-        ''
-          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=1.5 \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
+          postInstall = old.postInstall +
+                        ''
+          sed -i -re 's/^Exec=(.*)/Exec=env QT_SCALE_FACTOR=${scale} \1/' "$out/share/applications/org.qbittorrent.qBittorrent.desktop"
         '';
-    });
+        });
 
     tribler-pkg =
       let tribler-python = pkgs.python310;
