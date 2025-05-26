@@ -871,8 +871,8 @@ in
 
         pkgs.nix-diff
 
-        # isabelle-pkg
-        # isabelle-lsp-wrapper
+        isabelle-pkg
+        isabelle-lsp-wrapper
 
         pkgs.pcsx2
         game-run-wrapper
