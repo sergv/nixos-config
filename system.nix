@@ -419,7 +419,7 @@ in
     gc.automatic = false;
     package      = pkgs.unstable.nixVersions.stable;
     settings     = {
-      allowed-users         = ["@wheel"];
+      allowed-users         = ["@wheel" "nix-ssh"];
       bash-prompt-prefix    = "[nix] ";
       experimental-features = ["nix-command" "flakes"];
       # More at https://nixos.org/nix/manual/#conf-system-features.
@@ -427,6 +427,12 @@ in
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
+
+    sshServe = {
+      enable  = true;
+      keys    = [ "TODO: add public key here" ];
+      trusted = false;
+    };
   };
 
   programs.bash.completion.enable = true;
