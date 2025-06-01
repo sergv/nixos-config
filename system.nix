@@ -720,6 +720,7 @@ in
       sergey = {
         extraGroups = [
           "adm"
+          "adbusers"
           "audio"
           "netdev"
           "networkmanager"
