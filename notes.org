@@ -380,3 +380,21 @@ qemu-s390x target/s390x-unknown-linux-gnu/release/pijul
 #+END_EXAMPLE
 
 This runs an emulation of Pijul on the s390x architecture, using the native system calls of your system (I’ve only tested this on Linux).
+
+** 32-bit dev shell
+~nix develop .#devShell.i686-linux~
+** Share ~/nix/store~ between machines via substitutes
+On server:
+
+#+BEGIN_EXAMPLE
+nix.settings.allowed-users = ["nix-ssh"];
+nix.sshServe = {
+  enable  = true;
+  keys    = [ "TODO: add public key here" ];
+  trusted = false;
+};
+#+END_EXAMPLE
+
+On clients:
+~nix build --option extra-substituters 'ssh://nix-ssh@<HOST>?trusted=true&ssh-key=<PATH-TO-SSH-KEY>'~
+~nixos-rebuild build --option extra-substituters 'ssh://nix-ssh@<HOST>?trusted=true&ssh-key=<PATH-TO-SSH-KEY>'~
