@@ -504,14 +504,17 @@ in
     gc.automatic = false;
     package      = pkgs.unstable.nixVersions.stable;
     settings     = {
-      allowed-users = [ "@wheel" ];
-      bash-prompt-prefix = "[nix] ";
+      allowed-users         = [
+        "@wheel"
+        "nix-ssh"
+      ];
+      bash-prompt-prefix    = "[nix] ";
       experimental-features = [
         "nix-command"
         "flakes"
       ];
       # More at https://nixos.org/nix/manual/#conf-system-features.
-      system-features = [
+      system-features       = [
         "big-parallel"
         "gccarch-znver3"
         "gccarch-znver4"
@@ -519,6 +522,12 @@ in
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
+
+    sshServe = {
+      enable = true;
+      keys = [ "TODO: add public key here" ];
+      trusted = false;
+    };
   };
 
   programs.bash.completion.enable = true;
