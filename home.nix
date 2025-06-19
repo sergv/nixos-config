@@ -138,6 +138,14 @@ in
     arkenfox.hmModules.default
   ];
 
+  # Disable all home-manager manuals - the manpages fails on WSL because of
+  # non-functional Semaphore within Python.
+  manual = {
+    html.enable     = false;
+    json.enable     = false;
+    manpages.enable = false;
+  };
+
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home = {
