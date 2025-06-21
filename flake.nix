@@ -112,12 +112,6 @@
         pkgs = nixpkgs-unstable.legacyPackages."${system}";
       };
 
-      # Fix when upgrading 22.11 -> nixos-unstable circa 2023-04-11
-      fcitx-overlay = _: old: {
-        fcitx = old.fcitx5;
-        fcitx-engines = old.fcitx5;
-      };
-
       # In configuration.nix
       ssh-overlay = _: old: {
         openssh = old.openssh.overrideAttrs (old: {
@@ -223,12 +217,17 @@
               temporarily-disable-problematic-haskell-pkgs-checks old old2
               // disable-problematic-haskell-crypto-pkgs-checks old old2
             );
+            ghc967 = hutils.fixedExtend old.haskell.packages.ghc967 (
+              _: old2:
+              temporarily-disable-problematic-haskell-pkgs-checks old old2
+              // disable-problematic-haskell-crypto-pkgs-checks old old2
+            );
           };
         };
       };
 
       # Fixes for building with -march=znver3
-      zen4-march-overlay = _: old: {
+      zen4-march-overlay = new: old: {
 
         # # llvmPackages_15 = old.llvmPackages_15.extend (_: old2: {
         # #   libllvm = old2.libllvm.override (_: {
@@ -319,6 +318,16 @@
         #   };
         # };
 
+        # qt5 = old.qt5 // {
+        #   qtwebengine = builtins.abort "Don't build qtwebengine5";
+        # };
+
+        # qt5 = old.qt5 // {
+        #   qtwebengine = old.qt5.qtwebengine.override (_: {
+        #     stdenv = new.clangStdenv;
+        #   });
+        # };
+
         # To avoid infinite recursion
         cabal2nix-unwrapped = old.haskell.lib.justStaticExecutables (
           old.haskell.packages.native-bignum.ghc967.generateOptparseApplicativeCompletions [
@@ -378,9 +387,9 @@
           # virtualbox.enableExtensionPack = true;
         };
         overlays = [
-          fcitx-overlay
           ssh-overlay
-          improve-fetchgit-overlay
+          # improve-fetchgit-overlay
+          enable-ghc-unit-ids-overlay
         ];
       };
 
@@ -391,16 +400,17 @@
         overlays = [
           haskellNix.overlay
           enable-ghc-unit-ids-overlay
-          improve-fetchgit-overlay
+          # improve-fetchgit-overlay
           use-win32-thread-model-overlay
         ];
       };
 
       arch = import ./arch.nix;
 
+      # pkgs = pkgs-pristine;
       pkgs = import nixpkgs-unstable {
-        # inherit system;
-        inherit (arch) localSystem;
+        inherit system;
+        # inherit (arch) localSystem;
         config = {
           allowBroken = true;
           allowUnfree = true; # For nvidia drivers.
@@ -408,13 +418,12 @@
           #inherit (arch) replaceStdenv;
         };
         overlays = [
-          fcitx-overlay
           ssh-overlay
           enable-ghc-unit-ids-overlay
           # smaller-haskell-overlay
           haskell-disable-checks-overlay
           zen4-march-overlay
-          improve-fetchgit-overlay
+          # improve-fetchgit-overlay
 
           # arch-native-overlay
         ];
@@ -491,7 +500,6 @@
                   nur.overlays.default
                   overlay-unstable
                   # Don’t uncomment, otherwise overlays will be applied one more time.
-                  # fcitx-overlay
                   # ssh-overlay
                   # smaller-haskell-overlay
                   # haskell-disable-checks-overlay
