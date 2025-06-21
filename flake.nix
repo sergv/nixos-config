@@ -386,10 +386,12 @@
           allowUnfree = true;
           # virtualbox.enableExtensionPack = true;
         };
+        # NB keep this really pristine, any overlay here invalidates
+        # cache.
         overlays = [
-          ssh-overlay
+          # ssh-overlay
           # improve-fetchgit-overlay
-          enable-ghc-unit-ids-overlay
+          # enable-ghc-unit-ids-overlay
         ];
       };
 
