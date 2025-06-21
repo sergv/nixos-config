@@ -589,11 +589,9 @@ in
 
     desktopManager = {
       plasma5 = {
-        # phononBackend = "vlc";
         enable        = true;
       };
       #plasma6 = {
-      #  # phononBackend = "vlc";
       #  enable        = true;
       #};
       # xfce                  = {
