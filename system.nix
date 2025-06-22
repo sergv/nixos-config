@@ -19,7 +19,10 @@ in
   #boot.initrd.kernelModules = ["amdgpu"];
 
   # For EFI-based systems
-  boot.loader.systemd-boot.enable      = true;
+  boot.loader.systemd-boot = {
+    enable           = true;
+    memtest86.enable = true;
+  };
   boot.loader.efi.canTouchEfiVariables = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
