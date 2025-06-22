@@ -604,7 +604,7 @@ in
     enable           = true;
     defaultCacheTtl  = 3600000000;
     maxCacheTtl      = 3600000000;
-    pinentry.package = pkgs.pinentry-qt;
+    pinentry.package = pkgs-pristine.pinentry-qt;
   };
 
   services.sxhkd = {
@@ -841,7 +841,7 @@ in
       );
     in
     [
-      pkgs.anki
+      pkgs-pristine.anki
       (pkgs.aspellWithDicts (d: [
         d.en
         d.en-computers
@@ -897,8 +897,8 @@ in
       pkgs.shntool
       pkgs.smartmontools
       pkgs.sshfs
-      pkgs.telegram-desktop
-      pkgs.tdesktop
+      pkgs-pristine.telegram-desktop
+      pkgs-pristine.tdesktop
       pkgs.unzip
       pkgs.usbutils
       pkgs.vlc
