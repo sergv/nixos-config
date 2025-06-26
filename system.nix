@@ -151,12 +151,12 @@ in
         "films"
         "games"
         "health"
+        "London"
         "Music"
         "nix"
         "Pictures"
         { directory = "projects"; mode = "0700"; }
         "recipes"
-        "relocation"
         "scripts"
         "sites"
         "software"
