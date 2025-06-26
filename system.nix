@@ -173,6 +173,7 @@ in
         "films"
         "games"
         "health"
+        "London"
         "Music"
         "nix"
         "Pictures"
@@ -181,7 +182,6 @@ in
           mode = "0700";
         }
         "recipes"
-        "relocation"
         "scripts"
         "sites"
         "software"
