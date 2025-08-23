@@ -18,8 +18,8 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
     cabal-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "cabal";
-      rev    = "a54598d57c4ad413cb4d7d207b789e20021f8e07"; # "dev";
-      sha256 = "sha256-c7uSfIhqEZmdjLJr3fE0qbg7XMvh/27aqnJfA0L5i+w="; #pkgs.lib.fakeSha256;
+      rev    = "118bd16fded858db8ad4bb74212f873915ba98a0"; # "dev";
+      sha256 = "sha256-5ecomu9mroT/rPpP+wIQvsAMBXZyKgPlQ+dAYIYeKdw="; #pkgs.lib.fakeSha256;
     };
 
     doctest-repo = pkgs.fetchFromGitHub {
@@ -125,7 +125,7 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       }));
 
     # pkgs.haskell.packages.ghc961
-    hpkgsCabal = hpkgs912.extend (new: old:
+    hpkgsCabal = hpkgs910.extend (new: old:
       builtins.mapAttrs hutils.makeHaskellPackageAttribSmaller
         (old // {
         # ghc = hutils.smaller-ghc(old.ghc);
@@ -164,16 +164,28 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
           { inherit (new) Cabal-described Cabal-QuickCheck Cabal-tree-diff Cabal-tests;
           });
 
-        # hackage-security = hlib.doJailbreak
-        #   (old.callHackage "hackage-security" "0.6.2.6" {});
+        hackage-security =
+          # hlib.doJailbreak
+          #   (old.callHackage "hackage-security" "0.6.3.1" {});
+          # hlib.doJailbreak
+          (overrideCabal
+            "1"
+            "sha256-5yidF8pwnRrPubtDQC68/mwSbv+eC9omvrPGh9isJuo=" #pkgs.lib.fakeSha256
+            (old.callHackageDirect
+              {
+                pkg    = "hackage-security";
+                ver    = "0.6.3.1";
+                sha256 = "sha256-pbU35af2jqFhAtKDtkFRt4jY4m+BU5rpG1shr8qZiaQ="; #pkgs.lib.fakeSha256;
+              }
+              {}));
 
         # semaphore-compat = hlib.markUnbroken old.semaphore-compat;
 
         # # Force reinstall
         # semaphore-compat = old.callHackage "semaphore-compat" "1.0.0" {};
 
-        # Disable tests which take around 1 hour!
-        statistics = hlib.dontCheck old.statistics;
+        # # Disable tests which take around 1 hour!
+        # statistics = hlib.dontCheck old.statistics;
 
         # async = hlib.dontCheck old.async;
         # vector = hlib.dontCheck old.vector;
