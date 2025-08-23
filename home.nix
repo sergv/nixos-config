@@ -182,19 +182,20 @@ let wmctrl-pkg = pkgs.wmctrl;
         '';
 
     emacs-base = pkgs.emacs30.overrideAttrs (old: {
-      version        = "30.1";
+      # NixOS 25.05 patches do not apply to 30.2 any more. Remove throwing away of
+      # nixpkgs patches here when moving to a later NixOS release.
+      patches        = [];
+      version        = "30.2";
       withGTK3       = true;
       withSQLite3    = true;
       withTreeSitter = true;
-
       configureFlags = old.configureFlags ++ [
         (pkgs.lib.withFeature false "gc-mark-trace")
       ];
-
       src            = pkgs.fetchgit {
         url    = "https://github.com/sergv/emacs.git";
-        rev    = "63a212f2530105431879a1c944a98c84b9159408";
-        sha256 = "sha256-nWybAqeWB2Xhhfcxax2B7JE7R1rdhckwBRtVwbfllAc="; #pkgs.lib.fakeSha256;
+        rev    = "86023a80217c3bd16a6d18c976f56a9a54531246";
+        sha256 = "sha256-PAmfVhSLgW016kJiZlkWH64d2gvsJIqBdIKKQCO8b5M="; #pkgs.lib.fakeSha256;
       };
     });
 
