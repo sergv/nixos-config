@@ -36,13 +36,6 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       sha256 = "sha256-TW3e2xbUOgvqjk1cr2y2DOc+iuQpVfSJEkP9AgT0xXk="; #pkgs.lib.fakeSha256;
     };
 
-    blaze-svg-repo = pkgs.fetchFromGitHub {
-      owner  = "sergv";
-      repo   = "blaze-svg";
-      rev    = "d540dc6c4389636c175a0438ff540255aad3441b";
-      sha256 = "sha256-RRa3bB6As5QnHaOH9AP4yc5b4cigGY27MeQsyiYo65k="; #pkgs.lib.fakeSha256;
-    };
-
     fast-tags-repo = pkgs.fetchFromGitHub {
       owner  = "sergv";
       repo   = "fast-tags";
