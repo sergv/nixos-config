@@ -587,11 +587,13 @@ let
       rev,
       sha256,
     }:
+
     let
       ghcSrc = pkgs.fetchgit {
         url = "https://gitlab.haskell.org/ghc/ghc.git";
         inherit rev sha256;
       };
+
       ghc' = base-ghc-to-override.override (
         old:
         old
