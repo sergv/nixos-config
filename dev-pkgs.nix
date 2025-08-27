@@ -480,10 +480,12 @@ let #pkgs-pristine = nixpkgs-unstable.legacyPackages."${system}";
       };
 
     build-ghc = { base-ghc-to-override, build-pkgs, version, rev, sha256 }:
+
       let ghcSrc = pkgs.fetchgit {
             url = "https://gitlab.haskell.org/ghc/ghc.git";
             inherit rev sha256;
           };
+
           ghc' = base-ghc-to-override.override (old: old // {
             bootPkgs = build-pkgs;
             inherit ghcSrc;
