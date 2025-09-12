@@ -27,13 +27,13 @@
         SCHEDSTATS             = lib.mkForce lib.kernel.no;
 
         #FB_3DFX                 = lib.mkForce lib.kernel.no;
-        FB_3DFX_ACCEL           = lib.mkForce lib.kernel.no;
+        FB_3DFX_ACCEL          = lib.mkForce lib.kernel.no;
         #FB_3DFX_I2C             = lib.mkForce lib.kernel.no;
-        MLXSW_SPECTRUM          = lib.mkForce lib.kernel.no;
-        MLX_PLATFORM            = lib.mkForce lib.kernel.no;
+        MLXSW_SPECTRUM         = lib.mkForce lib.kernel.no;
+        MLX_PLATFORM           = lib.mkForce lib.kernel.no;
 
         # Sometimes doesn’t build and is not needed
-        NET_VENDOR_CAVIUM       = lib.mkForce lib.kernel.no;
+        NET_VENDOR_CAVIUM      = lib.mkForce lib.kernel.no;
 
         # # # HOTPLUG_CPU = lib.mkForce lib.kernel.no;
         # # CPU_SUP_HYGON = lib.mkForce lib.kernel.no;
