@@ -26,6 +26,11 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  boot.blacklistedKernelModules = [
+    # Don’t want my integrated GPU around at all.
+    "amdgpu"
+  ];
+
   boot.kernelParams = [
     "mitigations=off"
     "preempt=full"
