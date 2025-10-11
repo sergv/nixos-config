@@ -399,6 +399,9 @@ in
       "la"                  = "ls -A --color=always";
       "l"                   = "ls -CF --color=always";
 
+      # PS that shows full command lines and process tree.
+      "ps-full"             = "ps auxfww";
+
       ".."                  = "cd ..";
       "..."                 = "cd ../..";
       "...."                = "cd ../../..";
