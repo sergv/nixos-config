@@ -619,10 +619,8 @@ in
   xsession.enable = true;
 
   systemd.user.tmpfiles.rules = [
-    "d /tmp/emacs-cache                0755 sergey users - -"
     "d /tmp/cache                      0755 sergey users - -"
-    "d /tmp/cache/gradle-caches        0755 sergey users - -"
-    "d /tmp/cache/gradle-daemon        0755 sergey users - -"
+    "d /tmp/cache/emacs                0755 sergey users - -"
     "d /tmp/windows-shared             0755 sergey users - -"
     "d /home/sergey/.config            -    -      -     - -"
     "d /home/sergey/.local             -    -      -     - -"
@@ -630,9 +628,7 @@ in
     "d /home/sergey/Desktop            -    -      -     - -"
 
     # Forcefully symlink, removing destination if it exists.
-    "L+ /home/sergey/.emacs.d/compiled -    -      -     - /tmp/emacs-cache"
-    "L+ /home/sergey/.gradle/caches    -    -      -     - /tmp/cache/gradle-caches"
-    "L+ /home/sergey/.gradle/daemon    -    -      -     - /tmp/cache/gradle-daemon"
+    "L+ /home/sergey/.emacs.d/compiled -    -      -     - /tmp/cache/emacs"
   ]
   ++
     map
@@ -659,6 +655,7 @@ in
         ".config/QtProject.conf"
         ".config/Triblerrc"
 
+        # ".gradle"
         ".java/.userPrefs"
 
         ".local/ghci.conf"
