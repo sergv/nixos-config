@@ -398,3 +398,7 @@ nix.sshServe = {
 On clients:
 ~nix build --option extra-substituters 'ssh://nix-ssh@<HOST>?trusted=true&ssh-key=<PATH-TO-SSH-KEY>'~
 ~nixos-rebuild build --option extra-substituters 'ssh://nix-ssh@<HOST>?trusted=true&ssh-key=<PATH-TO-SSH-KEY>'~
+
+** Don’t use caches/build everything from source/stale cache entry does not exist
+Pass ~nix build <target> --option substitute false~
+
