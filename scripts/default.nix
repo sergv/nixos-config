@@ -12,6 +12,15 @@ let writePatchedScriptBin = name: buildInputs:
     reset-usb = writePatchedScriptBin "reset-usb" [];
 in {
   inherit reset-usb;
+
+  # Must be a clean script without mess produced wrapProgram or sg won’t work with errors like
+  # > setgroups: Operation not permitted
+  # > setgid: Operation not permitted
+  no-internet             = pkgs.writeScriptBin "no-internet" ''
+    #!${pkgs.bash}/bin/bash
+    exec sg no-internet "''${@}"
+  '';
+
   pm-suspend              = writePatchedScriptBin "pm-suspend"              [];
   git-commit-on-date      = writePatchedScriptBin "git-commit-on-date"      [ pkgs.git ];
   reset-nixos-usb-network = writePatchedScriptBin "reset-nixos-usb-network" [ reset-usb ];

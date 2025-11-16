@@ -414,13 +414,25 @@ in
     #interfaces.eth0 = {
     #  useDHCP = true;
     #};
-  };
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [... ];
-  # networking.firewall.allowedUDPPorts = [... ];
-  # Or disable the firewall altogether.
-  networking.firewall.enable = false;
+    firewall = {
+      enable = true;
+      allowPing = false;
+      extraCommands =
+        ''
+          iptables -I OUTPUT 1 -m owner --gid-owner no-internet -j DROP
+        '';
+
+      # Open ports in the firewall.
+      # allowedTCPPorts = [... ];
+      # allowedUDPPorts = [... ];
+    };
+
+    # Declarative successor of iptables
+    # nftables = {
+    #   enable = true;
+    # };
+  };
 
   # Enable commands like ‘nix search’ and flakes.
   nix = {
@@ -716,6 +728,9 @@ in
   users = {
     # Make sure that users are managed only through configuration.nix
     mutableUsers = false;
+    groups = {
+      no-internet = {};
+    };
     users = {
     #};
     ## Define a user account. Don't forget to set a password with ‘passwd’.
@@ -730,6 +745,9 @@ in
           "audio"
           "netdev"
           "networkmanager"
+          # Doesn’t disable internet per se, but I need to be part of the group
+          # to be able to run ‘no-internet’ script.
+          "no-internet"
           "plugdev"
           "sudo"
           "vboxusers"
