@@ -299,41 +299,6 @@ let
     mk-emacs-pkg "emacs-debug" emacs-debug-pkg
       "gdb -ex='set confirm on' -ex=run -ex=quit --args ";
 
-  emacsDesktopItem = pkgs.lib.generators.toINI { } {
-    "Desktop Entry" = {
-      Type           = "Application";
-      Exec           = "emacs %u";
-      Terminal       = false;
-      Name           = "Emacs";
-      Icon           = "emacs";
-      Comment        = "Edit text";
-      GenericName    = "Text Editor";
-      MimeType       = pkgs.lib.concatMapStrings (s: s + ";") emacsMimeTypes;
-      Categories     = "Utility;TextEditor;";
-      StartupWMClass = "Emacs";
-    };
-  };
-
-  emacsMimeTypes = [
-    "application/x-shellscript"
-    "text/english"
-    "text/plain"
-    "text/x-c"
-    "text/x-c++"
-    "text/x-c++hdr"
-    "text/x-c++src"
-    "text/x-chdr"
-    "text/x-csrc"
-    "text/x-java"
-    "text/x-haskell"
-    "text/x-makefile"
-    "text/x-moc"
-    "text/x-pascal"
-    "text/x-tcl"
-    "text/x-tex"
-    "x-scheme-handler/org-protocol"
-  ];
-
 in
 {
 
@@ -755,7 +720,59 @@ in
   };
 
   xdg = {
-    dataFile."applications/emacs.desktop".text = emacsDesktopItem;
+    desktopEntries = {
+      emacs = {
+        type        = "Application";
+        exec        = "emacs %u";
+        terminal    = false;
+        name        = "Emacs";
+        icon        = "emacs";
+        comment     = "Edit text";
+        genericName = "Text Editor";
+        categories  = [
+          "Utility"
+          "TextEditor"
+        ];
+        mimeType    = [
+          "application/x-shellscript"
+          "text/english"
+          "text/plain"
+          "text/x-c"
+          "text/x-c++"
+          "text/x-c++hdr"
+          "text/x-c++src"
+          "text/x-chdr"
+          "text/x-csrc"
+          "text/x-java"
+          "text/x-haskell"
+          "text/x-makefile"
+          "text/x-moc"
+          "text/x-pascal"
+          "text/x-tcl"
+          "text/x-tex"
+          "x-scheme-handler/org-protocol"
+        ];
+        # startupWMClass = "Emacs";
+      };
+
+      i2p = {
+        type             = "Application";
+        exec             = "firefox -P i2p %u";
+        terminal         = false;
+        name             = "I2P";
+        icon             = ./i2p.png;
+        comment          = "Anonymous Internet";
+        genericName      = "Web Browser";
+        mimeType         = [ ];
+        categories       = [
+          "Network"
+          "WebBrowser"
+        ];
+        # startupWMClass = "I2P";
+      };
+    };
+    # dataFile."applications/emacs.desktop".text = emacsDesktopItem;
+    # dataFile."applications/i2p.desktop".text = i2pDesktopItem;
   };
 
   # xdg.userDirs = {
