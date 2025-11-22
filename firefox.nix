@@ -374,15 +374,15 @@ in {
     Proxy = {
       Mode = "none"; # "manual"; # none | system | manual | autoDetect | autoConfig;
       Locked = false;
-      # HTTPProxy = hostname;
-      # UseHTTPProxyForAllProtocols = true;
-      # SSLProxy = hostname;
-      # FTPProxy = hostname;
-      SOCKSProxy = "127.0.0.1:9050"; # Tor
-      SOCKSVersion = 5; # 4 | 5
-      #Passthrough = <local>;
-      # AutoConfigURL = URL_TO_AUTOCONFIG;
-      # AutoLogin = true;
+      # # HTTPProxy = hostname;
+      # # UseHTTPProxyForAllProtocols = true;
+      # # SSLProxy = hostname;
+      # # FTPProxy = hostname;
+      # SOCKSProxy = "127.0.0.1:9050"; # Tor
+      # SOCKSVersion = 5; # 4 | 5
+      # #Passthrough = <local>;
+      # # AutoConfigURL = URL_TO_AUTOCONFIG;
+      # # AutoLogin = true;
       UseProxyForDNS = true;
     };
     SanitizeOnShutdown = {
@@ -449,259 +449,302 @@ in {
     version = "128.0"; # Used on 119.0, because we don't have firefox 118.0 handy
   };
 
-  profiles.Default = {
-    # programs.firefox.profiles.<name>.userContent
-    #
-    #     Custom Firefox user content CSS.
-    #     Type: strings concatenated with “\n”
-    #     Default: ""
-    #     Example:
-    #     ''
-    #       /* Hide scrollbar in FF Quantum */
-    #       *{scrollbar-width:none !important}
-    #     ''
+  profiles =
+    let default = {
+          # programs.firefox.profiles.<name>.userContent
+          #
+          #     Custom Firefox user content CSS.
+          #     Type: strings concatenated with “\n”
+          #     Default: ""
+          #     Example:
+          #     ''
+          #       /* Hide scrollbar in FF Quantum */
+          #       *{scrollbar-width:none !important}
+          #     ''
 
-    isDefault = true;
+          # Documentation https://arkenfox.dwarfmaster.net
+          arkenfox = {
+            enable = true;
 
-    # Documentation https://arkenfox.dwarfmaster.net
-    arkenfox = {
-      enable = true;
+            # STARTUP
+            "0100" = {
+              enable = false;
+              "0105".enable = true; # Disable sponsored content on Firefox Home (Activity Stream)
+              "0106".enable = true; # Clear default topsites
+            };
 
-      # STARTUP
-      "0100" = {
-        enable = false;
-        "0105".enable = true; # Disable sponsored content on Firefox Home (Activity Stream)
-        "0106".enable = true; # Clear default topsites
+            "0200" = {
+              enable = false;
+              # GEOLOCATION / LANGUAGE / LOCALE
+              "0202".enable = true; # Disable using the OS's geolocation service
+              # "0203".enable = true; # disable region updates
+              # WARNING(Krey): May break some input methods e.g xim/ibus for CJK languages [1]
+            };
+
+            # QUIETER FOX (Handles telemetry, etc..)
+            "0300" = {
+              enable = true;
+            };
+
+            # BLOCK IMPLICIT OUTBOUND [not explicitly asked for - e.g. clicked on]
+            "0600" = {
+              enable = true;
+            };
+
+            "0700" = {
+              enable = false;
+              "0704".enable = true; # Disable GIO as a potential proxy bypass vector
+            };
+
+            "0800" = {
+              enable = false;
+              # LOCATION BAR / SEARCH BAR / SUGGESTIONS / HISTORY / FORMS
+              "0802".enable = true; # disable location bar domain guessing
+              "0805".enable = true; # disable location bar making speculative connections
+              "0806".enable = true; # disable location bar leaking single words to a DNS provider **after searching**
+              "0807".enable = true; # disable location bar contextual suggestions
+              "0820".enable = true; # disable coloring of visited links
+            };
+
+            # PASSWORDS
+            "0900" = {
+              enable = true;
+            };
+
+            # HTTPS (SSL/TLS / OCSP / CERTS / HPKP)
+            "1200" = {
+              enable = true;
+            };
+
+            # HEADERS ? REFERERS
+            "1600" = {
+              enable = true;
+            };
+
+            # CONTAINERS
+            "1700" = {
+              enable = true;
+            };
+
+            # PLUGINS / MEDIA / WEBRTC
+            "2000" = {
+              enable = false;
+              "2002".enable = true; # Force WebRTC inside the proxy [FF70+]
+              "2003".enable = true; # Force a single network interface for ICE candidates generation [FF42+]
+              "2004".enable = true; # Force exclusion of private IPs from ICE candidates [FF51+]
+              "2020".enable = true; # Disable GMP (Gecko Media Plugins) - https://wiki.mozilla.org/GeckoMediaPlugins
+              # "2030".enable = true; # Disable autoplay of HTML5 media
+              # "2031".enable = true; # Disable autoplay of HTML5 media if you interacted with the site
+            };
+
+            # DOM (DOCUMENT OBJECT MODEL)
+            # Prevent scrips from resizing open windows (could be used for fingerprinting)
+            "2400" = {
+              enable = true;
+            };
+
+            "2600" = {
+              enable = false;
+              # MISCELLANEOUS
+              "2603".enable = true; # Remove temp files opened with an external application on exit
+              "2606".enable = true; # Disable UITour backend so there is no chance that a remote page can use it
+              "2608".enable = true; # Reset remote debugging to disabled
+              "2615".enable = true; # Disable websites overriding Firefox's keyboard shortcuts [FF58+]
+              "2616".enable = true; # Remove special permissions for certain mozilla domains [FF35+]
+              "2617".enable = true; # Remove webchannel whitelist (Seems to be deprecated with mozilla having still permissions in it)
+              "2619".enable = true; # Use Punycode in Internationalized Domain Names to eliminate possible spoofing
+              "2620".enable = true; # Enforce PDFJS, disable PDFJS scripting
+              # "2621".enable = true; # Disable links launching Windows Store on Windows 8/8.1/10 [WINDOWS]
+              "2624".enable = true; # Disable middle click on new tab button opening URLs or searches using clipboard [FF115+]
+              "2651".enable = true; # Enable user interaction for security by always asking where to download
+              "2652".enable = true; # Disable downloads panel opening on every download [FF96+]
+              "2654".enable = true; # Enable user interaction for security by always asking how to handle new mimetypes [FF101+]
+              "2662".enable = true; # Disable webextension restrictions on certain mozilla domains (you also need 4503) [FF60+]
+            };
+
+            # ETP (ENHANCED TRACKING PROTECTION)
+            "2700" = {
+              enable = true;
+            };
+
+            "2800" = {
+              enable = false;
+              "2811".enable = true; # Set/enforce what items to clear on shutdown (if 2810 is true)
+              "2812".enable = true; # Set Session Restore to clear on shutdown (if 2810 is true) [FF34+]
+              "2815".enable = true; # Set "Cookies" and "Site Data" to clear on shutdown (if 2810 is true)
+            };
+
+            # EFP (RESIST FINGERPRINTING)
+            "4500" = {
+              enable = true;
+              # "4503".enable = true; # Disable mozAddonManager Web API [FF57+]
+              "4504".enable = false; # Letterboxing
+            };
+
+            # OPTIONAL OPSEC
+            "5000" = {
+              enable = false;
+              "5003".enable = true; # Disable saving passwords
+              "5004".enable = true; # Disable permissions manager from writing to disk [FF41+] [RESTART], This means any permission changes are session only
+            };
+
+            # OPTIONAL HARDENING
+            ## NOTE(Krey): There are new vulnerabilities discovered in 2023, better disable it for now
+            "5500" = {
+              enable = false;
+              "5505".enable = true; # Diable Ion and baseline JIT to harden against JS exploits
+              # user_pref("javascript.options.wasm", false);
+              "5506".enable = true; # Disable WebAssembly
+            };
+
+            # DONT TOUTCH
+            ## NOTE(Krey): By default arkenfox flake sets all options are set to disabled, and these are expected to be always enabled
+            "6000" = {
+              enable = true;
+            };
+
+            # DONT BOTHER
+            "7000" = {
+              enable = false;
+              "7001".enable = true; # Disables Location-Aware Browsing, Full Screen Geo is behind a prompt (7002). Full screen requires user interaction
+              "7003".enable = true; # Disable non-modern cipher suites
+              "7004".enable = true; # Control TLS Versions, because they are used as a passive fingerprinting
+              "7005".enable = true; # Disable SSL Session IDs [FF36+]
+              "7006".enable = true; # Onions
+              "7007".enable = true; # Referencers, only cross-origin referers (1600s) need control
+              "7011".enable = true; # Disable website control over browser right-click context menu
+              "7013".enable = true; # Disable Clipboard API
+              "7014".enable = true; # Disable System Add-on updates (Managed by Nix)
+            };
+
+            # DON'T BOTHER: FINGERPRINTING
+            "8000" = {
+              enable = false;
+              "8001".enable = true; # Disable APIs
+            };
+
+            # NON-PROJECT RELATED
+            "9000" = {
+              enable = true;
+              "9002".enable = true; # Disable General>Browsing>Recommend extensions/features as you browse [FF67+]
+            };
+          };
+
+          settings = {
+            "network.proxy.socks_remote_dns" = true; # Do DNS lookup through proxy (required for tor to work)
+            "toolkit.tabbox.switchByScrolling" = true; # Allow scrolling tabs with mouse wheel
+
+            # Sacrifice some fingerprintability but don’t keep box around content
+            # which is super annoying.
+            # # Enable letterboxing
+            # "privacy.resistFingerprinting.letterboxing" = true;
+            "privacy.resistFingerprinting.letterboxing" = false;
+
+            # WebGL
+            "webgl.disabled" = true;
+
+            "browser.preferences.defaultPerformanceSettings.enabled" = false;
+            "layers.acceleration.disabled" = true;
+            "privacy.globalprivacycontrol.enabled" = true;
+
+            # "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
+
+            # "network.trr.mode" = 3;
+
+            # "network.dns.disableIPv6" = false;
+
+            "privacy.donottrackheader.enabled" = true;
+
+            # "privacy.clearOnShutdown.history" = true;
+            # "privacy.clearOnShutdown.downloads" = true;
+            # "browser.sessionstore.resume_from_crash" = true;
+
+            # See https://librewolf.net/docs/faq/#how-do-i-fully-prevent-autoplay for options
+            "media.autoplay.blocking_policy" = 2;
+
+            "privacy.resistFingerprinting" = true;
+
+            # Disable IPv6 as it's potentially leaky.
+            # 0701 under arkenfox.
+            "network.dns.disableIPv6" = true;
+
+            # Disable location bar using search - Don't leak URL typos to a search engine, give an error message instead
+            "keyword.enabled" = false;
+
+            # Display all parts of the url in the location bar.
+            # 0803 under arkenfox.
+            "browser.urlbar.trimURLs" = false;
+
+            "browser.cache.memory.enable" = true;
+            # In kibibytes.
+            "browser.cache.memory.capacity" = 102400;
+
+            # Disable all DRM content (EME: Encryption Media Extension)
+            # 2022 under arkenfox.
+            "media.eme.enabled" = false;
+
+            "browser.sessionstore.max_tabs_undo" = 2;
+            "browser.sessionstore.resume_from_crash" = true;
+
+            # Disable sending additional analytics to web servers
+            # 2602 under arkenfox
+            "beacon.enabled" = false;
+
+            # Disable other
+            # 8002 under arkenfox
+            "browser.display.use_document_fonts" = 0;
+            "browser.zoom.siteSpecific"          = false;
+            "dom.w3c_touch_events.enabled"       = 0;
+            "media.navigator.enabled"            = false;
+            "media.ondevicechange.enabled"       = false;
+            "media.video_stats.enabled"          = false;
+            "media.webspeech.synth.enabled"      = false;
+            "webgl.enable-debug-renderer-info"   = false;
+
+            # Stop complaining about visiting http sites.
+            # "network.security.ports.banned.override" = 80;
+            # "browser.fixup.fallback-to-https" = false;
+            "dom.security.https_only_mode"       = pkgs.lib.mkForce false;
+          };
+        };
+    in {
+      Default = default // {
+        isDefault = true;
+        id = 0;
+        settings = default.settings // {
+          "network.proxy.socks" = "127.0.0.1";
+          "network.proxy.socks_port" = 9050;
+        };
       };
+      i2p = default // {
+        bookmarks = {
+          force = true;
+          settings = [
+            {
+              name = "i2p router console";
+              url = "http://127.0.0.1:7657/home";
+            }
+          ];
+        };
+        isDefault = false;
+        id = 1;
+        settings = default.settings // {
+          "network.proxy.http" = "127.0.0.1";
+          "network.proxy.http_port" = 4444;
+          "network.proxy.ssl" = "127.0.0.1";
+          "network.proxy.ssl_port" = 4445;
+          # "network.proxy.socks" = "127.0.0.1";
+          # "network.proxy.socks_port" = "";
 
-      "0200" = {
-        enable = false;
-        # GEOLOCATION / LANGUAGE / LOCALE
-        "0202".enable = true; # Disable using the OS's geolocation service
-        # "0203".enable = true; # disable region updates
-        # WARNING(Krey): May break some input methods e.g xim/ibus for CJK languages [1]
-      };
+          # 0 Direct connection, no proxy. (Default in Windows and Mac previous to 1.9.2.4 /Firefox 3.6.4)
+          # 1 Manual proxy configuration.
+          # 2 Proxy auto-configuration (PAC).
+          # 4 Auto-detect proxy settings.
+          # 5 Use system proxy settings. (Default in Linux; default for all platforms, starting in 1.9.2.4 /Firefox 3.6.4)
+          "network.proxy.type" = "1";
 
-      # QUIETER FOX (Handles telemetry, etc..)
-      "0300" = {
-        enable = true;
-      };
-
-      # BLOCK IMPLICIT OUTBOUND [not explicitly asked for - e.g. clicked on]
-      "0600" = {
-        enable = true;
-      };
-
-      "0700" = {
-        enable = false;
-        "0704".enable = true; # Disable GIO as a potential proxy bypass vector
-      };
-
-      "0800" = {
-        enable = false;
-        # LOCATION BAR / SEARCH BAR / SUGGESTIONS / HISTORY / FORMS
-        "0802".enable = true; # disable location bar domain guessing
-        "0805".enable = true; # disable location bar making speculative connections
-        "0806".enable = true; # disable location bar leaking single words to a DNS provider **after searching**
-        "0807".enable = true; # disable location bar contextual suggestions
-        "0820".enable = true; # disable coloring of visited links
-      };
-
-      # PASSWORDS
-      "0900" = {
-        enable = true;
-      };
-
-      # HTTPS (SSL/TLS / OCSP / CERTS / HPKP)
-      "1200" = {
-        enable = true;
-      };
-
-      # HEADERS ? REFERERS
-      "1600" = {
-        enable = true;
-      };
-
-      # CONTAINERS
-      "1700" = {
-        enable = true;
-      };
-
-      # PLUGINS / MEDIA / WEBRTC
-      "2000" = {
-        enable = false;
-        "2002".enable = true; # Force WebRTC inside the proxy [FF70+]
-        "2003".enable = true; # Force a single network interface for ICE candidates generation [FF42+]
-        "2004".enable = true; # Force exclusion of private IPs from ICE candidates [FF51+]
-        "2020".enable = true; # Disable GMP (Gecko Media Plugins) - https://wiki.mozilla.org/GeckoMediaPlugins
-        # "2030".enable = true; # Disable autoplay of HTML5 media
-        # "2031".enable = true; # Disable autoplay of HTML5 media if you interacted with the site
-      };
-
-      # DOM (DOCUMENT OBJECT MODEL)
-      # Prevent scrips from resizing open windows (could be used for fingerprinting)
-      "2400" = {
-        enable = true;
-      };
-
-      "2600" = {
-        enable = false;
-        # MISCELLANEOUS
-        "2603".enable = true; # Remove temp files opened with an external application on exit
-        "2606".enable = true; # Disable UITour backend so there is no chance that a remote page can use it
-        "2608".enable = true; # Reset remote debugging to disabled
-        "2615".enable = true; # Disable websites overriding Firefox's keyboard shortcuts [FF58+]
-        "2616".enable = true; # Remove special permissions for certain mozilla domains [FF35+]
-        "2617".enable = true; # Remove webchannel whitelist (Seems to be deprecated with mozilla having still permissions in it)
-        "2619".enable = true; # Use Punycode in Internationalized Domain Names to eliminate possible spoofing
-        "2620".enable = true; # Enforce PDFJS, disable PDFJS scripting
-        # "2621".enable = true; # Disable links launching Windows Store on Windows 8/8.1/10 [WINDOWS]
-        "2624".enable = true; # Disable middle click on new tab button opening URLs or searches using clipboard [FF115+]
-        "2651".enable = true; # Enable user interaction for security by always asking where to download
-        "2652".enable = true; # Disable downloads panel opening on every download [FF96+]
-        "2654".enable = true; # Enable user interaction for security by always asking how to handle new mimetypes [FF101+]
-        "2662".enable = true; # Disable webextension restrictions on certain mozilla domains (you also need 4503) [FF60+]
-      };
-
-      # ETP (ENHANCED TRACKING PROTECTION)
-      "2700" = {
-        enable = true;
-      };
-
-      "2800" = {
-        enable = false;
-        "2811".enable = true; # Set/enforce what items to clear on shutdown (if 2810 is true)
-        "2812".enable = true; # Set Session Restore to clear on shutdown (if 2810 is true) [FF34+]
-        "2815".enable = true; # Set "Cookies" and "Site Data" to clear on shutdown (if 2810 is true)
-      };
-
-      # EFP (RESIST FINGERPRINTING)
-      "4500" = {
-        enable = true;
-        # "4503".enable = true; # Disable mozAddonManager Web API [FF57+]
-        "4504".enable = false; # Letterboxing
-      };
-
-      # OPTIONAL OPSEC
-      "5000" = {
-        enable = false;
-        "5003".enable = true; # Disable saving passwords
-        "5004".enable = true; # Disable permissions manager from writing to disk [FF41+] [RESTART], This means any permission changes are session only
-      };
-
-      # OPTIONAL HARDENING
-      ## NOTE(Krey): There are new vulnerabilities discovered in 2023, better disable it for now
-      "5500" = {
-        enable = false;
-        "5505".enable = true; # Diable Ion and baseline JIT to harden against JS exploits
-        # user_pref("javascript.options.wasm", false);
-        "5506".enable = true; # Disable WebAssembly
-      };
-
-      # DONT TOUTCH
-      ## NOTE(Krey): By default arkenfox flake sets all options are set to disabled, and these are expected to be always enabled
-      "6000" = {
-        enable = true;
-      };
-
-      # DONT BOTHER
-      "7000" = {
-        enable = false;
-        "7001".enable = true; # Disables Location-Aware Browsing, Full Screen Geo is behind a prompt (7002). Full screen requires user interaction
-        "7003".enable = true; # Disable non-modern cipher suites
-        "7004".enable = true; # Control TLS Versions, because they are used as a passive fingerprinting
-        "7005".enable = true; # Disable SSL Session IDs [FF36+]
-        "7006".enable = true; # Onions
-        "7007".enable = true; # Referencers, only cross-origin referers (1600s) need control
-        "7011".enable = true; # Disable website control over browser right-click context menu
-        "7013".enable = true; # Disable Clipboard API
-        "7014".enable = true; # Disable System Add-on updates (Managed by Nix)
-      };
-
-      # DON'T BOTHER: FINGERPRINTING
-      "8000" = {
-        enable = false;
-        "8001".enable = true; # Disable APIs
-      };
-
-      # NON-PROJECT RELATED
-      "9000" = {
-        enable = true;
-        "9002".enable = true; # Disable General>Browsing>Recommend extensions/features as you browse [FF67+]
+        };
       };
     };
-
-    settings = {
-      "network.proxy.socks_remote_dns" = true; # Do DNS lookup through proxy (required for tor to work)
-      "toolkit.tabbox.switchByScrolling" = true; # Allow scrolling tabs with mouse wheel
-
-      # Sacrifice some fingerprintability but don’t keep box around content
-      # which is super annoying.
-      # # Enable letterboxing
-      # "privacy.resistFingerprinting.letterboxing" = true;
-      "privacy.resistFingerprinting.letterboxing" = false;
-
-      # WebGL
-      "webgl.disabled" = true;
-
-      "browser.preferences.defaultPerformanceSettings.enabled" = false;
-      "layers.acceleration.disabled" = true;
-      "privacy.globalprivacycontrol.enabled" = true;
-
-      # "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
-
-      # "network.trr.mode" = 3;
-
-      # "network.dns.disableIPv6" = false;
-
-      "privacy.donottrackheader.enabled" = true;
-
-      # "privacy.clearOnShutdown.history" = true;
-      # "privacy.clearOnShutdown.downloads" = true;
-      # "browser.sessionstore.resume_from_crash" = true;
-
-      # See https://librewolf.net/docs/faq/#how-do-i-fully-prevent-autoplay for options
-      "media.autoplay.blocking_policy" = 2;
-
-      "privacy.resistFingerprinting" = true;
-
-      # Disable IPv6 as it's potentially leaky.
-      # 0701 under arkenfox.
-      "network.dns.disableIPv6" = true;
-
-      # Disable location bar using search - Don't leak URL typos to a search engine, give an error message instead
-      "keyword.enabled" = false;
-
-      # Display all parts of the url in the location bar.
-      # 0803 under arkenfox.
-      "browser.urlbar.trimURLs" = false;
-
-      "browser.cache.memory.enable" = true;
-      # In kibibytes.
-      "browser.cache.memory.capacity" = 102400;
-
-      # Disable all DRM content (EME: Encryption Media Extension)
-      # 2022 under arkenfox.
-      "media.eme.enabled" = false;
-
-      "browser.sessionstore.max_tabs_undo" = 2;
-      "browser.sessionstore.resume_from_crash" = true;
-
-      # Disable sending additional analytics to web servers
-      # 2602 under arkenfox
-      "beacon.enabled" = false;
-
-      # Disable other
-      # 8002 under arkenfox
-      "browser.display.use_document_fonts" = 0;
-      "browser.zoom.siteSpecific"          = false;
-      "dom.w3c_touch_events.enabled"       = 0;
-      "media.navigator.enabled"            = false;
-      "media.ondevicechange.enabled"       = false;
-      "media.video_stats.enabled"          = false;
-      "media.webspeech.synth.enabled"      = false;
-      "webgl.enable-debug-renderer-info"   = false;
-    };
-  };
 }
 
