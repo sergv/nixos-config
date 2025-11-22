@@ -442,6 +442,14 @@ in {
     #   Block = [<all_urls>];
     #   Exceptions = [http =//example.org/*]
     # };
+
+    Preferences = {
+      "browser.in-content.dark-mode" = true; # Use dark mode
+      "ui.systemUsesDarkTheme" = true;
+
+      "extensions.autoDisableScopes" = 0; # Automatically enable extensions
+      "extensions.update.enabled" = false;
+    };
   };
 
   arkenfox = {
