@@ -423,6 +423,14 @@ in
           iptables -I OUTPUT 1 -m owner --gid-owner no-internet -j DROP
         '';
 
+      allowedTCPPorts = [
+        # For i2p:
+        7656 # default sam port
+        7070 # default web interface port
+        4447 # default socks proxy port
+        4444 # default http proxy port
+      ];
+
       # Open ports in the firewall.
       # allowedTCPPorts = [... ];
       # allowedUDPPorts = [... ];
@@ -780,11 +788,17 @@ in
   };
 
   services.i2p = {
-    enable        = true;
+    enable  = true;
   };
 
   # services.i2pd = {
-  #   enable        = true;
+  #   enable  = true;
+  #   address = "127.0.0.1"; # you may want to set this to 0.0.0.0 if you are planning to use an ssh tunnel
+  #   proto   = {
+  #     http.enable       = true;
+  #     socksProxy.enable = true;
+  #     httpProxy.enable  = true;
+  #   };
   # };
 
   services.tor = {
