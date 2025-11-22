@@ -275,6 +275,15 @@ in {
             # https://www.youtube.com Remove annoying logo that may have animations, I hate them real bad now
             "www.youtube.com##ytd-yoodle-renderer.ytd-topbar-logo-renderer.style-scope"
             "www.youtube.com##.ytd-topbar-logo-renderer.style-scope > .ytd-logo.style-scope"
+
+            # herman.bearlog.dev/being-present
+            "www.youtube.com###items > ytd-item-section-renderer.style-scope.ytd-watch-next-secondary-results-renderer:last-child"
+            "www.youtube.com###[in-shorts]"
+            # Subscriptions, channels, playlists and others - column on the left. Both
+            # entries work together, haven’t investigated much.
+            # "www.youtube.com###sections"
+            # "www.youtube.com###secondary"
+
             "www.google.com###hplogo"
             "www.google.co.uk###hplogo"
             "www.google.com.ua###hplogo"
