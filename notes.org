@@ -14,6 +14,9 @@
 ** Debug trace
 ~builtins.trace <str> <return value>~
 
+*** Trace attribute set/record
+~builtins.trace (builtins.toString (builtins.attrNames xs))~
+
 ** Manually instantiate derivation and check its references
 #+BEGIN_EXAMPLE
 $ nix-instantiate hello-minimalistic.nix
@@ -28,7 +31,7 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
 #+END_EXAMPLE
 
 ** Atomic types
-- booleans: ~true~, ~false~
+- booleans: ~true~, ~false~, &&, ||, !
 - integer numbers
   + Support C-like arithmetic
   + Support C-like comparisons
@@ -56,6 +59,7 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
 + Delimited by space: ~[1 2 3]~
 + Concatenation: ~++~
 + Indexing: ~builtins.elemAt [ "hi" "there" ] 0~
++ Membership test: ~builtins.elem x xs~
 *** functions
 E.g. ~x: x + 1~, ~x: y: x * y~
 
