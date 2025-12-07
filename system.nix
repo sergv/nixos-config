@@ -565,6 +565,7 @@ in
     # longitude   = "30.5233";
   };
 
+  # For Wayland support use https://gitlab.com/chinstrap/gammastep
   services.redshift = {
     enable    = true;
     executable = "/bin/redshift";
