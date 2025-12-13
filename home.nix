@@ -3,9 +3,9 @@
   pkgs,
   pkgs-cross-win,
   pkgs-pristine,
-  pinned-pkgs,
-  nixpkgs-stable,
-  nixpkgs-unstable,
+  haskell-nixpkgs-improvements,
+  # , nixpkgs-stable
+  # , nixpkgs-unstable
   arkenfox,
   git-proxy-conf,
   system,
@@ -26,10 +26,9 @@ let
     inherit
       pkgs
       pkgs-cross-win
-      pinned-pkgs
+      haskell-nixpkgs-improvements
       system
-      nixpkgs-unstable
-      ; # nixpkgs-stable
+      ;
   };
 
   cuda-pkgs = import ./cuda-pkgs.nix {
@@ -905,7 +904,6 @@ in
       pkgs.mc
       pkgs.mplayer
       pkgs.nix-index
-      # pinned-pkgs.nixpkgs-22-11.nyx
       pkgs.p7zip
       pkgs.pavucontrol
 
