@@ -406,3 +406,8 @@ On clients:
 ** Don’t use caches/build everything from source/stale cache entry does not exist
 Pass ~nix build <target> --option substitute false~
 
+* Wayland TODO
+** Switch to https://gitlab.com/chinstrap/gammastep instead of redshift
+** Try xlibre?
+- https://github.com/X11Libre/packaging/discussions/12
+– https://codeberg.org/takagemacoed/xlibre-overlay
