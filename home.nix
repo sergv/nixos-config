@@ -2,9 +2,9 @@
 , pkgs
 , pkgs-cross-win
 , pkgs-pristine
-, pinned-pkgs
-, nixpkgs-stable
-, nixpkgs-unstable
+, haskell-nixpkgs-improvements
+# , nixpkgs-stable
+# , nixpkgs-unstable
 , arkenfox
 , git-proxy-conf
 , system
@@ -18,7 +18,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     scripts = import ./scripts { inherit pkgs; wmctrl = wmctrl-pkg; };
 
     dev-pkgs = import ./dev-pkgs.nix {
-      inherit pkgs pkgs-cross-win pinned-pkgs system nixpkgs-unstable; #nixpkgs-stable
+      inherit pkgs pkgs-cross-win haskell-nixpkgs-improvements system;
     };
 
     cuda-pkgs = import ./cuda-pkgs.nix {
@@ -832,7 +832,6 @@ in
         pkgs.mc
         pkgs.mplayer
         pkgs.nix-index
-        # pinned-pkgs.nixpkgs-22-11.nyx
         pkgs.p7zip
         pkgs.pavucontrol
 
