@@ -457,6 +457,9 @@ in
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
 
+    daemonCPUSchedPolicy = "idle";
+    daemonIOSchedClass = "idle";
+
     sshServe = {
       enable  = true;
       keys    = [ "TODO: add public key here" ];
