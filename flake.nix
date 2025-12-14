@@ -274,7 +274,7 @@
         pkgs-pristine = import nixpkgs-unstable {
           inherit system;
           config = {
-            allowBroken                    = true;
+            # allowBroken                    = true;
             allowUnfree                    = true;
             # virtualbox.enableExtensionPack = true;
           };
@@ -294,7 +294,7 @@
           # inherit system;
           inherit (arch) localSystem;
           config = {
-            allowBroken                    = true;
+            # allowBroken                    = true;
             allowUnfree                    = true; # For nvidia drivers.
             allowUnsupportedSystem         = true;
             # virtualbox.enableExtensionPack = true;
