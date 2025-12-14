@@ -162,6 +162,46 @@ let wmctrl-pkg = pkgs.wmctrl;
           python3                    = tribler-python;
         });
 
+    wine-pkg = pkgs.wineWowPackages.stagingFull;
+
+    winetricks-pkg =
+      let
+        # Patch allows to point winetricks to the wine executable via WINE_BIN environment variable.
+        patch = pkgs.fetchurl {
+          url = "https://github.com/Winetricks/winetricks/commit/1d441b422d9a9cc8b0a53fa203557957ca1adc44.patch";
+          hash = "sha256-/y7PkJ046X29QtK8uVN9ziq8co8rATcWDxPNM7Ph45I=";
+        };
+        patched = pkgs.winetricks.overrideAttrs (old: {
+          patches = (old.patches or []) ++ [patch];
+          # src = pkgs.fetchFromGitHub {
+          #   owner = "Winetricks";
+          #   repo = "winetricks";
+          #   # rev = "bc91718a5cad45e9f33de9b351a5960d5395bed5";
+          #   # sha256 = "sha256-YTEgb19aoM54KK8/IjrspoChzVnWAEItDlTxpfpS52w="; #pkgs.lib.fakeSha256;
+          #   rev = "5eed63521781ffc2f0c4bbee7ec9e215b13a1243";
+          #   sha256 = "sha256-thEL36C2I/l4R5YAyfVg9H3FttsslVRK06Y8rPg+7Do="; #pkgs.lib.fakeSha256;
+          # };
+        });
+      in
+        # ‘winetricks’ relies on knowing architecture of the ‘wine’
+        # executable, but on NixOS the ‘wine’ executable is a shell
+        # script wrapper which breaks ‘winetricks’. This export makes
+        # ‘winetricks’ learn about actual ‘wine’ executable and infer
+        # its architecture properly.
+        pkgs.runCommand "wrapped-winetricks" {
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+        }
+          # makeWrapper "${patched}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "$(dirname $(readlink -f $(which wine)))/.wine"
+          ''
+            mkdir -p "$out/bin"
+            makeWrapper "${patched}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "${wine-pkg}/bin/.wine"
+          ''
+
+          # export WINE_BIN=$(dirname $(readlink -f $(which wine)))/.wine
+
+          #patched
+        ;
+
     mk-isabelle = include-emacs-lsp-fixes:
       import ./isabelle/isabelle.nix {
         inherit pkgs include-emacs-lsp-fixes;
@@ -878,8 +918,8 @@ in
         # pkgs.vmware-workstation
 
         pkgs.cabextract
-        pkgs.wineWowPackages.stagingFull
-        pkgs.winetricks
+        wine-pkg
+        winetricks-pkg
 
         pkgs.nix-diff
 
