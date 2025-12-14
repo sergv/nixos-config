@@ -540,6 +540,7 @@ in
         "nix-command"
         "flakes"
       ];
+      # accept-flake-config   = true;
       # More at https://nixos.org/nix/manual/#conf-system-features.
       system-features       = [
         "big-parallel"
