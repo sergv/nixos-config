@@ -53,8 +53,8 @@ let wmctrl-pkg = pkgs.wmctrl;
     wm-sh = scripts.wm-sh;
 
     steam = pkgs.steam.override (_: {
-      # Remove non-free parts.
-      steam-unwrapped = null;
+      # # Remove non-free parts.
+      # steam-unwrapped = null;
       # Add 32-bit pulseaudio for Supreme Commander.
       extraLibraries = steam-pkgs: [steam-pkgs.libpulseaudio];
     });
@@ -222,13 +222,24 @@ let wmctrl-pkg = pkgs.wmctrl;
           ln -s "${isabelle-lsp-pkg}/bin/isabelle" "$out/bin/isabelle-emacs-lsp"
         '';
 
-    emacs-base = pkgs.emacs30.overrideAttrs (old: {
+    emacs-base = (pkgs.emacs30.override (_ : {
+      withNativeCompilation = false;
+      noGui = false;
+      srcRepo = true;
+      withXwidgets = false;
+      withTreeSitter = true;
+      withSQLite3 = false;
+      withSelinux = false;
+      withPgtk = false;
+      withJansson = false; # Use native JSON in Emacs instead, aviailable since version 30.
+      withGTK3 = true;
+    })).overrideAttrs (old: {
       # NixOS 25.05 patches do not apply to 30.2 any more. Remove throwing away of
       # nixpkgs patches here when moving to a later NixOS release.
-      patches        = [];
-      version        = "30.2";
+      # patches        = [];
+      # version        = "30.2";
       withGTK3       = true;
-      withSQLite3    = true;
+      withSQLite3    = false;
       withTreeSitter = true;
       configureFlags = old.configureFlags ++ [
         (pkgs.lib.withFeature false "gc-mark-trace")
@@ -437,21 +448,9 @@ in
 
   programs.git = {
     enable    = true;
-    userName  = "Sergey Vinokurov";
-    userEmail = "serg.foo@gmail.com";
     signing   = {
       key = "47E4DA2E6A3F58FE3F0198F4D6CD29530F98D6B8";
       signByDefault = true;
-    };
-    aliases   = {
-      "lg"  = "log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(red)%h %G?%C(reset)%C(yellow)%d%C(reset) %C(white)%s%C(reset) - %C(dim white)%an%C(reset) %C(green)(%ar)%C(reset)'";
-      "lgm" = "lg --no-merges";
-      "ch"  = "checkout";
-      "st"  = "status";
-      "co"  = "commit";
-      "me"  = "merge";
-      "br"  = "branch";
-      "m"   = "merge";
     };
     includes = [
       { contents = {
@@ -529,6 +528,22 @@ in
       "*~"
       "*.bak"
     ];
+    settings  = {
+      aliases = {
+        "lg"  = "log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(red)%h %G?%C(reset)%C(yellow)%d%C(reset) %C(white)%s%C(reset) - %C(dim white)%an%C(reset) %C(green)(%ar)%C(reset)'";
+        "lgm" = "lg --no-merges";
+        "ch"  = "checkout";
+        "st"  = "status";
+        "co"  = "commit";
+        "me"  = "merge";
+        "br"  = "branch";
+        "m"   = "merge";
+      };
+      user = {
+        name  = "Sergey Vinokurov";
+        email = "serg.foo@gmail.com";
+      };
+    };
   };
 
   programs.ssh = {
@@ -852,25 +867,21 @@ in
         pkgs.file
         pkgs.findutils
         pkgs.gimp
-        pkgs.glxinfo
         pkgs.gparted
         pkgs.graphviz
         pkgs.htop
         pkgs.imagemagick
         #pkgs.inkscape
         pkgs.iotop
-        #pkgs.kdePackages.ark
-        #pkgs.kdePackages.okular
-        #pkgs.kdePackages.oxygen-icons
-        #pkgs.kdePackages.plasma-systemmonitor
-        pkgs.libsForQt5.ark
-        pkgs.libsForQt5.okular
-        pkgs.libsForQt5.oxygen-icons
-        pkgs.libsForQt5.plasma-systemmonitor
+        pkgs.kdePackages.ark
+        pkgs.kdePackages.okular
+        pkgs.kdePackages.oxygen-icons
+        pkgs.kdePackages.plasma-systemmonitor
         pkgs.lsof
         pkgs.lzip
         pkgs.lzop
         pkgs.mc
+        pkgs.mesa-demos
         pkgs.mplayer
         pkgs.nix-index
         pkgs.p7zip
@@ -883,7 +894,6 @@ in
         pkgs.smartmontools
         pkgs.sshfs
         pkgs-pristine.telegram-desktop
-        pkgs-pristine.tdesktop
         pkgs.unzip
         pkgs.usbutils
         pkgs.vlc
@@ -902,7 +912,6 @@ in
         pkgs-pristine.libreoffice
 
         # Music
-        pkgs.audacious
         clementine-pkg
 
         pkgs.i2p

@@ -20,7 +20,7 @@
     };
 
     nixpkgs-stable = {
-      url = "nixpkgs/nixos-25.05";
+      url = "nixpkgs/nixos-25.11";
       # # unstable
       # url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
@@ -33,7 +33,7 @@
       # url = "nixpkgs/nixos-24.11";
       # url = "nixpkgs/nixos-23.05";
       # url = "nixpkgs/nixos-unstable";
-      url = "nixpkgs/nixos-25.05";
+      url = "nixpkgs/nixos-25.11";
     };
 
     # nixpkgs-fresh-ghc = {
@@ -42,12 +42,8 @@
 
     home-manager = {
       # # unstable
-      url                    = "github:nix-community/home-manager/release-25.05";
-      # url                    = "github:nix-community/home-manager/master";
-      # url                    = "github:nix-community/home-manager/release-24.11";
-      # url                    = "github:nix-community/home-manager/release-23.05";
-      # url                    = "github:nix-community/home-manager/release-22.11";
-      # Make home-manager use our version of nixpkgs
+      url = "github:nix-community/home-manager/release-25.11";
+      # url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -296,7 +292,10 @@
           config = {
             # allowBroken                    = true;
             allowUnfree                    = true; # For nvidia drivers.
-            allowUnsupportedSystem         = true;
+            # # May be needed for ghc windows cross-compiler but enabling it
+            # # breaks cuda-pkgs - it starts pulling in wrong dependency
+            # # that doesn’t build.
+            # allowUnsupportedSystem         = true;
             # virtualbox.enableExtensionPack = true;
             #inherit (arch) replaceStdenv;
           } // haskell-nixpkgs-improvements.config.host;

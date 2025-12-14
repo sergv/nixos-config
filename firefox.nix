@@ -1,13 +1,16 @@
 { pkgs, pkgs-pristine, firefox-addons }:
 
-let addons = firefox-addons;
+let
+  lib = pkgs.lib;
 
-    # mk-addon = id: pkg:
-    #   "{531906d3-e22f-4a6c-a102-8057b88a1a63}" = {
-    #     # NoScript
-    #     install_url = "file:///${addons.single-file}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/{531906d3-e22f-4a6c-a102-8057b88a1a63}.xpi";
-    #     installation_mode = "force_installed";
-    #   };
+  addons = firefox-addons;
+
+  # mk-addon = id: pkg:
+  #   "{531906d3-e22f-4a6c-a102-8057b88a1a63}" = {
+  #     # NoScript
+  #     install_url = "file:///${addons.single-file}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/{531906d3-e22f-4a6c-a102-8057b88a1a63}.xpi";
+  #     installation_mode = "force_installed";
+  #   };
 
 in {
   # package = pkgs.firefox;
@@ -279,6 +282,12 @@ in {
             # herman.bearlog.dev/being-present
             "www.youtube.com###items > ytd-item-section-renderer.style-scope.ytd-watch-next-secondary-results-renderer:last-child"
             "www.youtube.com###[in-shorts]"
+
+            # Remove more Youtube convenience sections like ‘Home+Shorts’, ‘Eplore’, and ‘More from...’
+            "www.youtube.com##ytd-guide-section-renderer.ytd-guide-renderer.style-scope:nth-of-type(1)"
+            "www.youtube.com##ytd-guide-section-renderer.ytd-guide-renderer.style-scope:nth-of-type(4)"
+            "www.youtube.com##ytd-guide-section-renderer.ytd-guide-renderer.style-scope:nth-of-type(5)"
+
             # Subscriptions, channels, playlists and others - column on the left. Both
             # entries work together, haven’t investigated much.
             # "www.youtube.com###sections"
@@ -328,7 +337,7 @@ in {
     # ];
     # };
     # };
-    NoDefaultBookmarks = true;
+    NoDefaultBookmarks = lib.mkDefault true;
     PasswordManagerEnabled = false; # Managed by KeepAss
     PDFjs = {
       Enabled = false; # Go away now
@@ -454,7 +463,8 @@ in {
 
   arkenfox = {
     enable = true; # Decide how we want to handle these things
-    version = "128.0"; # Used on 119.0, because we don't have firefox 118.0 handy
+    # version = "128.0";
+    version = "140.0";
   };
 
   profiles =
@@ -559,7 +569,6 @@ in {
               "2608".enable = true; # Reset remote debugging to disabled
               "2615".enable = true; # Disable websites overriding Firefox's keyboard shortcuts [FF58+]
               "2616".enable = true; # Remove special permissions for certain mozilla domains [FF35+]
-              "2617".enable = true; # Remove webchannel whitelist (Seems to be deprecated with mozilla having still permissions in it)
               "2619".enable = true; # Use Punycode in Internationalized Domain Names to eliminate possible spoofing
               "2620".enable = true; # Enforce PDFJS, disable PDFJS scripting
               # "2621".enable = true; # Disable links launching Windows Store on Windows 8/8.1/10 [WINDOWS]
@@ -618,7 +627,6 @@ in {
               "7003".enable = true; # Disable non-modern cipher suites
               "7004".enable = true; # Control TLS Versions, because they are used as a passive fingerprinting
               "7005".enable = true; # Disable SSL Session IDs [FF36+]
-              "7006".enable = true; # Onions
               "7007".enable = true; # Referencers, only cross-origin referers (1600s) need control
               "7011".enable = true; # Disable website control over browser right-click context menu
               "7013".enable = true; # Disable Clipboard API
@@ -639,6 +647,11 @@ in {
           };
 
           settings = {
+            # # Uniformly increase scale of UI and all pages content for 4k displays.
+            # "layout.css.devPixelsPerPx" = "1.5";
+            # Increase tabs size.
+            "browser.tabs.tabMinWidth" = "128";
+
             "network.proxy.socks_remote_dns" = true; # Do DNS lookup through proxy (required for tor to work)
             "toolkit.tabbox.switchByScrolling" = true; # Allow scrolling tabs with mouse wheel
 

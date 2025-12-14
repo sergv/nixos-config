@@ -31,10 +31,10 @@ in
     "amdgpu"
   ];
 
-  boot.kernelParams = [
-    "mitigations=off"
-    "preempt=full"
-  ];
+  # boot.kernelParams = [
+  #   "mitigations=off"
+  #   # "preempt=full"
+  # ];
 
   boot.kernel.sysctl = {
     # Allow ‘perf’ without root.
@@ -278,41 +278,32 @@ in
     systemPackages = [
       pkgs.alsa-tools
       pkgs.alsa-utils
-      # pkgs.android-studio
-      # pkgs.androidsdk
-      # pkgs.androidndk
-      pkgs.android-udev-rules
-      # pkgs.bumblebee
-      # pkgs.jdk7
-      # pkgs.jdk
       pkgs.killall
       # pkgs.libnotify # for showing notifications in wm_operate.py
       # pkgs.libreoffice
-      pkgs.linuxPackages.perf
+      pkgs.perf
       pkgs.ltrace
       pkgs.man
       pkgs.man-pages
       pkgs.mkpasswd
-      # pkgs.ocaml
-      # pkgs.octaveFull
       pkgs.pciutils
-      # pkgs.python36Packages.ipython
-      # pkgs.python36Packages.jupyter
-      # pkgs.python36Packages.jupyter_client
-      # pkgs.python36Packages.matplotlib
-      # pkgs.python36Packages.sympy
       pkgs.sudo
       pkgs.strace
       pkgs.vim
       # pkgs.veracrypt
       #(pkgs.wineFull.override { netapiSupport = false; })
-      #pkgs.winetricks
 
-      #gvenview
-      #okular
-      #evince
-      #htop
-      #kde system monitor
+      # pkgs.bumblebee
+      # pkgs.jdk7
+      # pkgs.jdk
+      # pkgs.ocaml
+      # pkgs.octaveFull
+      # pkgs.python36Packages.ipython
+      # pkgs.python36Packages.jupyter
+      # pkgs.python36Packages.jupyter_client
+      # pkgs.python36Packages.matplotlib
+      # pkgs.python36Packages.sympy
+
       #nix-bash-completions
 
       # # For Xfce
@@ -453,6 +444,7 @@ in
       # accept-flake-config   = true;
       # More at https://nixos.org/nix/manual/#conf-system-features.
       system-features       = ["big-parallel" "gccarch-znver3" "gccarch-znver4"];
+      build-dir             = nix-daemon-build-dir;
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
@@ -580,10 +572,6 @@ in
     };
   };
 
-  services.displayManager.defaultSession = "plasma";
-  #services.displayManager.defaultSession = "plasmax11";
-  # services.displayManager.defaultSession = "plasma";
-
   # Enable the X11 windowing system.
   services.xserver = {
     autorun    = true; # Start automatically at boot time.
@@ -620,18 +608,23 @@ in
       lightdm.enable = true;
     };
 
-    desktopManager = {
-      plasma5 = {
-        enable        = true;
-      };
-      #plasma6 = {
-      #  enable        = true;
-      #};
-      # xfce                  = {
-      #   enable            = true;
-      #   enableScreensaver = false;
-      # };
+  };
+
+  # services.displayManager.defaultSession = "plasma";
+  services.displayManager.defaultSession = "plasmax11";
+  # services.displayManager.defaultSession = "plasma";
+
+  services.desktopManager = {
+    # plasma5 = {
+    #   enable        = true;
+    # };
+    plasma6 = {
+      enable        = true;
     };
+    # xfce                  = {
+    #   enable            = true;
+    #   enableScreensaver = false;
+    # };
   };
 
   environment.etc."xdg/kwinrc".text = pkgs.lib.generators.toINI {} {
@@ -649,14 +642,6 @@ in
       # Clear /var/tmp whenever as it was by default.
       q /var/tmp 1777 root root - 30d
     '';
-
-  environment.plasma5.excludePackages = [
-    pkgs.plasma5Packages.kpeople
-    pkgs.plasma5Packages.kwallet
-    pkgs.plasma5Packages.kwallet-pam
-    pkgs.plasma5Packages.kwalletmanager
-    pkgs.plasma5Packages.milou
-  ];
 
   environment.plasma6.excludePackages = [
     pkgs.kdePackages.kpeople
@@ -727,12 +712,12 @@ in
       "d ${nix-daemon-build-dir} - root nixbld 7d -"
     ];
 
-    # File limit is for better for steam proton games.
-    # Timeout is for starting jobs that hang for any reason.
-    extraConfig = ''
-      DefaultLimitNOFILE=10485760
-      DefaultTimeoutStopSec=10s
-    '';
+    settings.Manager = {
+      # File limit is for better for steam proton games.
+      DefaultLimitNOFILE = "10485760";
+      # Timeout is for starting jobs that hang for any reason.
+      DefaultTimeoutStopSec = "10s";
+    };
   };
 
   # Set your time zone.
