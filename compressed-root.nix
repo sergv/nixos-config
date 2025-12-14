@@ -10,15 +10,7 @@ let
 
   # Should be enough to use vanilla ‘pkgs.pkgsStatic.btrfs-progs’
   # but they’re unbuildable in 25.05.
-  # btrfs = pkgs.pkgsStatic.btrfs-progs;
-  btrfs = pkgs.pkgsStatic.btrfs-progs.overrideAttrs (old: {
-    configureFlags = (old.configureFlags or [ ]) ++ [
-      # AC_FUNC_MALLOC is broken on cross builds.
-      "ac_cv_func_malloc_0_nonnull=yes"
-      "ac_cv_func_realloc_0_nonnull=yes"
-    ];
-    patches = (old.patches or [ ]) ++ [ patches/btrfs-progs-static.patch ];
-  });
+  btrfs = pkgs.pkgsStatic.btrfs-progs;
 
   # btrfs = pkgs.pkgsMusl.btrfs-progs;
 
