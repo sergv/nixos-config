@@ -289,12 +289,12 @@
           config = {
             allowBroken                    = true;
             allowUnfree                    = true; # For nvidia drivers.
+            allowUnsupportedSystem         = true;
             # virtualbox.enableExtensionPack = true;
             #inherit (arch) replaceStdenv;
           } // haskell-nixpkgs-improvements.config.host;
           overlays = [
             ssh-overlay
-            haskell-nixpkgs-improvements.overlays.host
             zen4-march-overlay
             # improve-fetchgit-overlay
 
@@ -302,25 +302,13 @@
           ];
         };
 
-        pkgs-cross-win = import nixpkgs-unstable {
-          # inherit system;
-          inherit (arch) localSystem;
-          config = haskell-nixpkgs-improvements.config.cross-win;
-          overlays = [
-            ssh-overlay
-            haskell-nixpkgs-improvements.overlays.cross-win
-            zen4-march-overlay
-            # improve-fetchgit-overlay
-          ];
-        };
-
         home-manager-extra-args = {
-          # inherit nixpkgs-fresh-ghc system;
+          # inherit nixpkgs-fresh-ghc;
           # NixOS will provide its own pkgs.
           # inherit pkgs;
-          inherit pkgs-cross-win;
+          inherit arch system;
           inherit pkgs-pristine;
-          inherit system arkenfox;
+          inherit arkenfox;
           inherit git-proxy-conf;
           inherit haskell-nixpkgs-improvements;
         };

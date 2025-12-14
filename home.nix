@@ -7,6 +7,7 @@
 # , nixpkgs-unstable
 , arkenfox
 , git-proxy-conf
+, arch
 , system
 , ...
 }:
@@ -18,7 +19,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     scripts = import ./scripts { inherit pkgs; wmctrl = wmctrl-pkg; };
 
     dev-pkgs = import ./dev-pkgs.nix {
-      inherit pkgs pkgs-cross-win haskell-nixpkgs-improvements system;
+      inherit pkgs haskell-nixpkgs-improvements arch system;
     };
 
     cuda-pkgs = import ./cuda-pkgs.nix {
