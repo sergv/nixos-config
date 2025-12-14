@@ -1,10 +1,9 @@
 args@{
   haskell-nixpkgs-improvements,
   # , nixpkgs-stable
+  arch,
   system,
   pkgs,
-  pkgs-cross-win,
-  ...
 }:
 let
 
@@ -43,7 +42,13 @@ let
         ${builtins.concatStringsSep "\n" (builtins.map f keep-these)}
       '';
 
-  haskell-tools     = haskell-nixpkgs-improvements.lib.derive-haskell-tools system pkgs pkgs-cross-win;
+  haskell-tools =
+    let
+      pkgs-haskell   = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.host ];
+      pkgs-cross-win = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.cross-win ];
+    in
+    haskell-nixpkgs-improvements.lib.derive-haskell-tools system pkgs-haskell pkgs-cross-win;
+
   all-haskell-tools = lib.attrsets.unionOfDisjoint haskell-tools.tools (
     lib.attrsets.unionOfDisjoint haskell-tools.ghc.host haskell-tools.ghc.cross-win
   );

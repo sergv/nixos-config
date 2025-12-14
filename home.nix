@@ -8,6 +8,7 @@
   # , nixpkgs-unstable
   arkenfox,
   git-proxy-conf,
+  arch,
   system,
   ...
 }:
@@ -25,8 +26,8 @@ let
   dev-pkgs = import ./dev-pkgs.nix {
     inherit
       pkgs
-      pkgs-cross-win
       haskell-nixpkgs-improvements
+      arch
       system
       ;
   };
