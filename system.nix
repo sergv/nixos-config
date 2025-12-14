@@ -450,6 +450,7 @@ in
       allowed-users         = ["@wheel" "nix-ssh"];
       bash-prompt-prefix    = "[nix] ";
       experimental-features = ["nix-command" "flakes"];
+      # accept-flake-config   = true;
       # More at https://nixos.org/nix/manual/#conf-system-features.
       system-features       = ["big-parallel" "gccarch-znver3" "gccarch-znver4"];
     };

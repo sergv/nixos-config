@@ -96,6 +96,13 @@
       inputs.haskellNix.follows = "haskellNix";
     };
 
+    # # inputs.nixpkgs.url = "github:nixos/nixpkgs";
+    # inputs.hackage-server.url = "github:bgamari/hackage-server/wip/doc-builder-tls";
+    # inputs.cabal.url = "github:haskell/cabal/cabal-install-v3.10.3.0";
+    # inputs.cabal.flake = false;
+    # inputs.hackage-security.url = "github:haskell/hackage-security/hackage-security/v0.6.2.6";
+    # inputs.hackage-security.flake = false;
+
   };
 
   outputs =
