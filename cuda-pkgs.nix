@@ -28,7 +28,7 @@ let cuda   = pkgs.cudaPackages.cudatoolkit;
           fi
         done
 
-        "${cuda}/bin/nvcc" --compiler-bindir "${pkgs.gcc12}/bin/gcc" --system-include "${cudart}/include" --library-path "${cudart}/lib" "''${@}"
+        "${cuda}/bin/nvcc" --compiler-bindir "${pkgs.gcc}/bin/gcc" --system-include "${cudart}/include" --library-path "${cudart}/lib" "''${@}"
 
         if [[ ! -z "$target" && -f "$target" ]]; then
           ${pkgs.patchelf}/bin/patchelf --add-rpath /run/opengl-driver/lib "$target"
