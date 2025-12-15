@@ -2,21 +2,28 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
+{ bore-scheduler-src, kernel-march-patches, linuk-tkg-src }:
+
 { config, pkgs, ... }:
 
 let nix-daemon-build-dir = "/tmp/nix-daemon";
 in
 {
   imports =
-    [# Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./compressed-root.nix
-      ./kernel.nix
+      (import ./kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
     ];
 
   # For booting see https://nixos.wiki/wiki/Bootloader
 
   #boot.initrd.kernelModules = ["amdgpu"];
+
+  # Very bad idea to disable this: doing so leads to boot failures
+  # complaining about incompatible (lib) device mapper version.
+  # boot.initrd.includeDefaultModules = false;
 
   # For EFI-based systems
   boot.loader.systemd-boot = {
@@ -29,6 +36,7 @@ in
   boot.blacklistedKernelModules = [
     # Don’t want my integrated GPU around at all.
     "amdgpu"
+    # "dm_mod"
   ];
 
   # boot.kernelParams = [
@@ -330,7 +338,7 @@ in
           storage-driver = "overlay2";
         };
       };
-    }; #.enable = true;
+    };
     virtualbox.host = {
       enable              = true;
       enableExtensionPack = true;
@@ -850,7 +858,7 @@ in
   };
 
   system = {
-    nixos.label = "arch-generic";
+    nixos.label = "zen4";
     autoUpgrade = { enable = false; allowReboot = false; };
 
     # Include everything required to build every package on the system.
