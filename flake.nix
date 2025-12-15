@@ -92,6 +92,21 @@
       inputs.haskellNix.follows = "haskellNix";
     };
 
+    bore-scheduler-src = {
+      url = "github:firelzrd/bore-scheduler";
+      flake = false;
+    };
+
+    kernel-march-patches = {
+      url = "github:graysky2/kernel_compiler_patch";
+      flake = false;
+    };
+
+    linuk-tkg-src = {
+      url = "github:Frogging-Family/linux-tkg";
+      flake = false;
+    };
+
     # # inputs.nixpkgs.url = "github:nixos/nixpkgs";
     # inputs.hackage-server.url = "github:bgamari/hackage-server/wip/doc-builder-tls";
     # inputs.cabal.url = "github:haskell/cabal/cabal-install-v3.10.3.0";
@@ -115,6 +130,9 @@
     , nur
     # , haskellNix
     , haskell-nixpkgs-improvements
+    , bore-scheduler-src
+    , kernel-march-patches
+    , linuk-tkg-src
     , ...
     }:
     let system = "x86_64-linux";
@@ -349,7 +367,7 @@
               ];
             })
 
-            ./system.nix
+            (import ./system.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
             impermanence.nixosModule
 

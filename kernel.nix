@@ -1,128 +1,72 @@
-{ self, lib, ... }: {
-  boot = {
-    # loader.grub.configurationName = "Xanmod Bore";
-    # kernelPackages = pkgs.linuxKernel.kernels.linux_zen;
-    # kernelPackages = pkgs.linuxKernel.kernels.linux_default.override {
-    # };
-    kernelPatches = [
-      {
-        name = "Remove unused kernel parts";
-        patch = null;
-        # ignoreConfigErrors = true;
-        structuredExtraConfig = {
-          LRU_GEN                = lib.mkForce lib.kernel.yes;
-          LRU_GEN_ENABLED        = lib.mkForce lib.kernel.yes;
+{ bore-scheduler-src, kernel-march-patches, linuk-tkg-src }:
 
-          HZ_1000                = lib.mkForce lib.kernel.yes;
-          UNWINDER_FRAME_POINTER = lib.mkForce lib.kernel.no;
-          STACKPROTECTOR         = lib.mkForce lib.kernel.no;
-          HIBERNATION            = lib.mkForce lib.kernel.no;
-          X86_KERNEL_IBT         = lib.mkForce lib.kernel.no;
-          PAGE_POISONING         = lib.mkForce lib.kernel.no;
-          SLUB_DEBUG             = lib.mkForce lib.kernel.no;
-          SCHED_STACK_END_CHECK  = lib.mkForce lib.kernel.no;
-          DEBUG_VM               = lib.mkForce lib.kernel.no;
-          DEBUG_VIRTUAL          = lib.mkForce lib.kernel.no;
-          DEBUG_LIST             = lib.mkForce lib.kernel.no;
-          DEBUG_PLIST            = lib.mkForce lib.kernel.no;
-          DEBUG_SG               = lib.mkForce lib.kernel.no;
-          DEBUG_NOTIFIERS        = lib.mkForce lib.kernel.no;
-          DEBUG_MAPLE_TREE       = lib.mkForce lib.kernel.no;
-          # DEBUG_CREDENTIALS      = lib.mkForce lib.kernel.no;
-          SCHED_DEBUG            = lib.mkForce lib.kernel.no;
-          SCHEDSTATS             = lib.mkForce lib.kernel.no;
+{ self, lib, pkgs, ... }: {
+  boot =
+    let kernelPkgs = pkgs.linuxKernel.packages.linux_6_17;
 
-          #FB_3DFX                 = lib.mkForce lib.kernel.no;
-          FB_3DFX_ACCEL          = lib.mkForce lib.kernel.no;
-          #FB_3DFX_I2C             = lib.mkForce lib.kernel.no;
-          MLXSW_SPECTRUM         = lib.mkForce lib.kernel.no;
-          MLX_PLATFORM           = lib.mkForce lib.kernel.no;
-
-          # Sometimes doesn’t build and is not needed
-          NET_VENDOR_CAVIUM      = lib.mkForce lib.kernel.no;
-
-          # Debug info that consumes a lot of both RAM and on-disk space during build.
-          # Disabling this causes SCHED_CLASS_EXT to become unused so we need to unset it.
-          DEBUG_INFO_BTF         = lib.mkForce lib.kernel.no;
-          SCHED_CLASS_EXT        = lib.mkForce lib.kernel.unset;
-
-          CPU_MITIGATIONS        = lib.mkForce lib.kernel.no;
-          MITIGATION_SLS         = lib.mkForce lib.kernel.unset;
-
-          # # Clang options require a lot of extra config
-          # CC_IS_CLANG            = lib.mkForce yes;
-          # LTO                    = lib.mkForce yes;
-          # LTO_CLANG              = lib.mkForce yes;
-          # # full LTO is much more expsneive
-          # LTO_CLANG_THIN         = lib.mkForce yes;
-
-          # # # HOTPLUG_CPU = lib.mkForce lib.kernel.no;
-          # # CPU_SUP_HYGON = lib.mkForce lib.kernel.no;
-          # # CPU_SUP_CENTAUR = lib.mkForce lib.kernel.no;
-          # # CPU_SUP_ZHAOXIN = lib.mkForce lib.kernel.no;
-          # # # # ACPI_HOTPLUG_CPU = lib.mkForce lib.kernel.no;
-          # # # ACPI_HOTPLUG_MEMORY = lib.mkForce lib.kernel.no;
-          # # # ACPI_HOTPLUG_IOAPIC = lib.mkForce lib.kernel.no;
-          # # # HOTPLUG_SMT = lib.mkForce lib.kernel.no;
-          # # # ARCH_ENABLE_MEMORY_HOTPLUG = lib.mkForce lib.kernel.no;
-          # # # ARCH_ENABLE_MEMORY_HOTREMOVE = lib.mkForce lib.kernel.no;
-          # # MEMORY_HOTPLUG = lib.mkForce lib.kernel.no;
-          # # HOTPLUG_PCI_PCIE = lib.mkForce lib.kernel.no;
-          # # HOTPLUG_PCI = lib.mkForce lib.kernel.no;
-          # # HOTPLUG_PCI_ACPI = lib.mkForce lib.kernel.no;
-          # # INPUT_TABLET = lib.mkForce lib.kernel.no;
-          # # INPUT_JOYSTICK = lib.mkForce lib.kernel.no;
-          # # MOUSE_PS2 = lib.mkForce lib.kernel.no;
-          # # # # INFINIBAND = lib.mkForce lib.kernel.no;
-          # # UBIFS_FS = lib.mkForce lib.kernel.no;
-          # # DEBUG_INFO = lib.mkForce lib.kernel.no;
-          # HIBERNATION = lib.mkForce lib.kernel.no;
-          # STACKPROTECTOR = lib.mkForce lib.kernel.no;
-          # # STACKPROTECTOR_STRONG = lib.mkForce lib.kernel.no;
-          # # # FIREWIRE = lib.mkForce lib.kernel.no;
-          # # # FUSION = lib.mkForce lib.kernel.no;
-          # # # MEMORY_HOTREMOVE = lib.mkForce lib.kernel.no;
-          # # # SLUB_DEBUG = lib.mkForce lib.kernel.no;
-          # # # SCHED_DEBUG = lib.mkForce lib.kernel.no;
-          # # # SCHED_INFO = lib.mkForce lib.kernel.no;
-          # # # LOCK_DEBUGGING_SUPPORT = lib.mkForce lib.kernel.no;
-          # # # I2C = lib.mkForce lib.kernel.no;
+        patches = import ./kernel-patches.nix {
+          inherit lib bore-scheduler-src kernel-march-patches linuk-tkg-src;
+          kernelVersion = lib.versions.majorMinor kernelPkgs.kernel.version;
         };
 
-        # extraConfig = ''
-        #   HOTPLUG_CPU n
-        #   CPU_SUP_HYGON n
-        #   CPU_SUP_CENTAUR n
-        #   CPU_SUP_ZHAOXIN n
-        #   ACPI_HOTPLUG_CPU n
-        #   ACPI_HOTPLUG_MEMORY n
-        #   ACPI_HOTPLUG_IOAPIC n
-        #   HOTPLUG_SMT n
-        #   ARCH_ENABLE_MEMORY_HOTPLUG n
-        #   ARCH_ENABLE_MEMORY_HOTREMOVE n
-        #   MEMORY_HOTPLUG n
-        #   HOTPLUG_PCI_PCIE n
-        #   HOTPLUG_PCI n
-        #   HOTPLUG_PCI_ACPI n
-        #   INPUT_TABLET n
-        #   INPUT_JOYSTICK n
-        #   MOUSE_PS2 n
-        #   INFINIBAND n
-        #   UBIFS_FS n
-        #   DEBUG_INFO n
-        #   HIBERNATION n
-        #   STACKPROTECTOR n
-        #   STACKPROTECTOR_STRONG n
-        #   FIREWIRE n
-        #   FUSION n
-        #   MEMORY_HOTREMOVE n
-        # '';
-        #   # SLUB_DEBUG n
-        #   # SCHED_DEBUG n
-        #   # SCHED_INFO n
-        #   # LOCK_DEBUGGING_SUPPORT n
-        #   # I2C n
-      }
-    ];
-  };
+        # Inspired by
+        # https://github.com/lovesegfault/nix-config/blob/db3262d344a10ed589539f834a15e9988f8dba0e/nix/overlays/linux-lto.nix
+        # https://github.com/xddxdd/nix-cachyos-kernel/blob/master/helpers.nix
+        # https://github.com/positron-solutions/derpconfig/blob/master/examples/kernel-clang.nix and https://github.com/positron-solutions/derpconfig/blob/master/examples/patches.nix
+        # https://github.com/chaotic-cx/nyx/tree/main/pkgs/linux-cachyos
+
+        # llvmPackages = "llvmPackages_14";
+        llvmPackages = "llvmPackages";
+        noBintools   = { bootBintools = null; bootBintoolsNoLibc = null; };
+        hostLLVM     = pkgs.pkgsBuildHost.${llvmPackages}.override noBintools;
+        buildLLVM    = pkgs.pkgsBuildBuild.${llvmPackages}.override noBintools;
+
+        mkLLVMPlatform = platform: platform // {
+          useLLVM = true;
+          linux-kernel = platform.linux-kernel // {
+            makeFlags = (platform.linux-kernel.makeFlags or []) ++ [
+              "LLVM=1"
+              "LLVM_IAS=1"
+              "CC=${buildLLVM.clangUseLLVM}/bin/clang"
+              "LD=${buildLLVM.lld}/bin/ld.lld"
+              "HOSTLD=${hostLLVM.lld}/bin/ld.lld"
+              "AR=${buildLLVM.llvm}/bin/llvm-ar"
+              "HOSTAR=${hostLLVM.llvm}/bin/llvm-ar"
+              "NM=${buildLLVM.llvm}/bin/llvm-nm"
+              "STRIP=${buildLLVM.llvm}/bin/llvm-strip"
+              "OBJCOPY=${buildLLVM.llvm}/bin/llvm-objcopy"
+              "OBJDUMP=${buildLLVM.llvm}/bin/llvm-objdump"
+              "READELF=${buildLLVM.llvm}/bin/llvm-readelf"
+              "HOSTCC=${hostLLVM.clangUseLLVM}/bin/clang"
+              "HOSTCXX=${hostLLVM.clangUseLLVM}/bin/clang++"
+            ];
+          };
+        };
+
+        stdenvClangUseLLVM = pkgs.overrideCC hostLLVM.stdenv hostLLVM.clangUseLLVM;
+        stdenvPlatformLLVM = stdenvClangUseLLVM.override (old: {
+          hostPlatform  = mkLLVMPlatform old.hostPlatform;
+          buildPlatform = mkLLVMPlatform old.buildPlatform;
+        });
+        llvmStdenv = stdenvPlatformLLVM;
+
+        llvm = kernel:
+          kernel.override {
+            stdenv                             = llvmStdenv;
+            buildPackages                      = pkgs.buildPackages // { stdenv = llvmStdenv; };
+            argsOverride.kernelPatches         = kernel.kernelPatches;
+            argsOverride.structuredExtraConfig = kernel.structuredExtraConfig;
+          };
+
+    in {
+      kernelPackages = (pkgs.linuxKernel.packagesFor ((llvm kernelPkgs.kernel).override (old: {
+        argsOverride.kernelPatches = old.kernelPatches ++ patches;
+      }))).extend (final: prev: {
+        virtualbox = prev.virtualbox.overrideAttrs (final2: prev2: {
+          # Export environment variable for kernel’s module compilation makefile.
+          # It’s there where decision to pick clang vs gcc is taken, not in virtualbox’s makefile.
+          "LLVM" = "1";
+        });
+      });
+    };
 }
