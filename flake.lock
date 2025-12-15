@@ -42,6 +42,22 @@
         "type": "github"
       }
     },
+    "bore-scheduler-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764342762,
+        "narHash": "sha256-svIpCsJ0+IKJorVUoJIT02sGjbUwdXk4kUQztfmGb4Q=",
+        "owner": "firelzrd",
+        "repo": "bore-scheduler",
+        "rev": "02867ff7fd059a9a416eb1658493ddfcaa9c5ba5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "firelzrd",
+        "repo": "bore-scheduler",
+        "type": "github"
+      }
+    },
     "cabal-32": {
       "flake": false,
       "locked": {
@@ -650,6 +666,38 @@
         "type": "github"
       }
     },
+    "kernel-march-patches": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1755592475,
+        "narHash": "sha256-Y/ZTUhD2Zgnsz8fJR+qpU6iK6+IVGOrm9rQfm8NPJbc=",
+        "owner": "graysky2",
+        "repo": "kernel_compiler_patch",
+        "rev": "a814e64f4f871a9e4ed74026cfae9bc24fb166ce",
+        "type": "github"
+      },
+      "original": {
+        "owner": "graysky2",
+        "repo": "kernel_compiler_patch",
+        "type": "github"
+      }
+    },
+    "linuk-tkg-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765827327,
+        "narHash": "sha256-22IgNDsp4zoReHAU9+UULaOLXIxAZd7lqJqYRKHEg7s=",
+        "owner": "Frogging-Family",
+        "repo": "linux-tkg",
+        "rev": "40dae7d17463159c4cbee54cad1851f7ec3fa5e0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Frogging-Family",
+        "repo": "linux-tkg",
+        "type": "github"
+      }
+    },
     "nixpkgs-18-09": {
       "flake": false,
       "locked": {
@@ -963,6 +1011,7 @@
     "root": {
       "inputs": {
         "arkenfox": "arkenfox",
+        "bore-scheduler-src": "bore-scheduler-src",
         "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
         "git-hooks": "git-hooks",
@@ -970,6 +1019,8 @@
         "haskellNix": "haskellNix",
         "home-manager": "home-manager",
         "impermanence": "impermanence",
+        "kernel-march-patches": "kernel-march-patches",
+        "linuk-tkg-src": "linuk-tkg-src",
         "nixpkgs-20-03": "nixpkgs-20-03_2",
         "nixpkgs-20-09": "nixpkgs-20-09_2",
         "nixpkgs-22-11": "nixpkgs-22-11_2",
