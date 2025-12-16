@@ -821,6 +821,11 @@ in
         ".local/share/plasma-systemmonitor"
         ".local/share/sddm"
 
+        ".local/state/dolphinstaterc"
+        ".local/state/kickerstaterc"
+        ".local/state/konsolestaterc"
+        ".local/state/plasmashellstaterc"
+        ".local/state/systemsettingsstaterc"
     ];
 
   dconf.settings = {
