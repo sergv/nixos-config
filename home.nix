@@ -340,7 +340,11 @@ in
     };
   };
 
-  fonts.fontconfig.enable = true;
+  fonts.fontconfig = {
+    enable       = true;
+    hinting      = "full";
+    antialiasing = true;
+  };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
