@@ -11,7 +11,7 @@
 { config, pkgs, ... }:
 
 let
-  nix-daemon-build-dir = "/tmp/nix-daemon";
+  nix-daemon-build-dir = "/builds-nix-tmp";
 in
 {
   imports = [
@@ -658,7 +658,7 @@ in
     services.nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
 
     tmpfiles.rules = [
-      "d ${nix-daemon-build-dir} - root nixbld 7d -"
+      "d ${nix-daemon-build-dir} 0755 root root 7d -"
     ];
 
     settings.Manager = {
