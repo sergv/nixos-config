@@ -748,7 +748,6 @@ in
         ".config/libreoffice"
         ".config/mc"
         ".config/paradox-launcher-v2"
-        ".config/pulse"
         ".config/ristretto"
         ".config/transmission"
         ".config/vlc"
