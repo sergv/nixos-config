@@ -725,7 +725,7 @@ in
         exec           = "emacs %u";
         terminal       = false;
         name           = "Emacs";
-        icon           = ./emacs.png;
+        icon           = ./icons/emacs.png;
         comment        = "Edit text";
         genericName    = "Text Editor";
         mimeType       = [
@@ -756,7 +756,7 @@ in
         exec           = "firefox -P i2p %u";
         terminal       = false;
         name           = "I2P";
-        icon           = ./i2p.png;
+        icon           = ./icons/i2p.png;
         comment        = "Anonymous Internet";
         genericName    = "Web Browser";
         mimeType       = [];
