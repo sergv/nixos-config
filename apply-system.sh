@@ -28,7 +28,8 @@ export NINJAFLAGS="-j8 -l8"
 command="$1"
 shift
 
-nixos-rebuild "${command}" --flake .#home --verbose --keep-going -j4 "${@}"
+# --verbose
+nixos-rebuild "${command}" --flake .#home --keep-going -j4 "${@}"
 
 # nixos-rebuild build --flake .#home --verbose --keep-going "${@}"
 # nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
