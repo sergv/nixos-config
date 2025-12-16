@@ -647,8 +647,8 @@ in {
           };
 
           settings = {
-            # # Uniformly increase scale of UI and all pages content for 4k displays.
-            # "layout.css.devPixelsPerPx" = "1.5";
+            # Uniformly increase scale of UI and all pages content for 4k displays.
+            "layout.css.devPixelsPerPx" = "1.5";
             # Increase tabs size.
             "browser.tabs.tabMinWidth" = "128";
 
