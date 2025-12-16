@@ -531,15 +531,6 @@ in
     };
   };
 
-  environment.etc."tmpfiles.d/tmp.conf".text =
-    ''
-      # Never clear /tmp directory
-      q /tmp     1777 root root - -
-
-      # Clear /var/tmp whenever as it was by default.
-      q /var/tmp 1777 root root - 30d
-    '';
-
   environment.plasma6.excludePackages = [
     pkgs.kdePackages.kpeople
     pkgs.kdePackages.kwallet
@@ -607,6 +598,10 @@ in
 
     tmpfiles.rules = [
       "d ${nix-daemon-build-dir} 0755 root root 7d -"
+      # Never clear /tmp directory
+      "q /tmp     1777 root root - -"
+      # Clear /var/tmp whenever as it was by default.
+      "q /var/tmp 1777 root root - 30d"
     ];
 
     settings.Manager = {
