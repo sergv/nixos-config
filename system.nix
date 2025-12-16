@@ -159,12 +159,11 @@ in
       "/etc/ssh/ssh_host_ed25519_key"
       "/etc/ssh/ssh_host_ed25519_key.pub"
     ];
-    # users.sergey = {
-    #   directories = [
-    #     ".config/foo"
-    #     ".local/bar"
-    #   ];
-    # };
+    users.sergey = {
+      directories = [
+        ".config/pulse"
+      ];
+    };
   };
 
   programs.adb.enable = true;
