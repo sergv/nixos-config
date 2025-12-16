@@ -105,6 +105,20 @@ in
         "lazytime"
       ];
     };
+    "/permanent/storage" = {
+      depends = [ "/" ];
+      device = "/dev/disk/by-uuid/eb1eedc4-1ed2-4716-9839-e3c7823efc82";
+      fsType = "ext4";
+      # options = ["discard"]; # for ssds
+      options = [
+        "rw"
+        "errors=remount-ro"
+        "noatime"
+        "nodiratime"
+        "lazytime"
+        "x-gvfs-hide"
+      ];
+    };
   };
 
   # Old desktop
