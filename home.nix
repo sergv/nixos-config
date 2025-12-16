@@ -725,7 +725,7 @@ in
         exec           = "emacs %u";
         terminal       = false;
         name           = "Emacs";
-        icon           = "emacs";
+        icon           = ./emacs.png;
         comment        = "Edit text";
         genericName    = "Text Editor";
         mimeType       = [
