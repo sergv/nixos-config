@@ -141,7 +141,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 0";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 0";
       keys = [
         # Numpad
         "shift + KP_End"
@@ -151,7 +151,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 1";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 1";
       keys = [
         # Numpad
         "shift + KP_Down"
@@ -161,7 +161,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 2";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 2";
       keys = [
         # Numpad
         "shift + KP_Next"
@@ -171,7 +171,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 3";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 3";
       keys = [
         # Numpad
         "shift + KP_Left"
@@ -181,7 +181,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 4";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 4";
       keys = [
         # Numpad
         "shift + KP_Begin"
@@ -191,7 +191,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 5";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 5";
       keys = [
         # Numpad
         "shift + KP_Right"
@@ -201,7 +201,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 6";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 6";
       keys = [
         # Numpad
         "shift + KP_Home"
@@ -211,7 +211,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 7";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 7";
       keys = [
         # Numpad
         "shift + KP_Up"
@@ -221,7 +221,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 9";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 9";
       keys = [
         # Numpad
         "shift + KP_Prior"
@@ -231,7 +231,7 @@ let
     }
 
     {
-      cmd  = "; ${wmctrl-pkg}/bin/wmctrl -r :ACTIVE: -t 10";
+      cmd  = "; ${wm-sh}/bin/wm.sh move-active-to 10";
       keys = [
         # Numpad
         "shift + KP_Delete"
