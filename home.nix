@@ -77,6 +77,9 @@ let
   '';
 
   clementine-pkg =
+    let
+      clementine-scale = "1.25";
+    in
     (pkgs.clementine.override (
       old:
       old
@@ -89,13 +92,6 @@ let
       }
     )).overrideAttrs
       (old: {
-        version = "1.4.1-27";
-        src = pkgs.fetchFromGitHub {
-          owner = "clementine-player";
-          repo = "Clementine";
-          rev = "658f34ec40dde09b473bdda3d90050455e724fad";
-          sha256 = "sha256-VdMw8pFgw+jhXKFw5+lnxTzmhB9F44zqhqCLAss1WBQ="; # pkgs.lib.fakeSha256;
-        };
         cmakeFlags = [
           "-DFORCE_GIT_REVISION=1.4.1"
           "-DUSE_SYSTEM_PROJECTM=ON"
@@ -121,6 +117,16 @@ let
           patches/clementine-enlarge-playback-control-buttons.patch
           patches/clementine-enlarge-volume-slider.patch
         ];
+
+        postInstall =
+          builtins.replaceStrings
+            [
+              "wrapQtApp $out/bin/clementine"
+            ]
+            [
+              ''wrapQtApp $out/bin/clementine --set-default QT_SCALE_FACTOR "${clementine-scale}"''
+            ]
+            old.postInstall;
       });
 
   qbittorrent-pkg =
