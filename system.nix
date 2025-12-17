@@ -159,11 +159,6 @@ in
       "/etc/ssh/ssh_host_ed25519_key"
       "/etc/ssh/ssh_host_ed25519_key.pub"
     ];
-    users.sergey = {
-      directories = [
-        ".config/pulse"
-      ];
-    };
   };
 
   programs.adb.enable = true;
@@ -356,6 +351,9 @@ in
   };
 
   programs.bash.completion.enable = true;
+
+  # Needed to make impermanence's allow_other work.
+  programs.fuse.userAllowOther = true;
 
   # To be able to manipulate gtk settings.
   programs.dconf.enable = true;
