@@ -65,46 +65,51 @@ let wmctrl-pkg = pkgs.wmctrl;
       exec "${steam.run}/bin/steam-run" "''${@}"
     '';
 
-    clementine-pkg = (pkgs.clementine.override (old: old // {
-      liblastfm               = null;
-      config.clementine.ipod  = false;
-      config.clementine.mtp   = false;
-      config.clementine.cd    = false;
-      config.clementine.cloud = false;
-    })).overrideAttrs (old: {
-      version = "1.4.1-27";
-      src     = pkgs.fetchFromGitHub {
-        owner  = "clementine-player";
-        repo   = "Clementine";
-        rev    = "658f34ec40dde09b473bdda3d90050455e724fad";
-        sha256 = "sha256-VdMw8pFgw+jhXKFw5+lnxTzmhB9F44zqhqCLAss1WBQ="; #pkgs.lib.fakeSha256;
-      };
-      cmakeFlags = [
-        "-DFORCE_GIT_REVISION=1.4.1"
-        "-DUSE_SYSTEM_PROJECTM=ON"
-        "-DSPOTIFY_BLOB=OFF"
-        "-DGOOGLE_DRIVE=OFF"
-        "-DDROPBOX=OFF"
-        "-DSKYDRIVE=OFF"
-        "-DBOX=OFF"
-        "-DSEAFILE=OFF"
-        "-DAUDIOCD=OFF"
-        "-DLIBGPOD=OFF"
-        "-DGIO=OFF"
-        "-DLIBMTP=OFF"
-        "-DWIIMOTEDEV=OFF"
-        "-DUDISKS2=OFF"
-        "-DMOODBAR=OFF"
-        "-DSPARKLE=OFF"
-        "-DTRANSLATIONS=OFF"
-      ];
+    clementine-pkg =
+      let clementine-scale = "1.25";
+      in
+        (pkgs.clementine.override (old: old // {
+          liblastfm               = null;
+          config.clementine.ipod  = false;
+          config.clementine.mtp   = false;
+          config.clementine.cd    = false;
+          config.clementine.cloud = false;
+        })).overrideAttrs (old: {
+          cmakeFlags = [
+            "-DFORCE_GIT_REVISION=1.4.1"
+            "-DUSE_SYSTEM_PROJECTM=ON"
+            "-DSPOTIFY_BLOB=OFF"
+            "-DGOOGLE_DRIVE=OFF"
+            "-DDROPBOX=OFF"
+            "-DSKYDRIVE=OFF"
+            "-DBOX=OFF"
+            "-DSEAFILE=OFF"
+            "-DAUDIOCD=OFF"
+            "-DLIBGPOD=OFF"
+            "-DGIO=OFF"
+            "-DLIBMTP=OFF"
+            "-DWIIMOTEDEV=OFF"
+            "-DUDISKS2=OFF"
+            "-DMOODBAR=OFF"
+            "-DSPARKLE=OFF"
+            "-DTRANSLATIONS=OFF"
+          ];
 
-      patches = (old.patches or []) ++ [
-        patches/clementine-remove-love-scrobbling-and-button-to-clear-playlist.patch
-        patches/clementine-enlarge-playback-control-buttons.patch
-        patches/clementine-enlarge-volume-slider.patch
-      ];
-    });
+          patches = (old.patches or []) ++ [
+            patches/clementine-remove-love-scrobbling-and-button-to-clear-playlist.patch
+            patches/clementine-enlarge-playback-control-buttons.patch
+            patches/clementine-enlarge-volume-slider.patch
+          ];
+
+          postInstall =
+            builtins.replaceStrings
+              [ "wrapQtApp $out/bin/clementine"
+              ]
+              [ ''wrapQtApp $out/bin/clementine --set-default QT_SCALE_FACTOR "${clementine-scale}"''
+              ]
+              old.postInstall;
+        });
+
 
     qbittorrent-pkg =
       let scale = "1.5";
