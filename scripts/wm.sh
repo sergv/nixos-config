@@ -63,6 +63,20 @@ case "$command" in
         wmctrl -s "$dest"
         echo "$current_desktop" > "$last_workspace_file"
         ;;
+    "move-active-to" )
+        if [ "$#" -ne 2 ]; then
+          err "usage: $0 move-active-to WORKSPACE-NUMBER"
+        fi
+        dest="$2"
+        [ -z "$dest" ] && err "Empty destination to move to: '$dest'"
+
+        count_windows_on_current=$(wmctrl -l | awk 'BEGIN { s = 0 }; $2 == '"$current_desktop"' { s += 1; } END { print s; }')
+        if [ "$count_windows_on_current" -ne 0 ]; then
+            wmctrl -r :ACTIVE: -t "$dest"
+        else
+            err "No active window"
+        fi
+        ;;
     * )
         err "Invalid command: '$command'"
         ;;
