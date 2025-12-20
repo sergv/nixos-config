@@ -352,9 +352,6 @@ in
 
   programs.bash.completion.enable = true;
 
-  # Needed to make impermanence's allow_other work.
-  programs.fuse.userAllowOther = true;
-
   # To be able to manipulate gtk settings.
   programs.dconf.enable = true;
 

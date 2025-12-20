@@ -48,7 +48,10 @@
     };
 
     impermanence = {
-      url = "github:nix-community/impermanence";
+      # url = "github:nix-community/impermanence";
+      url = "github:nix-community/impermanence/home-manager-v2";
+      inputs.home-manager.follows = "home-manager";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     flake-compat = {
@@ -354,6 +357,7 @@
           modules = [
 
             ({ config, pkgs, ... }: {
+
               nixpkgs.overlays = [
                 nur.overlays.default
                 overlay-unstable
@@ -370,7 +374,7 @@
 
             (import ./system.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
-            impermanence.nixosModule
+            impermanence.nixosModules.impermanence
 
             # Enable Home Manager as NixOs module
             home-manager.nixosModules.home-manager
