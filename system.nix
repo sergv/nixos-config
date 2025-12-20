@@ -336,6 +336,8 @@ in
       # More at https://nixos.org/nix/manual/#conf-system-features.
       system-features       = ["big-parallel" "gccarch-znver3" "gccarch-znver4"];
       build-dir             = nix-daemon-build-dir;
+      keep-outputs          = true;
+      keep-derivations      = true;
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
