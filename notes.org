@@ -229,7 +229,7 @@ Old ones
 ~nix store gc -v~
 
 New one that also removes stale GC roots:
-~nix-collect-garbage -d~
+~nix-collect-garbage -d --option keep-outputs true --option keep-derivations true~
 
 ** Deduplicate store
 ~nix-store --optimise~
