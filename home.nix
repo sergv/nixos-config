@@ -609,7 +609,7 @@ in
       # Pulseaudio doesn’t like symlinks.
       ".config/pulse"
 
-      "Documents"
+      { directory = "Documents"; mode = "0700"; }
       "Downloads"
       "London"
       "Music"
@@ -620,19 +620,19 @@ in
       "art"
       "bicycle"
       "books"
-      "documents"
+      { directory = "documents"; mode = "0700"; }
       "dwhelper"
       "films"
       "games"
-      "health"
+      { directory = "health"; mode = "0700"; }
       "nix"
-      "projects"
+      { directory = "projects"; mode = "0700"; }
       "recipes"
       "scripts"
       "sites"
       "software"
       "tmp"
-      "todo"
+      { directory = "todo"; mode = "0700"; }
       "torrents"
       "travelling"
       "vim"
@@ -650,14 +650,14 @@ in
       ".emacs.d"
       ".ghc"
       ".ghc-wasm"
-      ".gnupg"
+      { directory = ".gnupg"; mode = "0700"; }
       ".gradle"
       ".isabelle"
       ".java/.userPrefs"
       ".litecoin"
       ".mozilla"
       ".paradoxlauncher"
-      ".ssh"
+      { directory = ".ssh"; mode = "0700"; }
       ".stack"
       ".thunderbird"
 
@@ -666,7 +666,7 @@ in
       ".config/Clementine"
       ".config/Google"
       ".config/PCSX2"
-      ".config/VirtualBox"
+      { directory = ".config/VirtualBox"; mode = "0700"; }
       ".config/Xilinx"
       ".config/android"
       ".config/audacious"
@@ -692,11 +692,11 @@ in
       ".local/share/aspyr-media"
       ".local/share/direnv"
       ".local/share/docker"
-      ".local/share/keyrings"
+      { directory = ".local/share/keyrings"; mode = "0700"; }
       ".local/share/mc"
       ".local/share/mime"
       ".local/share/openmw"
-      ".local/share/qBittorrent"
+      { directory = ".local/share/qBittorrent"; mode = "0700"; }
       ".local/share/ristretto"
       ".local/share/strawberry"
       ".local/share/trash"
