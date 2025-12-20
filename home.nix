@@ -801,7 +801,6 @@ in
       ".aspell.en.pws"
       ".bash_history"
       ".rtorrent.rc"
-      ".viminfo"
       ".vimrc"
       ".config/Audaciousrc"
       ".config/QtProject.conf"
