@@ -492,6 +492,7 @@ in
     # };
   };
 
+  # Seems to have no effect on Plasma 6, thus Plasma 5 only.
   environment.etc."xdg/kwinrc".text = pkgs.lib.generators.toINI {} {
     # Disable Application Launcher menu when Win-key is pressed, https://askubuntu.com/questions/1256305/how-do-i-prevent-application-launcher-pop-up-when-win-key-is-pressed-in-kde.
     "ModifierOnlyShortcuts" = {
