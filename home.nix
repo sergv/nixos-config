@@ -457,74 +457,6 @@ in
       key = "47E4DA2E6A3F58FE3F0198F4D6CD29530F98D6B8";
       signByDefault = true;
     };
-    includes = [
-      { contents = {
-          advice = {
-            # Disable `git status' hints on how to stage, etc.
-            statusHints         = false;
-	          graftFileDeprecated = false;
-          };
-          branch = {
-            # When branching off a remote branch, automatically let the local
-            # branch track the remote one.
-            autosetupmerge = true;
-          };
-          color = {
-            ui = true;
-          };
-          diff = {
-            # Make git diff use mnemonic prefixes (Index, Work tree, etc) instead
-            # of standard a/ & b/ prefixes.
-            mnemonicprefix = true;
-            # Show more informative diff when submodules are involved.
-            submodule = "log";
-          };
-          # http = git-proxy-conf;
-          # https = git-proxy-conf;
-          merge = {
-            # Always show a diffstat at the end of merge.
-            stat = true;
-          };
-          rebase = {
-            # Always show a diffstat at the end of rebase.
-            stat = true;
-          };
-          rerere = {
-            enabled = true;
-            # Autostage files solved by rerere
-            autoupdate = true;
-          };
-          status = {
-            # Provide more information on sumbodule changes in "git status"
-            submoduleSummary = true;
-          };
-          pull = {
-            # Automatically rebase when doing "git pull" but preserve local merges.
-	          # This is the value for git < 2.34
-	          #rebase = preserve
-	          # This is the value for git >= 2.34
-	          rebase = "merges";
-            # Fetch submodules when superproject retrieves commit that updates
-            # submodule's reference.
-            recurseSubmodules = "on-demand";
-          };
-          fetch = {
-            # Fetch submodules when superproject retrieves commit that updates
-            # submodule's reference.
-            recurseSubmodules = "on-demand";
-          };
-          push = {
-            default = "simple";
-            # Check that all submodule commits that current commit to be pushed
-            # references are already pushed somewhere.
-            recurseSubmodules = "check";
-          };
-          init = {
-	          defaultBranch = "master";
-          };
-        };
-      }
-    ];
     ignores = [
       ".eproj-info"
       "cabal-project*.local"
@@ -534,7 +466,7 @@ in
       "*.bak"
     ];
     settings  = {
-      aliases = {
+      alias = {
         "lg"  = "log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(red)%h %G?%C(reset)%C(yellow)%d%C(reset) %C(white)%s%C(reset) - %C(dim white)%an%C(reset) %C(green)(%ar)%C(reset)'";
         "lgm" = "lg --no-merges";
         "ch"  = "checkout";
@@ -547,6 +479,69 @@ in
       user = {
         name  = "Sergey Vinokurov";
         email = "serg.foo@gmail.com";
+      };
+      advice = {
+        # Disable `git status' hints on how to stage, etc.
+        statusHints         = false;
+	      graftFileDeprecated = false;
+      };
+      branch = {
+        # When branching off a remote branch, automatically let the local
+        # branch track the remote one.
+        autosetupmerge = true;
+      };
+      color = {
+        ui = true;
+      };
+      diff = {
+        # Make git diff use mnemonic prefixes (Index, Work tree, etc) instead
+        # of standard a/ & b/ prefixes.
+        mnemonicprefix = true;
+        # Show more informative diff when submodules are involved.
+        submodule = "log";
+      };
+      # http = git-proxy-conf;
+      # https = git-proxy-conf;
+      merge = {
+        # Always show a diffstat at the end of merge.
+        stat = true;
+      };
+      rebase = {
+        # Always show a diffstat at the end of rebase.
+        stat = true;
+      };
+      rerere = {
+        enabled = true;
+        # Autostage files solved by rerere
+        autoupdate = true;
+      };
+      status = {
+        # Provide more information on sumbodule changes in "git status"
+        submoduleSummary = true;
+      };
+      pull = {
+        # Automatically rebase when doing "git pull" but preserve local merges.
+	      # This is the value for git < 2.34
+	      #rebase = preserve
+	      # This is the value for git >= 2.34
+	      rebase = "merges";
+        # Fetch submodules when superproject retrieves commit that updates
+        # submodule's reference.
+        recurseSubmodules = "on-demand";
+      };
+      fetch = {
+        # Fetch submodules when superproject retrieves commit that updates
+        # submodule's reference.
+        recurseSubmodules = "on-demand";
+      };
+      push = {
+        default = "simple";
+        # Check that all submodule commits that current commit to be pushed
+        # references are already pushed somewhere.
+        recurseSubmodules = "check";
+      };
+      init = {
+	      defaultBranch = "master";
       };
     };
   };
