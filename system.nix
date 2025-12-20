@@ -398,35 +398,6 @@ in
     ];
   };
 
-  security.pam = {
-    loginLimits = [
-      {
-        domain = "*";
-        type   = "soft";
-        item   = "nofile";
-        value  = "8192";
-      }
-      {
-        domain = "*";
-        type   = "hard";
-        item   = "nofile";
-        value  = "1048576";
-      }
-      # {
-      #   domain = "@users";
-      #   type   = "hard";
-      #   item   = "data";
-      #   value  = "7000000"; # kill process if it goes over 7Gb
-      # }
-      # {
-      #   domain = "@users";
-      #   type   = "soft";
-      #   item   = "data";
-      #   value  = "4000000"; # Notify process if it eats more than 4Gb
-      # }
-    ];
-  };
-
   services.acpid.enable = true;
   powerManagement = {
     enable          = true;
@@ -602,11 +573,15 @@ in
     ];
 
     settings.Manager = {
-      # File limit is for better for steam proton games.
-      DefaultLimitNOFILE = "10485760";
+      # File limit.
+      DefaultLimitNOFILE = "8192:10485760";
       # Timeout is for starting jobs that hang for any reason.
       DefaultTimeoutStopSec = "10s";
     };
+    user.extraConfig =
+    ''
+      DefaultLimitNOFILE=8192:262144
+    '';
   };
 
   # Set your time zone.
