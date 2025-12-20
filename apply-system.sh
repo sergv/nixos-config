@@ -28,6 +28,9 @@ export NINJAFLAGS="-j8 -l8"
 command="$1"
 shift
 
+# force nixos-rebuild to use nix-daemon
+# NIX_REMOTE=daemon
+
 # --verbose
 nixos-rebuild "${command}" --flake .#home --keep-going -j4 "${@}"
 
