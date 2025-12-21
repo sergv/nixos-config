@@ -221,13 +221,15 @@ in
     };
   };
 
-  services.pulseaudio = {
-    enable       = true;
-    support32Bit = true;
-  };
-
+  # Enable sound with PipeWire
+  services.pulseaudio.enable = false;
   services.pipewire = {
-    enable = false;
+    enable            = true; # Enable PipeWire
+    alsa.enable       = true; # Enable ALSA support
+    alsa.support32Bit = true; # Enable 32-bit ALSA support
+    audio.enable      = true;
+    pulse.enable      = true; # Enable PulseAudio compatibility
+    jack.enable       = true; # Add support for JACK applications
   };
 
   hardware = {
