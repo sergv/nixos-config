@@ -513,6 +513,18 @@ in
     pkgs.kdePackages.milou
   ];
 
+  # # Set desktop wallpaper on login
+  # systemd.user.services.set-wallpaper = {
+  #   description = "Set KDE Plasma wallpaper";
+  #   wantedBy = [ "graphical-session.target" ];
+  #   after = [ "graphical-session.target" ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     ExecStart = "${pkgs.libsForQt5.plasma-workspace}/bin/plasma-apply-wallpaperimage /home/mathias/bgimage";
+  #     Restart = "no";
+  #   };
+  # };
+
   # Enable automounting in Thunar
   services.udisks2.enable = true;
 
