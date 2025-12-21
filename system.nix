@@ -403,6 +403,9 @@ in
     cpuFreqGovernor = "performance";
   };
 
+  # Do not download any new firmware without my input.
+  services.fwupd.enable = false;
+
   services.locate = {
     enable    = true;
     package   = pkgs.mlocate;
