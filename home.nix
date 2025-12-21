@@ -1006,6 +1006,7 @@ in
         #pkgs.inkscape
         pkgs.iotop
         pkgs.kdePackages.ark
+        pkgs.kdePackages.filelight # Disk usage visualization tool, alternative to baobab
         pkgs.kdePackages.okular
         pkgs.kdePackages.oxygen-icons
         pkgs.kdePackages.plasma-systemmonitor
