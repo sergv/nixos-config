@@ -567,7 +567,9 @@ in
   };
 
   systemd = {
-    services.nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
+    services = {
+      nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
+    };
 
     tmpfiles.rules = [
       "d ${nix-daemon-build-dir} 0755 root root 7d -"
@@ -583,10 +585,15 @@ in
       # Timeout is for starting jobs that hang for any reason.
       DefaultTimeoutStopSec = "10s";
     };
-    user.extraConfig =
-    ''
-      DefaultLimitNOFILE=8192:262144
-    '';
+    user = {
+      extraConfig =
+        ''
+          DefaultLimitNOFILE=8192:262144
+        '';
+
+      # Disable rootless docker at startup - it will start automatically when docker is used.
+      services.docker.wantedBy = pkgs.lib.mkForce [];
+    };
   };
 
   # Set your time zone.
