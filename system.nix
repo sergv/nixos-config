@@ -258,6 +258,10 @@ in
     support32Bit = true;
   };
 
+  services.pipewire = {
+    enable = false;
+  };
+
   hardware = {
     bluetooth.enable = false;
 
@@ -464,10 +468,6 @@ in
     enable = true;
     package = pkgs.mlocate;
     interval = "daily";
-  };
-
-  services.pipewire = {
-    enable = false;
   };
 
   # Enable CUPS to print documents.
