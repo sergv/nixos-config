@@ -406,8 +406,20 @@ On clients:
 ** Don’t use caches/build everything from source/stale cache entry does not exist
 Pass ~nix build <target> --option substitute false~
 
+** Flakes development cookbook
+
+- Enter development shell for a package ~foo~ defined in current flake.
+  ~nix develop .#packages.x86_64-linux.foo~
+- List all available commands: ~declare -F~ - nix phases will be bash functions
+  ~declare -F | grep -i phase~
+- Show all commands with definitions: ~typeset -f~
+- Optional: get sources with ~unpackPhase~
+– ~configurePhase~ or ~cmakeConfigurePhase~ or equivalent depending on flake
+- ~buildPhase~
+
 * Wayland TODO
 ** Switch to https://gitlab.com/chinstrap/gammastep instead of redshift
 ** Try xlibre?
 - https://github.com/X11Libre/packaging/discussions/12
 – https://codeberg.org/takagemacoed/xlibre-overlay
+
