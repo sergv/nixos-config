@@ -66,51 +66,28 @@ let wmctrl-pkg = pkgs.wmctrl;
       exec "${steam.run}/bin/steam-run" "''${@}"
     '';
 
-    clementine-pkg =
-      let clementine-scale = "1.25";
-      in
-        (pkgs.clementine.override (old: old // {
-          liblastfm               = null;
-          config.clementine.ipod  = false;
-          config.clementine.mtp   = false;
-          config.clementine.cd    = false;
-          config.clementine.cloud = false;
-        })).overrideAttrs (old: {
-          cmakeFlags = [
-            "-DFORCE_GIT_REVISION=1.4.1"
-            "-DUSE_SYSTEM_PROJECTM=ON"
-            "-DSPOTIFY_BLOB=OFF"
-            "-DGOOGLE_DRIVE=OFF"
-            "-DDROPBOX=OFF"
-            "-DSKYDRIVE=OFF"
-            "-DBOX=OFF"
-            "-DSEAFILE=OFF"
-            "-DAUDIOCD=OFF"
-            "-DLIBGPOD=OFF"
-            "-DGIO=OFF"
-            "-DLIBMTP=OFF"
-            "-DWIIMOTEDEV=OFF"
-            "-DUDISKS2=OFF"
-            "-DMOODBAR=OFF"
-            "-DSPARKLE=OFF"
-            "-DTRANSLATIONS=OFF"
-          ];
+    strawberry-pkg = pkgs.strawberry.overrideAttrs (old: {
+      src = pkgs.fetchgit {
+        url    = "https://github.com/sergv/strawberry.git";
+        rev    = "fb93e0e09454dcc154c1901c4df196271fe2d549";
+        sha256 = "sha256-rrjeMg/cYSbcbbBtT/VvyXysfNnikMHXRwyiPe5Hguk="; #pkgs.lib.fakeSha256;
+      };
 
-          patches = (old.patches or []) ++ [
-            patches/clementine-remove-love-scrobbling-and-button-to-clear-playlist.patch
-            patches/clementine-enlarge-playback-control-buttons.patch
-            patches/clementine-enlarge-volume-slider.patch
-          ];
+      cmakeFlags =
+        (old.cmakeFlags or []) ++
+        builtins.map (x: pkgs.lib.cmakeBool x false) [
+          "ENABLE_GIO"
+          "ENABLE_AUDIOCD"
+          "ENABLE_MTP"
+          "ENABLE_GPOD"
+          "ENABLE_SPOTIFY"
+        ];
 
-          postInstall =
-            builtins.replaceStrings
-              [ "wrapQtApp $out/bin/clementine"
-              ]
-              [ ''wrapQtApp $out/bin/clementine --set-default QT_SCALE_FACTOR "${clementine-scale}"''
-              ]
-              old.postInstall;
-        });
-
+      # postInstall =
+      #   old.postInstall + "\n" + ''
+      #     qtWrapperArgs+=(--set-default QT_SCALE_FACTOR "1.25")
+      #   '';
+    });
 
     qbittorrent-pkg =
       let scale = "1.5";
@@ -669,7 +646,6 @@ in
 
         ".config/.arduino15"
         ".config/AndroidStudio3.2"
-        ".config/Clementine"
         ".config/Google"
         ".config/PCSX2"
         ".config/VirtualBox"
@@ -687,6 +663,7 @@ in
         ".config/mc"
         ".config/paradox-launcher-v2"
         ".config/ristretto"
+        ".config/strawberry"
         ".config/transmission"
         ".config/vlc"
         ".config/xfce4"
@@ -1047,7 +1024,7 @@ in
         pkgs-pristine.libreoffice
 
         # Music
-        clementine-pkg
+        strawberry-pkg
 
         pkgs.i2p
         pkgs.xd
