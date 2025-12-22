@@ -110,6 +110,13 @@
       flake = false;
     };
 
+    ksysguard6-src = {
+      url = "github:sergv/ksysguard6";
+      flake = true;
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
     # # inputs.nixpkgs.url = "github:nixos/nixpkgs";
     # inputs.hackage-server.url = "github:bgamari/hackage-server/wip/doc-builder-tls";
     # inputs.cabal.url = "github:haskell/cabal/cabal-install-v3.10.3.0";
@@ -136,6 +143,7 @@
     , bore-scheduler-src
     , kernel-march-patches
     , linuk-tkg-src
+    , ksysguard6-src
     , ...
     }:
     let system = "x86_64-linux";
@@ -339,6 +347,7 @@
           inherit impermanence;
           inherit git-proxy-conf;
           inherit haskell-nixpkgs-improvements;
+          inherit ksysguard6-src;
         };
 
         overlay-unstable = _: _: {

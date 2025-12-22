@@ -511,6 +511,7 @@ in
     pkgs.kdePackages.kwallet-pam
     pkgs.kdePackages.kwalletmanager
     pkgs.kdePackages.milou
+    pkgs.kdePackages.plasma-systemmonitor
   ];
 
   # # Set desktop wallpaper on login
