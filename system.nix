@@ -344,6 +344,8 @@ in
       build-dir             = nix-daemon-build-dir;
       keep-outputs          = true;
       keep-derivations      = true;
+      # Disable global flake registry
+      flake-registry        = "";
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
