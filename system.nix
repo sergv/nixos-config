@@ -224,12 +224,59 @@ in
   # Enable sound with PipeWire
   services.pulseaudio.enable = false;
   services.pipewire = {
-    enable            = true; # Enable PipeWire
-    alsa.enable       = true; # Enable ALSA support
-    alsa.support32Bit = true; # Enable 32-bit ALSA support
-    audio.enable      = true;
-    pulse.enable      = true; # Enable PulseAudio compatibility
-    jack.enable       = true; # Add support for JACK applications
+    enable             = true; # Enable PipeWire
+    alsa.enable        = true; # Enable ALSA support
+    alsa.support32Bit  = true; # Enable 32-bit ALSA support
+    audio.enable       = true;
+    pulse.enable       = true; # Enable PulseAudio compatibility
+    # Optional support for JACK applications
+    # jack.enable       = true; #
+
+    extraConfig.pipewire = {
+
+      # Allow speakers to go to sleep to conserve power. Unclear whether it works,
+      # but speakers seem to be able to suspend now.
+      "99-disable-suspend" = {
+        "stream.properties" = {
+          "dither.noise"  = 0;
+          # rectangular, triangular, triangular-hf, wannamaker3, shaped5
+          "dither.method" = "none" ;
+        };
+
+        "monitor.alsa.rules" = [
+          {
+            matches = [
+              {
+                # "node.name" = "~alsa_output.*Speaker";
+                # "node.name" = "~alsa_output.*analog-stereo";
+                "node.name" = "~alsa_output.*";
+              }
+            ];
+            actions = {
+              update-props = {
+                # "dither.method" = "wannamaker3";
+                # "dither.noise" = 15;
+
+                "dither.noise"  = 0;
+                # rectangular, triangular, triangular-hf, wannamaker3, shaped5
+                "dither.method" = "none" ;
+              };
+            };
+          }
+        ];
+      };
+
+      # # Low-latency setup from https://nixos.wiki/wiki/PipeWire
+      # "92-low-latency" = {
+      #   "context.properties" = {
+      #     "default.clock.rate" = 48000;
+      #     "default.clock.quantum" = 32;
+      #     "default.clock.min-quantum" = 32;
+      #     "default.clock.max-quantum" = 32;
+      #   };
+      # };
+    };
+
   };
 
   hardware = {
