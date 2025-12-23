@@ -37,7 +37,18 @@ in
     # Don’t want my integrated GPU around at all.
     "amdgpu"
     # "dm_mod"
+    # Disable HDMI audio which is inferior to speakers
+    "snd_hda_codec_hdmi"
+    "snd_hda_codec_nvhdmi"
   ];
+
+  boot.extraModprobeConfig = ''
+    #option foo bar=1
+
+    # Last resort removal of a module, when other methods of blacklisting failed.
+    install snd_hda_codec_hdmi /bin/true
+    install snd_hda_codec_nvhdmi /bin/true
+  '';
 
   # boot.kernelParams = [
   #   "mitigations=off"
