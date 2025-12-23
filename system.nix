@@ -248,34 +248,12 @@ in
 
       # Allow speakers to go to sleep to conserve power. Unclear whether it works,
       # but speakers seem to be able to suspend now.
-      "99-disable-suspend" = {
+      "99-disable-suspend-default" = {
         "stream.properties" = {
           "dither.noise"  = 0;
           # rectangular, triangular, triangular-hf, wannamaker3, shaped5
           "dither.method" = "none" ;
         };
-
-        "monitor.alsa.rules" = [
-          {
-            matches = [
-              {
-                # "node.name" = "~alsa_output.*Speaker";
-                # "node.name" = "~alsa_output.*analog-stereo";
-                "node.name" = "~alsa_output.*";
-              }
-            ];
-            actions = {
-              update-props = {
-                # "dither.method" = "wannamaker3";
-                # "dither.noise" = 15;
-
-                "dither.noise"  = 0;
-                # rectangular, triangular, triangular-hf, wannamaker3, shaped5
-                "dither.method" = "none" ;
-              };
-            };
-          }
-        ];
       };
 
       # # Low-latency setup from https://nixos.wiki/wiki/PipeWire
@@ -289,6 +267,53 @@ in
       # };
     };
 
+    wireplumber = {
+      enable = true;
+      extraConfig = {
+        "99-disable-suspend-alsa" = {
+          "monitor.alsa.rules" = [
+            {
+              matches = [
+                {
+                  # "node.name" = "~alsa_output.*Speaker";
+                  # "node.name" = "~alsa_output.*analog-stereo";
+                  "node.name" = "~alsa_output.*";
+                }
+              ];
+              actions = {
+                update-props = {
+                  # "dither.method" = "wannamaker3";
+                  # "dither.noise" = 15;
+
+                  "dither.noise"  = 0;
+                  # rectangular, triangular, triangular-hf, wannamaker3, shaped5
+                  "dither.method" = "none" ;
+                };
+              };
+            }
+          ];
+        };
+
+        "99-disable-hdmi-output" = {
+          "monitor.alsa.rules" = [
+            {
+              matches = [
+                {
+                  # device.name = "alsa_card.pci-0000_01_00.1"
+                  "node.name" = "~alsa_output.*hdmi";
+                }
+              ];
+              actions = {
+                update-props = {
+                  # "device.disabled" = true;
+                  "node.disabled" = true;
+                };
+              };
+            }
+          ];
+        };
+      };
+    };
   };
 
   hardware = {
