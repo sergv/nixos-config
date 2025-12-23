@@ -129,6 +129,7 @@ in
         "lazytime"
         "x-gvfs-hide"
       ];
+      neededForBoot = true;
     };
   };
 
