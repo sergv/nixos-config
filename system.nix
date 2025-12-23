@@ -97,6 +97,7 @@ in
       fsType    = "ext4";
       # options = ["discard"]; # for ssds
       options   = ["rw" "errors=remount-ro" "noatime" "nodiratime" "lazytime" "x-gvfs-hide"];
+      neededForBoot = true;
     };
   };
 
