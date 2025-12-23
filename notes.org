@@ -267,6 +267,7 @@ flake ~ project file
 NUR - like AUR, Nix User Repository
 
 * Cookbook/FAQ
+** To use system registry execute ~nix flake update nixpkgs --override-input nixpkgs flake:nixpkgs~
 ** Dummy hash function
 ~pkgs.lib.fakeHash~
 ~pkgs.lib.fakeSha256~
