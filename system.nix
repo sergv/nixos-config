@@ -270,7 +270,7 @@ in
     wireplumber = {
       enable = true;
       extraConfig = {
-        "99-disable-suspend-alsa" = {
+        "99-enable-suspend-alsa" = {
           "monitor.alsa.rules" = [
             {
               matches = [
@@ -282,12 +282,12 @@ in
               ];
               actions = {
                 update-props = {
+                  "session.suspend-timeout-seconds" = 0;
+                  "dither.noise"                    = 0;
+                  # rectangular, triangular, triangular-hf, wannamaker3, shaped5
+                  "dither.method"                   = "none" ;
                   # "dither.method" = "wannamaker3";
                   # "dither.noise" = 15;
-
-                  "dither.noise"  = 0;
-                  # rectangular, triangular, triangular-hf, wannamaker3, shaped5
-                  "dither.method" = "none" ;
                 };
               };
             }
