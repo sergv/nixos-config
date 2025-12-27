@@ -832,6 +832,10 @@ in
     antialias     = true;
   };
 
+  # Disable ksgrd_network_helper within security.wrappers since the executable
+  # is patched out and does not exist.
+  security.wrappers.ksgrd_network_helper = { enable = pkgs.lib.mkForce false; };
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
