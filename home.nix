@@ -10,7 +10,6 @@
 , git-proxy-conf
 , arch
 , system
-, ksysguard6-src
 , ...
 }:
 
@@ -1000,7 +999,7 @@ in
         pkgs.iotop
         pkgs.kdePackages.ark
         pkgs.kdePackages.filelight # Disk usage visualization tool, alternative to baobab
-        ksysguard6-src.packages."${system}".ksysguard6
+        pkgs.ksysguard6
         pkgs.kdePackages.okular
         pkgs.kdePackages.oxygen-icons
         pkgs.lsof
