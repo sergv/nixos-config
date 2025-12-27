@@ -999,7 +999,7 @@ in
         pkgs.iotop
         pkgs.kdePackages.ark
         pkgs.kdePackages.filelight # Disk usage visualization tool, alternative to baobab
-        pkgs.ksysguard6
+        pkgs.sergv-extensions.ksysguard6
         pkgs.kdePackages.okular
         pkgs.kdePackages.oxygen-icons
         pkgs.lsof
