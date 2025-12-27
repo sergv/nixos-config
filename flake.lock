@@ -693,19 +693,16 @@
     },
     "ksysguard6-src": {
       "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
         "nixpkgs": [
           "nixpkgs-unstable"
         ]
       },
       "locked": {
-        "lastModified": 1766797671,
-        "narHash": "sha256-Rnk+CFtoXmzz/+45qy/vYf6SYT2ewGL29kprzVXyXlE=",
+        "lastModified": 1766836930,
+        "narHash": "sha256-mH9fPMj2d12ZNhr6EPNiY1jRfhOn0Y2D+kjGf03gAL4=",
         "owner": "sergv",
         "repo": "ksysguard6",
-        "rev": "1f90804b472f1c3ab5e7503ebfcbc4249ea8076b",
+        "rev": "bcbb7b9ad354582c784e71cec8c2cdf1544aff77",
         "type": "github"
       },
       "original": {

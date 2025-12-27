@@ -350,7 +350,6 @@
         inherit impermanence;
         inherit git-proxy-conf;
         inherit haskell-nixpkgs-improvements;
-        inherit ksysguard6-src;
       };
 
       overlay-unstable = _: _: {
@@ -374,6 +373,7 @@
               nixpkgs.overlays = [
                 nur.overlays.default
                 overlay-unstable
+                ksysguard6-src.overlays.default
                 # Don’t uncomment, otherwise overlays will be applied one more time.
                 # haskell-nixpkgs-improvements.overlay.enable-ghc-unit-ids
                 # ssh-overlay
