@@ -231,6 +231,12 @@ Old ones
 New one that also removes stale GC roots:
 ~nix-collect-garbage -d --option keep-outputs true --option keep-derivations true~
 
+Print all GC roots: ~nix-store --gc --print-roots~
+
+*** Clean up garbage
+~sudo nix-collect-garbage -d~ - also removes old system & home config generations
+~nix store optimise~
+
 ** Deduplicate store
 ~nix-store --optimise~
 ~nix store optimise~
@@ -288,19 +294,6 @@ Programs and libraries used by the new derivation at run-time
 Programs and libraries used at build-time that, if they are a compiler
 or similar tool, produce code to run at run-time — i.e. tools used to
 build the new derivation
-
-** Clean up garbage
-~sudo nix-collect-garbage -d~ - also removes old system & home config generations
-~nix store optimise~
-
-** Tracking dependencies
-
-- echo *ghc* | xargs --max-args 1 echo | sort
-- nix-store -q --tree <STORE-PATH>
-- nix-store -q --referrers <STORE-PATH>
-- nix-store -q --referrers-closure <STORE-PATH>
-- nix-store --gc --print-roots
-- nix-store --query --roots <STORE-PATH>
 
 ** ~nix show-derivation~
 For current development shell: ~nix show-derivation .#devShells.x86_64-linux.default~
@@ -417,6 +410,25 @@ Pass ~nix build <target> --option substitute false~
 - Optional: get sources with ~unpackPhase~
 – ~configurePhase~ or ~cmakeConfigurePhase~ or equivalent depending on flake
 - ~buildPhase~
+
+** Tracking dependencies
+
+- echo *ghc* | xargs --max-args 1 echo | sort
+- nix-store -q --tree <STORE-PATH>
+- nix-store -q --referrers <STORE-PATH>
+- nix-store -q --referrers-closure <STORE-PATH>
+- nix-store --gc --print-roots
+- nix-store --query --roots <STORE-PATH>
+
+** Store exploration
+*** Which derivation produced file
+~nix-store --query --deriver /nix/store/.../file~
+*** Where flake output will get stored
+~nix path-info --recursive .#haskell-package-sets.x86_64-linux.host.ghc914.hiedb~
+*** All dependencies of flake derivation
+~nix-store -q --tree DERIVATION~
+*** Try this too
+~nix-store --query --include-outputs --graph DERIVATION~
 
 * Wayland TODO
 ** Switch to https://gitlab.com/chinstrap/gammastep instead of redshift
