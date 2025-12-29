@@ -84,8 +84,9 @@ borePatches
       SYMBOLIC_ERRNAME = unset;
       DYNAMIC_DEBUG = unset;
 
-      PRINTK = no;
+      PRINTK = yes;
       PRINTK_INDEX = unset;
+      PRINTK_CALLER = no;
       RD_LZO = no;
       RD_LZ4 = no;
       RD_BZIP2 = no;
@@ -93,6 +94,8 @@ borePatches
       INITRAMFS_COMPRESSION_LZ4 = unset;
       INITRAMFS_COMPRESSION_BZIP2 = unset;
       # DEBUG_KERNEL = no;
+
+      CONFIG_SECURITY_DMESG_RESTRICT = unset;
 
       # # Omit scheduling-clock ticks on CPUs that are either idle
       # # or that have only one runnable task (CONFIG_NO_HZ_FULL=y).
