@@ -698,11 +698,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1766837688,
-        "narHash": "sha256-cB7qehZDcJHaC/BwvnXvi1lZsLuqmeyVO1pvd6UUarM=",
+        "lastModified": 1766972661,
+        "narHash": "sha256-EHOyO9aBmMkj+3+4pV8+llp7vdL7Ue8bg7KsD2Y/KA0=",
         "owner": "sergv",
         "repo": "ksysguard6",
-        "rev": "92de07f75a3c457a41114e5e62cd9a2fe254c42a",
+        "rev": "551680a77880e2857c4c0efda432892cf57a0ff8",
         "type": "github"
       },
       "original": {
