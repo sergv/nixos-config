@@ -56,6 +56,8 @@ in
   # ];
 
   boot.kernel.sysctl = {
+    # Allow ‘dmesg’ without root.
+    "kernel.dmesg_restrict"      = 0;
     # Allow ‘perf’ without root.
     "kernel.perf_event_paranoid" = -1;
     "kernel.kptr_restrict"       = pkgs.lib.mkForce 0;
