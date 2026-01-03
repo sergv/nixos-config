@@ -34,7 +34,7 @@ let
 
   haskell-tools =
     let
-      pkgs-haskell = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.host ];
+      pkgs-haskell   = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.host ];
       pkgs-cross-win = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.cross-win ];
     in
       haskell-nixpkgs-improvements.lib.derive-haskell-tools
