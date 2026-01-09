@@ -1084,7 +1084,7 @@ in
       pkgs.lzop
       pkgs.mc
       pkgs.mesa-demos
-      pkgs.mplayer
+      pkgs.mpv
       pkgs.nix-index
       pkgs.p7zip
       pkgs.pavucontrol
