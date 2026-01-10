@@ -49,7 +49,7 @@
 
     impermanence = {
       # url = "github:nix-community/impermanence";
-      url = "github:nix-community/impermanence/home-manager-v2";
+      url = "github:nix-community/impermanence";
       inputs.home-manager.follows = "home-manager";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
