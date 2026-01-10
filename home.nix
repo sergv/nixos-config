@@ -7,7 +7,6 @@
   # , nixpkgs-stable
   # , nixpkgs-unstable
   arkenfox,
-  impermanence,
   git-proxy-conf,
   arch,
   system,
@@ -335,7 +334,6 @@ in
 
   imports = [
     arkenfox.hmModules.default
-    impermanence.homeManagerModules.impermanence
   ];
 
   # Home Manager needs a bit of information about you and the
