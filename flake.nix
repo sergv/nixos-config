@@ -347,7 +347,6 @@
         inherit arch system;
         inherit pkgs-pristine;
         inherit arkenfox;
-        inherit impermanence;
         inherit git-proxy-conf;
         inherit haskell-nixpkgs-improvements;
       };
