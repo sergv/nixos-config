@@ -114,7 +114,6 @@
       url = "github:sergv/ksysguard6";
       flake = true;
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.flake-utils.follows = "flake-utils";
     };
 
     # # inputs.nixpkgs.url = "github:nixos/nixpkgs";
