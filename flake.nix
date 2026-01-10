@@ -388,13 +388,15 @@
             home-manager.nixosModules.home-manager
 
             {
-              home-manager.useGlobalPkgs    = true;
-              home-manager.useUserPackages  = true;
-              home-manager.users.sergey     = import ./home.nix;
-              home-manager.extraSpecialArgs = home-manager-extra-args;
-              # home-manager.users.sergey = {
-              #   imports = [ ./home.nix ];
-              # };
+              home-manager = {
+                useGlobalPkgs    = true;
+                useUserPackages  = true;
+                users.sergey     = import ./home.nix;
+                extraSpecialArgs = home-manager-extra-args;
+                # users.sergey = {
+                #   imports = [ ./home.nix ];
+                # };
+              };
             }
 
           ];
