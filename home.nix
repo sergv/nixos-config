@@ -1067,7 +1067,6 @@ in
         # emacs-native-wrapped
         emacs-bytecode-wrapped
         emacs-debug-wrapped
-        pkgs.tree-sitter
       ] ++
       # Btrfs utils
       # [ pkgs.btrfs-progs
