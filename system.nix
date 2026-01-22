@@ -822,6 +822,10 @@ in
   #   };
   # };
 
+  services.geoclue2 = {
+    enable = pkgs.lib.mkForce false;
+  };
+
   services.tor = {
     enable = true;
     client.enable = true;
