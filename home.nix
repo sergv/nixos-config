@@ -1017,6 +1017,7 @@ in
         pkgs.smartmontools
         pkgs.sshfs
         pkgs-pristine.telegram-desktop
+        pkgs.unrar
         pkgs.unzip
         pkgs.usbutils
         pkgs.vlc
