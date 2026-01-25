@@ -588,9 +588,11 @@ in
             "Videos"
             "audiobooks"
             "books"
+            "comics"
             "films"
             "gamedev"
             "games"
+            "manga"
             "software"
             "tmp"
           ];
