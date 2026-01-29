@@ -430,6 +430,10 @@ Pass ~nix build <target> --option substitute false~
 *** Try this too
 ~nix-store --query --include-outputs --graph DERIVATION~
 
+** Force add file to store bypassing hash checking
+~sudo mount -o remount,rw /nix/store~
+~sudo cp file </nix/store/PATH>~
+~printf '</nix/store/PATH>\n\n0\n' | sudo nix-store --register-validity --reregister~
 * Wayland TODO
 ** Switch to https://gitlab.com/chinstrap/gammastep instead of redshift
 ** Try xlibre?
