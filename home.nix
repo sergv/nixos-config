@@ -672,6 +672,7 @@ in
           [
             "Documents"
             "Downloads"
+            "My Games"
             "London"
             "VirtualBox VMs"
             "art"
