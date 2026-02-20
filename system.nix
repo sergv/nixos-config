@@ -375,19 +375,19 @@ in
     # Prefer eth0 to eno1 and the like.
     usePredictableInterfaceNames = true;
 
-    # Don’t autoconfigure all network interfaces
-    useDHCP = false;
-    bridges = {
-      br0 = {
-        interfaces = ["eth-usb" "eth0"];
-      };
+    # # Don’t autoconfigure all network interfaces
+    # useDHCP = false;
+    # bridges = {
+    #   br0 = {
+    #     interfaces = ["eth-usb" "eth0"];
+    #   };
+    # };
+    # interfaces.br0 = {
+    #   useDHCP = true;
+    # };
+    interfaces.eth0 = {
+     useDHCP = true;
     };
-    interfaces.br0 = {
-      useDHCP = true;
-    };
-    #interfaces.eth0 = {
-    #  useDHCP = true;
-    #};
 
     firewall = {
       enable = true;
