@@ -440,3 +440,17 @@ Pass ~nix build <target> --option substitute false~
 - https://github.com/X11Libre/packaging/discussions/12
 – https://codeberg.org/takagemacoed/xlibre-overlay
 
+* Wine
+For faf but helps with others too
+- Install dxvk and other dependencies: ~winetricks dxvk d3dx9 xact~
+- Update faf-linux repo
+- ~export DXVK_CONFIG_FILE="/home/sergey/games/installed/scfa/faf-linux/dxvk.conf"~
+  ^may need to use dxvk config from there, not confirmed but seems to work with it
+- ~export WINEDLLOVERRIDES="d3d9=n"~  <- from proton launcher
+- ~export WINE_LARGE_ADDRESS_AWARE=1~ <- ditto
+- ~unset WINEESYNC WINEFSYNC~         <- ditto
+
+– Standard stuff so that redshift won’t mess up gamma:
+  ~wine reg add 'HKEY_CURRENT_USER\Software\Wine\X11 Driver' /t REG_SZ /v UseXVidMode /d N /f~
+
+- Run winecfg, enable virtual desktop 3840 by 2160 with default 96 dpi
