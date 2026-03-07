@@ -16,6 +16,27 @@
         "type": "github"
       }
     },
+    "NixOS-WSL": {
+      "inputs": {
+        "flake-compat": "flake-compat",
+        "nixpkgs": [
+          "nixpkgs-stable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1765841014,
+        "narHash": "sha256-55V0AJ36V5Egh4kMhWtDh117eE3GOjwq5LhwxDn9eHg=",
+        "owner": "nix-community",
+        "repo": "NixOS-WSL",
+        "rev": "be4af8042e7a61fa12fda58fe9a3b3babdefe17b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "NixOS-WSL",
+        "type": "github"
+      }
+    },
     "arkenfox": {
       "inputs": {
         "flake-compat": [
@@ -39,22 +60,6 @@
       "original": {
         "owner": "dwarfmaster",
         "repo": "arkenfox-nixos",
-        "type": "github"
-      }
-    },
-    "bore-scheduler-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1765882786,
-        "narHash": "sha256-5bSOHTeyhAT0JOWEylg8hMyWfqnOB+1jjQUL+jDeH6k=",
-        "owner": "firelzrd",
-        "repo": "bore-scheduler",
-        "rev": "be2ff398362eb3383971c835de591221693182b0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "firelzrd",
-        "repo": "bore-scheduler",
         "type": "github"
       }
     },
@@ -126,6 +131,7 @@
       }
     },
     "flake-compat": {
+      "flake": false,
       "locked": {
         "lastModified": 1765121682,
         "narHash": "sha256-4VBOP18BFeiPkyhy9o4ssBNQEvfvv1kXkasAYd0+rrA=",
@@ -141,6 +147,21 @@
       }
     },
     "flake-compat_2": {
+      "locked": {
+        "lastModified": 1765121682,
+        "narHash": "sha256-4VBOP18BFeiPkyhy9o4ssBNQEvfvv1kXkasAYd0+rrA=",
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "rev": "65f23138d8d09a92e30f1e5c87611b23ef451bf3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
+    "flake-compat_3": {
       "flake": false,
       "locked": {
         "lastModified": 1672831974,
@@ -329,7 +350,7 @@
         "cabal-34": "cabal-34",
         "cabal-36": "cabal-36",
         "cardano-shell": "cardano-shell",
-        "flake-compat": "flake-compat_2",
+        "flake-compat": "flake-compat_3",
         "hackage": "hackage",
         "hackage-for-stackage": "hackage-for-stackage",
         "hackage-internal": "hackage-internal",
@@ -634,29 +655,6 @@
         "type": "github"
       }
     },
-    "impermanence": {
-      "inputs": {
-        "home-manager": [
-          "home-manager"
-        ],
-        "nixpkgs": [
-          "nixpkgs-unstable"
-        ]
-      },
-      "locked": {
-        "lastModified": 1767822991,
-        "narHash": "sha256-iyrn9AcPZCoyxX4OT8eMkBsjG7SRUQXXS/V1JzxS7rA=",
-        "owner": "nix-community",
-        "repo": "impermanence",
-        "rev": "82e5bc4508cab9e8d5a136626276eb5bbce5e9c5",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-community",
-        "repo": "impermanence",
-        "type": "github"
-      }
-    },
     "iserv-proxy": {
       "flake": false,
       "locked": {
@@ -671,22 +669,6 @@
         "owner": "stable-haskell",
         "ref": "iserv-syms",
         "repo": "iserv-proxy",
-        "type": "github"
-      }
-    },
-    "kernel-march-patches": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1755592475,
-        "narHash": "sha256-Y/ZTUhD2Zgnsz8fJR+qpU6iK6+IVGOrm9rQfm8NPJbc=",
-        "owner": "graysky2",
-        "repo": "kernel_compiler_patch",
-        "rev": "a814e64f4f871a9e4ed74026cfae9bc24fb166ce",
-        "type": "github"
-      },
-      "original": {
-        "owner": "graysky2",
-        "repo": "kernel_compiler_patch",
         "type": "github"
       }
     },
@@ -707,22 +689,6 @@
       "original": {
         "owner": "sergv",
         "repo": "ksysguard6",
-        "type": "github"
-      }
-    },
-    "linuk-tkg-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1766198275,
-        "narHash": "sha256-N2AM0sBwVMHcjIr2ZPGQ4ANcGtutwK5CczYO0q66zr0=",
-        "owner": "Frogging-Family",
-        "repo": "linux-tkg",
-        "rev": "58f33a93b04adfa41cbf74e3aa685cc6c3981829",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Frogging-Family",
-        "repo": "linux-tkg",
         "type": "github"
       }
     },
@@ -1038,18 +1004,15 @@
     },
     "root": {
       "inputs": {
+        "NixOS-WSL": "NixOS-WSL",
         "arkenfox": "arkenfox",
-        "bore-scheduler-src": "bore-scheduler-src",
-        "flake-compat": "flake-compat",
+        "flake-compat": "flake-compat_2",
         "flake-utils": "flake-utils",
         "git-hooks": "git-hooks",
         "haskell-nixpkgs-improvements": "haskell-nixpkgs-improvements",
         "haskellNix": "haskellNix",
         "home-manager": "home-manager",
-        "impermanence": "impermanence",
-        "kernel-march-patches": "kernel-march-patches",
         "ksysguard6-src": "ksysguard6-src",
-        "linuk-tkg-src": "linuk-tkg-src",
         "nixpkgs-20-03": "nixpkgs-20-03_2",
         "nixpkgs-20-09": "nixpkgs-20-09_2",
         "nixpkgs-22-11": "nixpkgs-22-11_2",
