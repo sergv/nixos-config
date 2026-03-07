@@ -22,47 +22,7 @@ let wmctrl-pkg = pkgs.wmctrl;
       inherit pkgs haskell-nixpkgs-improvements arch system;
     };
 
-    cuda-pkgs = import ./cuda-pkgs.nix {
-      inherit pkgs;
-    };
-
-    byar = import ./beyond-all-reason-launcher.nix {
-      inherit (pkgs-pristine)
-        lib
-        stdenv
-        fetchFromGitHub
-        buildNpmPackage
-        runCommand
-        nodejs
-        electron
-        # butler
-        steam-run
-        jq
-        xorg
-        libcxx
-
-        gcc
-        cmake
-        curl
-        pkg-config
-        jsoncpp
-        boost
-        minizip;
-    };
-
     wm-sh = scripts.wm-sh;
-
-    steam = pkgs.steam.override (_: {
-      # # Remove non-free parts.
-      # steam-unwrapped = null;
-      # Add 32-bit pulseaudio for Supreme Commander.
-      extraLibraries = steam-pkgs: [steam-pkgs.libpulseaudio];
-    });
-
-    game-run-wrapper = pkgs.writeScriptBin "game-run" ''
-      #!${pkgs.bash}/bin/bash
-      exec "${steam.run}/bin/steam-run" "''${@}"
-    '';
 
     strawberry-pkg = pkgs.strawberry.overrideAttrs (old: {
       src = pkgs.fetchgit {
@@ -88,8 +48,7 @@ let wmctrl-pkg = pkgs.wmctrl;
     });
 
     qbittorrent-pkg =
-      let scale = "1.5";
-          #scale = "1.0";
+      let scale = "1.0";
       in
         (pkgs.qbittorrent.override {
           webuiSupport  = false;
@@ -143,46 +102,6 @@ let wmctrl-pkg = pkgs.wmctrl;
           libtorrent-rasterbar-1_2_x = libtorrent-rasterbar-1_2_x-upd;
           python3                    = tribler-python;
         });
-
-    wine-pkg = pkgs.wineWowPackages.stagingFull;
-
-    winetricks-pkg =
-      let
-        # Patch allows to point winetricks to the wine executable via WINE_BIN environment variable.
-        patch = pkgs.fetchurl {
-          url = "https://github.com/Winetricks/winetricks/commit/1d441b422d9a9cc8b0a53fa203557957ca1adc44.patch";
-          hash = "sha256-/y7PkJ046X29QtK8uVN9ziq8co8rATcWDxPNM7Ph45I=";
-        };
-        patched = pkgs.winetricks.overrideAttrs (old: {
-          patches = (old.patches or []) ++ [patch];
-          # src = pkgs.fetchFromGitHub {
-          #   owner = "Winetricks";
-          #   repo = "winetricks";
-          #   # rev = "bc91718a5cad45e9f33de9b351a5960d5395bed5";
-          #   # sha256 = "sha256-YTEgb19aoM54KK8/IjrspoChzVnWAEItDlTxpfpS52w="; #pkgs.lib.fakeSha256;
-          #   rev = "5eed63521781ffc2f0c4bbee7ec9e215b13a1243";
-          #   sha256 = "sha256-thEL36C2I/l4R5YAyfVg9H3FttsslVRK06Y8rPg+7Do="; #pkgs.lib.fakeSha256;
-          # };
-        });
-      in
-        # ‘winetricks’ relies on knowing architecture of the ‘wine’
-        # executable, but on NixOS the ‘wine’ executable is a shell
-        # script wrapper which breaks ‘winetricks’. This export makes
-        # ‘winetricks’ learn about actual ‘wine’ executable and infer
-        # its architecture properly.
-        pkgs.runCommand "wrapped-winetricks" {
-          nativeBuildInputs = [ pkgs.makeWrapper ];
-        }
-          # makeWrapper "${patched}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "$(dirname $(readlink -f $(which wine)))/.wine"
-          ''
-            mkdir -p "$out/bin"
-            makeWrapper "${patched}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "${wine-pkg}/bin/.wine"
-          ''
-
-          # export WINE_BIN=$(dirname $(readlink -f $(which wine)))/.wine
-
-          #patched
-        ;
 
     mk-isabelle = include-emacs-lsp-fixes:
       import ./isabelle/isabelle.nix {
@@ -638,11 +557,8 @@ in
           ".faforever"
 
           ".android"
-          ".bitcoin"
           ".cabal"
-          ".cargo"
           ".dosbox"
-          ".electrum"
           ".emacs.d"
           ".ghc"
           ".ghc-wasm"
@@ -652,7 +568,6 @@ in
           ".java/.userPrefs"
           ".litecoin"
           ".mozilla"
-          ".paradoxlauncher"
           ".ssh"
           ".stack"
           ".thunderbird"
@@ -665,7 +580,6 @@ in
           ".config/Xilinx"
           ".config/android"
           ".config/audacious"
-          ".config/bitcoin"
           ".config/chromium"
           ".config/dconf"
           ".config/fontforge"
@@ -674,7 +588,6 @@ in
           ".config/keybase"
           ".config/libreoffice"
           ".config/mc"
-          ".config/paradox-launcher-v2"
           ".config/ristretto"
           ".config/strawberry"
           ".config/transmission"
@@ -683,10 +596,8 @@ in
           ".local/share/3909"
           ".local/share/Anki"
           ".local/share/Anki2"
-          ".local/share/Paradox Interactive"
           ".local/share/TelegramDesktop"
           ".local/share/Tyranny"
-          ".local/share/aspyr-media"
           ".local/share/direnv"
           ".local/share/docker"
           ".local/share/keyrings"
@@ -1006,6 +917,7 @@ in
         pkgs.lsof
         pkgs.lzip
         pkgs.lzop
+        pkgs.maxima
         pkgs.mc
         pkgs.mesa-demos
         pkgs.mpv
@@ -1049,21 +961,12 @@ in
 
         pkgs.vdhcoapp
 
-        # byar
-
-        # pkgs.vmware-workstation
-
-        pkgs.cabextract
-        wine-pkg
-        winetricks-pkg
-
         pkgs.nix-diff
 
         isabelle-pkg
         isabelle-lsp-wrapper
 
         pkgs.pcsx2
-        game-run-wrapper
 
         tex-pkg
         wmctrl-pkg
@@ -1077,7 +980,6 @@ in
       #   pkgs.compsize
       # ] ++
       builtins.attrValues dev-pkgs ++
-      builtins.attrValues cuda-pkgs ++
       builtins.attrValues my-fonts ++
       builtins.attrValues scripts;
 
