@@ -17,7 +17,6 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./compressed-root.nix
     (import ./kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
   ];
 
@@ -98,8 +97,7 @@ in
     #             ];
     # };
 
-    "/nix" = {
-      depends = [ "/" ];
+    "/" = {
       device = "/dev/disk/by-label/nixos-root";
       fsType = "ext4";
       options = [
@@ -108,35 +106,17 @@ in
         "nodiratime"
         "lazytime"
         "x-gvfs-hide"
-        "discard"
       ];
     };
-    "/permanent" = {
-      depends = [ "/" ];
-      device = "/dev/disk/by-label/nixos-permanent";
-      fsType = "ext4";
-      # options       = ["discard"]; # for ssds
-      options = [
-        "rw"
-        "errors=remount-ro"
-        "noatime"
-        "nodiratime"
-        "lazytime"
-        "x-gvfs-hide"
-      ];
-      neededForBoot = true;
-    };
+
     "/boot" = {
       depends = [ "/" ];
       device = "/dev/disk/by-label/NIXOS-BOOT";
       fsType = "vfat";
       options = [
-        "nofail"
-        "rw"
-        "errors=remount-ro"
-        "noatime"
-        "nodiratime"
-        "lazytime"
+        "fmask=0022"
+        "dmask=0022"
+        "x-gvfs-hide"
       ];
     };
     "/permanent/storage" = {
@@ -209,7 +189,6 @@ in
       "/var/log"
     ];
     files = [
-      "/etc/machine-id"
       "/etc/ssh/ssh_host_rsa_key"
       "/etc/ssh/ssh_host_rsa_key.pub"
       "/etc/ssh/ssh_host_ed25519_key"
@@ -271,8 +250,8 @@ in
       };
     };
     virtualbox.host = {
-      enable = true;
-      enableExtensionPack = true;
+      enable = false;
+      enableExtensionPack = false;
     };
   };
 
@@ -360,7 +339,7 @@ in
   };
 
   hardware = {
-    bluetooth.enable = false;
+    bluetooth.enable = true;
 
     # OpenGL
     graphics.enable = true;
@@ -368,29 +347,38 @@ in
     # Enable acceleration in x32 wine apps.
     graphics.enable32Bit = true;
 
-    nvidia = {
-      modesetting.enable = false;
+    opengl = {
+      extraPackages = [
+        # pkgs.intel-media-driver # LIBVA_DRIVER_NAME=iHD
+        pkgs.intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+        pkgs.libvdpau-va-gl
+      ];
 
-      # Enable power management (do not disable this unless you have a reason to).
-      # Likely to cause problems on laptops and with screen tearing if disabled.
-      powerManagement.enable = true;
-
-      # Use the open source version of the kernel module ("nouveau")
-      # Note that this offers much lower performance and does not
-      # support all the latest Nvidia GPU features.
-      # You most likely don't want this.
-      # Only available on driver 515.43.04+
-      open = false;
-
-      prime.offload.enable = false;
-
-      # Enable the Nvidia settings menu,
-      # accessible via `nvidia-settings`.
-      nvidiaSettings = true;
-
-      # Optionally, you may need to select the appropriate driver version for your specific GPU.
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      extraPackages32 = [ pkgs.pkgsi686Linux.intel-vaapi-driver ];
     };
+
+    # nvidia = {
+    #   # Modesetting is needed most of the time
+    #   modesetting.enable = true;
+    #
+    #  # Enable power management (do not disable this unless you have a reason to).
+    #  # Likely to cause problems on laptops and with screen tearing if disabled.
+    #  powerManagement.enable = true;
+    #
+    #   # Use the open source version of the kernel module ("nouveau")
+    #  # Note that this offers much lower performance and does not
+    #  # support all the latest Nvidia GPU features.
+    #  # You most likely don't want this.
+    #   # Only available on driver 515.43.04+
+    #   open = false;
+    #
+    #   # Enable the Nvidia settings menu,
+    #  # accessible via `nvidia-settings`.
+    #   nvidiaSettings = true;
+    #
+    #   # Optionally, you may need to select the appropriate driver version for your specific GPU.
+    #   package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # };
   };
 
   console = {
@@ -408,10 +396,10 @@ in
   networking = {
     # Supreme Commander’s faf cilent doesn’t work with IPv6 at all.
     enableIPv6 = false;
-    hostName = "home"; # Define your hostname.
+    hostName = "notebook"; # Define your hostname.
     #hostName              = ""; # Use dhcp-provided hostname.
-    # networkmanager.enable = true;
-    #wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
+    networkmanager.enable = true;
+    # wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
 
     # Prefer eth0 to eno1 and the like.
     usePredictableInterfaceNames = true;
@@ -426,6 +414,7 @@ in
     # interfaces.br0 = {
     #   useDHCP = true;
     # };
+
     interfaces.eth0 = {
       useDHCP = true;
     };
@@ -473,16 +462,12 @@ in
       ];
       # accept-flake-config   = true;
       # More at https://nixos.org/nix/manual/#conf-system-features.
-      system-features       = [
-        "big-parallel"
-        "gccarch-znver3"
-        "gccarch-znver4"
-      ];
-      build-dir = nix-daemon-build-dir;
-      keep-outputs = true;
+      system-features  = [ "big-parallel" ];
+      build-dir        = nix-daemon-build-dir;
+      keep-outputs     = true;
       keep-derivations = true;
       # Disable global flake registry
-      flake-registry = "";
+      flake-registry   = "";
     };
     # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
     #   "experimental-features = nix-command flakes";
@@ -590,6 +575,8 @@ in
     };
   };
 
+  services.displayManager.defaultSession = "xfce";
+
   # Enable the X11 windowing system.
   services.xserver = {
     autorun = true; # Start automatically at boot time.
@@ -626,9 +613,9 @@ in
     # Enable touchpad support.
     # libinput.enable = true;
 
-    #videoDrivers = ["intel" "nvidia"]
+    videoDrivers = [ "intel" ];
     #videoDrivers = ["amdgpu" "nvidia"];
-    videoDrivers = [ "nvidia" ];
+    # videoDrivers = ["nvidia"];
     #videoDrivers = ["modesetting"];
 
     #KDE
@@ -638,24 +625,15 @@ in
       lightdm.enable = true;
     };
 
-  };
-
-  # services.displayManager.defaultSession = "plasma";
-  services.displayManager.defaultSession = "plasmax11";
-  # services.displayManager.defaultSession = "plasma";
-
-  services.desktopManager = {
-    # plasma5 = {
-    #   enable        = true;
-    # };
-    plasma6 = {
-      enable = true;
+    desktopManager = {
+      xfce = {
+        enable = true;
+        enableScreensaver = false;
+      };
     };
-    # xfce                  = {
-    #   enable            = true;
-    #   enableScreensaver = false;
-    # };
   };
+
+  # services.displayManager.defaultSession = "xfce";
 
   environment.etc = {
     "xdg/kglobalshortcutsrc".text = pkgs.lib.generators.toINI { } {
@@ -924,6 +902,7 @@ in
     settings = {
       PermitRootLogin = "no";
       PasswordAuthentication = false;
+      UsePAM = false;
       X11Forwarding = true;
     };
   };
@@ -994,11 +973,11 @@ in
     };
   };
 
-  # zramSwap = {
-  #   enable        = true;
-  #   algorithm     = "zstd";
-  #   memoryPercent = 33;
-  # };
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+  };
 
   system = {
     nixos.label = "zen4";

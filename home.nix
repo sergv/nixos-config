@@ -29,48 +29,7 @@ let
     pkgs = pkgs-opt;
   };
 
-  cuda-pkgs = import ./cuda-pkgs.nix {
-    inherit pkgs;
-  };
-
-  byar = import ./beyond-all-reason-launcher.nix {
-    inherit (pkgs-pristine)
-      lib
-      stdenv
-      fetchFromGitHub
-      buildNpmPackage
-      runCommand
-      nodejs
-      electron
-      # butler
-      steam-run
-      jq
-      xorg
-      libcxx
-
-      gcc
-      cmake
-      curl
-      pkg-config
-      jsoncpp
-      boost
-      minizip
-      ;
-  };
-
   wm-sh = scripts.wm-sh;
-
-  steam = pkgs.steam.override (_: {
-    # # Remove non-free parts.
-    # steam-unwrapped = null;
-    # Add 32-bit pulseaudio for Supreme Commander.
-    extraLibraries = steam-pkgs: [ steam-pkgs.libpulseaudio ];
-  });
-
-  game-run-wrapper = pkgs.writeScriptBin "game-run" ''
-    #!${pkgs.bash}/bin/bash
-    exec "${steam.run}/bin/steam-run" "''${@}"
-  '';
 
   strawberry-pkg = pkgs-opt.strawberry.overrideAttrs (old: {
     src = pkgs.fetchgit {
@@ -99,8 +58,7 @@ let
 
   qbittorrent-pkg =
     let
-      scale = "1.5";
-      #scale = "1.0";
+      scale = "1.0";
     in
     (pkgs.qbittorrent.override {
       webuiSupport = false;
@@ -159,33 +117,6 @@ let
       libtorrent-rasterbar-1_2_x = libtorrent-rasterbar-1_2_x-upd;
       python3 = tribler-python;
     });
-
-  # wine-pkg = arch.use-march-optimizations pkgs pkgs.wineWow64Packages.stagingFull;
-  wine-pkg = pkgs-opt.wineWow64Packages.stagingFull;
-
-  winetricks-pkg =
-    let
-      winetricks = pkgs.winetricks;
-    in
-    # ‘winetricks’ relies on knowing architecture of the ‘wine’
-    # executable, but on NixOS the ‘wine’ executable is a shell
-    # script wrapper which breaks ‘winetricks’. This export makes
-    # ‘winetricks’ learn about actual ‘wine’ executable and infer
-    # its architecture properly.
-    pkgs.runCommand "wrapped-winetricks"
-      {
-        nativeBuildInputs = [ pkgs.makeWrapper ];
-      }
-      # makeWrapper "${winetricks}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "$(dirname $(readlink -f $(which wine)))/.wine"
-      ''
-        mkdir -p "$out/bin"
-        makeWrapper "${winetricks}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "${wine-pkg}/bin/.wine"
-      ''
-
-  # export WINE_BIN=$(dirname $(readlink -f $(which wine)))/.wine
-
-  #patched
-  ;
 
   mk-isabelle =
     include-emacs-lsp-fixes:
@@ -772,11 +703,8 @@ in
             ".faforever"
 
             ".android"
-            ".bitcoin"
             ".cabal"
-            ".cargo"
             ".dosbox"
-            ".electrum"
             ".emacs.d"
             ".ghc"
             ".ghc-wasm"
@@ -786,7 +714,6 @@ in
             ".java/.userPrefs"
             ".litecoin"
             ".mozilla"
-            ".paradoxlauncher"
             ".ssh"
             ".stack"
             ".thunderbird"
@@ -799,7 +726,6 @@ in
             ".config/Xilinx"
             ".config/android"
             ".config/audacious"
-            ".config/bitcoin"
             ".config/chromium"
             ".config/dconf"
             ".config/fontforge"
@@ -808,7 +734,6 @@ in
             ".config/keybase"
             ".config/libreoffice"
             ".config/mc"
-            ".config/paradox-launcher-v2"
             ".config/ristretto"
             ".config/strawberry"
             ".config/transmission"
@@ -817,10 +742,8 @@ in
             ".local/share/3909"
             ".local/share/Anki"
             ".local/share/Anki2"
-            ".local/share/Paradox Interactive"
             ".local/share/TelegramDesktop"
             ".local/share/Tyranny"
-            ".local/share/aspyr-media"
             ".local/share/direnv"
             ".local/share/docker"
             ".local/share/keyrings"
@@ -1172,6 +1095,7 @@ in
       pkgs.lsof
       pkgs-opt.lzip
       pkgs-opt.lzop
+      pkgs.maxima
       pkgs-opt.mc
       pkgs.mesa-demos
       pkgs-opt.mpv
@@ -1213,21 +1137,12 @@ in
       qbittorrent-pkg
       # tribler-pkg
 
-      # byar
-
-      # pkgs.vmware-workstation
-
-      pkgs.cabextract
-      wine-pkg
-      winetricks-pkg
-
       pkgs-opt.nix-diff
 
       isabelle-pkg
       isabelle-lsp-wrapper
 
       pkgs.pcsx2
-      game-run-wrapper
 
       tex-pkg
       wmctrl-pkg
@@ -1242,7 +1157,6 @@ in
       #   pkgs.compsize
       # ] ++
       builtins.attrValues dev-pkgs
-    ++ builtins.attrValues cuda-pkgs
     ++ builtins.attrValues my-fonts
     ++ builtins.attrValues scripts;
 

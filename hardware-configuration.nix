@@ -16,17 +16,17 @@
 
   boot.initrd.availableKernelModules =
     #[ "xhci_pci" "nvme" "ahci" "usb_storage" "usbhid" "sd_mod" ];
-    # "sd_mod"
     [
-      "nvme"
-      "ahci"
       "xhci_pci"
-      "usbhid"
+      "ahci"
       "usb_storage"
+      "sd_mod"
+      "sr_mod"
+      "rtsx_pci_sdmmc"
     ];
   boot.initrd.kernelModules = [ ];
   # Not clear why kvm-amd was enabled by nixos-generate-config.
-  # boot.kernelModules = ["kvm-amd"];
+  # "kvm-intel"
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
