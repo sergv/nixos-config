@@ -77,8 +77,8 @@ lib.attrsets.unionOfDisjoint all-haskell-tools {
     }
   ] pkgs.llvmPackages_22.bintools;
 
-  # for ‘clang-format’
-  clang-tools     = pkgs.llvmPackages_22.clang-tools;
+  astyle          = pkgs.astyle;
+  clang-tools     = pkgs.llvmPackages_22.clang-tools; # for ‘clang-format’
   cmake           = pkgs.cmake;
   diffutils       = pkgs.diffutils;
   gdb             = pkgs.gdb;
