@@ -253,26 +253,19 @@
             # #   });
             # # });
 
-            # # libvorbis = old.libvorbis.override (_: {
-            # #
-            # #   # GCC 13.2 leads to segfault during testing. If we ignore tests
-            # #   # then other package’s tests will segfault, libvorbis is somehow not
-            # #   # functional with GCC 13.2.
-            # #   stdenv = old.clangStdenv; #old.overrideCC old.stdenv old.gcc12;
-            # #
-            # #   # Disable -march and -mtune for a package.
-            # #   # stdenv = old.stdenv.override (old2: old2 // {
-            # #   #   hostPlatform   = old2.hostPlatform // {
-            # #   #     gcc = {};
-            # #   #   };
-            # #   #   buildPlatform  = old2.buildPlatform // {
-            # #   #     gcc = {};
-            # #   #   };
-            # #   #   targetPlatform = old2.targetPlatform // {
-            # #   #     gcc = {};
-            # #   #   };
-            # #   # });
-            # # });
+          # Tests fail but is required for Wine.
+          libpulseaudio = old.libpulseaudio.overrideAttrs (_: {
+            doCheck = false;
+          });
+
+          # Tests fail but is required for Wine.
+          pulseaudio = old.pulseaudio.overrideAttrs (_: {
+            doCheck = false;
+          });
+
+          # gsl = old.gsl.overrideAttrs (_: {
+          #   doCheck = false;
+          # });
 
             # # libvorbis = old.libvorbis.overrideAttrs (_: {
             # #   # doCheck = false;
