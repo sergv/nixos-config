@@ -205,6 +205,16 @@
           # #   # doCheck = false;
           # # });
 
+          # Tests fail but is required for Wine.
+          libpulseaudio = old.libpulseaudio.overrideAttrs (_: {
+            doCheck = false;
+          });
+
+          # Tests fail but is required for Wine.
+          pulseaudio = old.pulseaudio.overrideAttrs (_: {
+            doCheck = false;
+          });
+
           # gsl = old.gsl.overrideAttrs (_: {
           #   doCheck = false;
           # });
