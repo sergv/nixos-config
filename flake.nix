@@ -215,15 +215,15 @@
         ];
 
         # Build some packages with -march=znver4
-        zen4-march-overlay = new: old:
-          builtins.listToAttrs
-            (builtins.map
-              (x: {
-                name = x;
-                value = arch.use-march-optimizations old (builtins.getAttr x old);
-              })
-              packages-to-optimize)
-          // {
+        zen4-march-overlay = new: old: {
+          # builtins.listToAttrs
+          #   (builtins.map
+          #     (x: {
+          #       name = x;
+          #       value = arch.use-march-optimizations old (builtins.getAttr x old);
+          #     })
+          #     packages-to-optimize)
+          # // {
 
             # kdePackages = old.kdePackages // {
             #   mkKdeDerivation = arch.use-march-optimizations old old.mkKdeDerivation;
@@ -450,31 +450,7 @@
           ];
         };
 
-        pkgs-opt = import nixpkgs-unstable {
-          # inherit system;
-          inherit (arch) localSystem;
-          config = {
-            # allowBroken                    = true;
-            allowUnfree                    = true; # For nvidia drivers.
-            # # May be needed for ghc windows cross-compiler but enabling it
-            # # breaks cuda-pkgs - it starts pulling in wrong dependency
-            # # that doesn’t build.
-            # allowUnsupportedSystem         = true;
-            # virtualbox.enableExtensionPack = true;
-            #inherit (arch) replaceStdenv;
-          } // haskell-nixpkgs-improvements.config.host;
-          overlays = [
-            ssh-overlay
-            systemd-disable-age-verification-overlay
-            # Redundant here.
-            # zen4-march-overlay
-            zen4-march-fixes-overlay
-            trix.overlays.default
-            # improve-fetchgit-overlay
-
-            # arch-native-overlay
-          ];
-        };
+        pkgs-opt = pkgs;
 
         home-manager-extra-args = {
           # inherit nixpkgs-fresh-ghc;

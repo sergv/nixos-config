@@ -1,8 +1,7 @@
 { wm-sh, wmctrl-pkg }:
 let misc-keybindings = {
-      # "super + t"          = "exo-open --launch TerminalEmulator";
-      # "mod4 + t"          = "exo-open --launch TerminalEmulator";
-      "mod4 + t"           = "konsole";
+      "mod4 + t"          = "exo-open --launch TerminalEmulator";
+      # "mod4 + t"           = "konsole";
       # "mod4 + t"           = "xfce4-terminal";
 
       "KP_Divide"          = "; ${wm-sh}/bin/wm.sh backward";
