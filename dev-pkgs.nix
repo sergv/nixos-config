@@ -44,9 +44,8 @@ let
   all-haskell-tools =
     lib.attrsets.unionOfDisjoint
       haskell-tools.tools
-      (lib.attrsets.unionOfDisjoint
-        haskell-tools.ghc.host
-        haskell-tools.ghc.cross-win);
+      { inherit (haskell-tools.ghc.host) ghc96 ghc98 ghc910 ghc912 ghc914;
+      };
 
 in
 lib.attrsets.unionOfDisjoint all-haskell-tools {
