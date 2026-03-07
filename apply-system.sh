@@ -27,9 +27,9 @@ shift
 # force nixos-rebuild to use nix-daemon
 # NIX_REMOTE=daemon
 
-system_name="home"
-jobs="1"
-cores="2"
+system_name="work-wsl"
+jobs="4"
+cores="8"
 export NIX_BUILD_CORES="$cores"
 export NINJAFLAGS="-j$cores -l$cores"
 
