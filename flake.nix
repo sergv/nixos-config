@@ -217,127 +217,127 @@
       ];
 
       # Build some packages with -march=znver4
-      zen4-march-overlay =
-        new: old:
-        builtins.listToAttrs (
-          builtins.map (x: {
-            name = x;
-            value = arch.use-march-optimizations old (builtins.getAttr x old);
-          }) packages-to-optimize
-        )
-        // {
+      zen4-march-overlay = new: old: {
+        # builtins.listToAttrs
+        #   (builtins.map
+        #     (x: {
+        #       name = x;
+        #       value = arch.use-march-optimizations old (builtins.getAttr x old);
+        #     })
+        #     packages-to-optimize)
+        # // {
 
-          # kdePackages = old.kdePackages // {
-          #   mkKdeDerivation = arch.use-march-optimizations old old.mkKdeDerivation;
-          #   # plasma-desktop = arch.use-march-optimizations old old.kdePackages.plasma-desktop;
-          #   # kwin           = arch.use-march-optimizations old old.kdePackages.kwin;
-          #   # kwin-x11       = arch.use-march-optimizations old old.kdePackages.kwin-x11;
-          # };
+        # kdePackages = old.kdePackages // {
+        #   mkKdeDerivation = arch.use-march-optimizations old old.mkKdeDerivation;
+        #   # plasma-desktop = arch.use-march-optimizations old old.kdePackages.plasma-desktop;
+        #   # kwin           = arch.use-march-optimizations old old.kdePackages.kwin;
+        #   # kwin-x11       = arch.use-march-optimizations old old.kdePackages.kwin-x11;
+        # };
 
-          # wineWow64Packages = old.wineWow64Packages // {
-          #   stagingFull = arch.use-march-optimizations old old.wineWow64Packages.stagingFull;
-          # };
+        # wineWow64Packages = old.wineWow64Packages // {
+        #   stagingFull = arch.use-march-optimizations old old.wineWow64Packages.stagingFull;
+        # };
 
-          # # llvmPackages_15 = old.llvmPackages_15.extend (_: old2: {
-          # #   libllvm = old2.libllvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # #   llvm = old2.llvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # # });
-          # #
-          # # # llvmPackages_16 = old.llvmPackages_16.override {
-          # # #   stdenv = old.clangStdenv;
-          # # # };
-          # #
-          # # llvmPackages_16 = old.llvmPackages_16.extend (_: old2: {
-          # #   libllvm = old2.libllvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # #   llvm = old2.llvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # # });
-          # #
-          # # llvmPackages_17 = old.llvmPackages_17.extend (_: old2: {
-          # #   libllvm = old2.libllvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # #   llvm = old2.llvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # # });
+        # # llvmPackages_15 = old.llvmPackages_15.extend (_: old2: {
+        # #   libllvm = old2.libllvm.override (_: {
+        # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+        # #     stdenv = old.clangStdenv;
+        # #   });
+        # #   llvm = old2.llvm.override (_: {
+        # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+        # #     stdenv = old.clangStdenv;
+        # #   });
+        # # });
+        # #
+        # # # llvmPackages_16 = old.llvmPackages_16.override {
+        # # #   stdenv = old.clangStdenv;
+        # # # };
+        # #
+        # # llvmPackages_16 = old.llvmPackages_16.extend (_: old2: {
+        # #   libllvm = old2.libllvm.override (_: {
+        # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+        # #     stdenv = old.clangStdenv;
+        # #   });
+        # #   llvm = old2.llvm.override (_: {
+        # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+        # #     stdenv = old.clangStdenv;
+        # #   });
+        # # });
+        # #
+        # # llvmPackages_17 = old.llvmPackages_17.extend (_: old2: {
+        # #   libllvm = old2.libllvm.override (_: {
+        # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+        # #     stdenv = old.clangStdenv;
+        # #   });
+        # #   llvm = old2.llvm.override (_: {
+        # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
+        # #     stdenv = old.clangStdenv;
+        # #   });
+        # # });
 
-          # # libvorbis = old.libvorbis.override (_: {
-          # #
-          # #   # GCC 13.2 leads to segfault during testing. If we ignore tests
-          # #   # then other package’s tests will segfault, libvorbis is somehow not
-          # #   # functional with GCC 13.2.
-          # #   stdenv = old.clangStdenv; #old.overrideCC old.stdenv old.gcc12;
-          # #
-          # #   # Disable -march and -mtune for a package.
-          # #   # stdenv = old.stdenv.override (old2: old2 // {
-          # #   #   hostPlatform   = old2.hostPlatform // {
-          # #   #     gcc = {};
-          # #   #   };
-          # #   #   buildPlatform  = old2.buildPlatform // {
-          # #   #     gcc = {};
-          # #   #   };
-          # #   #   targetPlatform = old2.targetPlatform // {
-          # #   #     gcc = {};
-          # #   #   };
-          # #   # });
-          # # });
+        # # libvorbis = old.libvorbis.override (_: {
+        # #
+        # #   # GCC 13.2 leads to segfault during testing. If we ignore tests
+        # #   # then other package’s tests will segfault, libvorbis is somehow not
+        # #   # functional with GCC 13.2.
+        # #   stdenv = old.clangStdenv; #old.overrideCC old.stdenv old.gcc12;
+        # #
+        # #   # Disable -march and -mtune for a package.
+        # #   # stdenv = old.stdenv.override (old2: old2 // {
+        # #   #   hostPlatform   = old2.hostPlatform // {
+        # #   #     gcc = {};
+        # #   #   };
+        # #   #   buildPlatform  = old2.buildPlatform // {
+        # #   #     gcc = {};
+        # #   #   };
+        # #   #   targetPlatform = old2.targetPlatform // {
+        # #   #     gcc = {};
+        # #   #   };
+        # #   # });
+        # # });
 
-          # # libvorbis = old.libvorbis.overrideAttrs (_: {
-          # #   # doCheck = false;
-          # # });
+        # # libvorbis = old.libvorbis.overrideAttrs (_: {
+        # #   # doCheck = false;
+        # # });
 
-          # gsl = old.gsl.overrideAttrs (_: {
-          #   doCheck = false;
-          # });
+        # gsl = old.gsl.overrideAttrs (_: {
+        #   doCheck = false;
+        # });
 
-          # tzdata = old.tzdata.overrideAttrs (_: {
-          #   doCheck = false;
-          # });
+        # tzdata = old.tzdata.overrideAttrs (_: {
+        #   doCheck = false;
+        # });
 
-          # virtualbox = old.virtualbox.overrideAttrs (old2: {
-          #   patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
-          # });
+        # virtualbox = old.virtualbox.overrideAttrs (old2: {
+        #   patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
+        # });
 
-          # libreoffice = old.libreoffice.override (old2: {
-          #   unwrapped = old2.unwrapped.overrideAttrs (_: {
-          #     doCheck = false;
-          #   });
-          # });
+        # libreoffice = old.libreoffice.override (old2: {
+        #   unwrapped = old2.unwrapped.overrideAttrs (_: {
+        #     doCheck = false;
+        #   });
+        # });
 
-          # python311 = old.python311.override {
-          #   packageOverrides = _: old2: {
-          #     pandas = old2.pandas.overrideAttrs (old-pandas-attrs: {
-          #       doCheck        = false;
-          #       doInstallCheck = false;
-          #     });
-          #   };
-          # };
+        # python311 = old.python311.override {
+        #   packageOverrides = _: old2: {
+        #     pandas = old2.pandas.overrideAttrs (old-pandas-attrs: {
+        #       doCheck        = false;
+        #       doInstallCheck = false;
+        #     });
+        #   };
+        # };
 
-          # qt5 = old.qt5 // {
-          #   qtwebengine = builtins.abort "Don't build qtwebengine5";
-          # };
+        # qt5 = old.qt5 // {
+        #   qtwebengine = builtins.abort "Don't build qtwebengine5";
+        # };
 
-          # qt5 = old.qt5 // {
-          #   qtwebengine = old.qt5.qtwebengine.override (_: {
-          #     stdenv = new.clangStdenv;
-          #   });
-          # };
+        # qt5 = old.qt5 // {
+        #   qtwebengine = old.qt5.qtwebengine.override (_: {
+        #     stdenv = new.clangStdenv;
+        #   });
+        # };
 
-        };
+      };
 
       # Fixes for building packages with -march=znver4
       zen4-march-fixes-overlay = new: old: {
@@ -453,32 +453,7 @@
         ];
       };
 
-      pkgs-opt = import nixpkgs-unstable {
-        # inherit system;
-        inherit (arch) localSystem;
-        config = {
-          # allowBroken                    = true;
-          allowUnfree = true; # For nvidia drivers.
-          # # May be needed for ghc windows cross-compiler but enabling it
-          # # breaks cuda-pkgs - it starts pulling in wrong dependency
-          # # that doesn’t build.
-          # allowUnsupportedSystem         = true;
-          # virtualbox.enableExtensionPack = true;
-          #inherit (arch) replaceStdenv;
-        }
-        // haskell-nixpkgs-improvements.config.host;
-        overlays = [
-          ssh-overlay
-          systemd-disable-age-verification-overlay
-          # Redundant here.
-          # zen4-march-overlay
-          zen4-march-fixes-overlay
-          trix.overlays.default
-          # improve-fetchgit-overlay
-
-          # arch-native-overlay
-        ];
-      };
+      pkgs-opt = pkgs;
 
       home-manager-extra-args = {
         # inherit nixpkgs-fresh-ghc;

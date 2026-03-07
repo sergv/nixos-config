@@ -50,10 +50,15 @@ let
     in
     haskell-nixpkgs-improvements.lib.derive-haskell-tools system pkgs-haskell pkgs-cross-win;
 
-  all-haskell-tools =
-    lib.attrsets.unionOfDisjoint haskell-tools.tools
-      # haskell-tools.ghc.host;
-      (lib.attrsets.unionOfDisjoint haskell-tools.ghc.host haskell-tools.ghc.cross-win);
+  all-haskell-tools = lib.attrsets.unionOfDisjoint haskell-tools.tools {
+    inherit (haskell-tools.ghc.host)
+      ghc96
+      ghc98
+      ghc910
+      ghc912
+      ghc914
+      ;
+  };
 
 in
 lib.attrsets.unionOfDisjoint all-haskell-tools {

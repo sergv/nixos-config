@@ -28,8 +28,8 @@ shift
 # NIX_REMOTE=daemon
 
 system_name="home"
-jobs="4"
-cores="8"
+jobs="1"
+cores="2"
 export NIX_BUILD_CORES="$cores"
 export NINJAFLAGS="-j$cores -l$cores"
 
