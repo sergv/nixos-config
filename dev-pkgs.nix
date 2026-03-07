@@ -60,6 +60,7 @@ lib.attrsets.unionOfDisjoint all-haskell-tools {
   lld  = filter-bin "llvmPackages_22.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_22.bintools;
 
   # for ‘clang-format’
+  astyle          = pkgs.astyle;
   clang-tools     = pkgs.llvmPackages_22.clang-tools;
   cmake           = pkgs.cmake;
   diffutils       = pkgs.diffutils;
