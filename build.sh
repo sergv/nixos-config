@@ -10,15 +10,15 @@ set -u
 # propagate errors from all parts of pipes
 set -o pipefail
 
-export NIX_BUILD_CORES="1"
-export NINJAFLAGS="-j1 -l1"
+export NIX_BUILD_CORES="10"
+export NINJAFLAGS="-j10 -l10"
+
+# nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#nixosConfigurations."work-wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose --max-jobs 4 --cores 10 --keep-going "${@}"
+trix build .#nixosConfigurations."work-wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --max-jobs 4 --cores 10 "${@}"
 
 # ssh-agent
 # ssh-add /home/sergey/.ssh/nix-cache-ro.key
 # --option extra-substituters ssh://nix-ssh@192.168.1.226?trusted=true
-
-# nix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose --max-jobs 1 --cores 2 --keep-going "${@}"
-trix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --max-jobs 1 --cores 2 "${@}"
 
 # exec ./apply-system.sh build "${@}"
 
