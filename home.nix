@@ -789,7 +789,6 @@ in
           ];
 
       files = [
-        ".emacs"
         "machine-specific-setup.el"
         "password.org"
         "todo.org"
@@ -811,6 +810,8 @@ in
             method = "symlink";
           })
           [
+            ".emacs"
+
             # KDE, prefers symlinks - bind mounts cannot be overwritten in-place which has led to
             # following issues previously (may or may not be relevant any more):
             # - broken plasma config from nixpkgs and konsole.
