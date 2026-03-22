@@ -742,8 +742,22 @@ in {
           force = true;
           settings = [
             {
-              name = "i2p router console";
-              url = "http://127.0.0.1:7657/home";
+              toolbar = true;
+              bookmarks = [
+                {
+                  name = "i2p router console";
+                  url = "http://127.0.0.1:7657/home";
+                }
+                {
+                  name = "rutracker";
+                  url = "http://bkhuehxydyprxpd4372h4boyluardjogyuff5p5l3u7syguavz5a.b32.i2p/forum/index.php";
+                }
+                {
+                  name = "postman";
+                  url = "http://tracker2.postman.i2p/index.php?view=Browse";
+
+                }
+              ];
             }
           ];
         };
