@@ -621,6 +621,8 @@ in
     # Forcefully symlink, removing destination if it exists.
     "L+ /home/sergey/.emacs.d/compiled 0755 -      -     - /tmp/cache/emacs"
 
+    "L+ /home/sergey/.emacs            0644 -      -     - /permanent/home/sergey/.emacs"
+
     # "L+ /home/sergey/.vimrc            0644 -      -     - /permanent/home/sergey/.vimrc"
   ];
 
@@ -810,7 +812,7 @@ in
             method = "symlink";
           })
           [
-            ".emacs"
+            # ".emacs"
 
             # KDE, prefers symlinks - bind mounts cannot be overwritten in-place which has led to
             # following issues previously (may or may not be relevant any more):
