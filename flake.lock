@@ -45,11 +45,11 @@
     "bore-scheduler-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1765882786,
-        "narHash": "sha256-5bSOHTeyhAT0JOWEylg8hMyWfqnOB+1jjQUL+jDeH6k=",
+        "lastModified": 1773428819,
+        "narHash": "sha256-Nb20eFFliVngS7Fr+FMm3BExz8PaKwxeZfp3kNxaa6M=",
         "owner": "firelzrd",
         "repo": "bore-scheduler",
-        "rev": "be2ff398362eb3383971c835de591221693182b0",
+        "rev": "a020594b8562909d71494f1857432f61cb75893a",
         "type": "github"
       },
       "original": {
@@ -713,11 +713,11 @@
     "linuk-tkg-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1766198275,
-        "narHash": "sha256-N2AM0sBwVMHcjIr2ZPGQ4ANcGtutwK5CczYO0q66zr0=",
+        "lastModified": 1775274023,
+        "narHash": "sha256-pYGxNCWc8GVvVBIQxSQ5FEKC0cPxC0dgQsCl5NPkazg=",
         "owner": "Frogging-Family",
         "repo": "linux-tkg",
-        "rev": "58f33a93b04adfa41cbf74e3aa685cc6c3981829",
+        "rev": "24003524287c8aa1c42776d5234dc5db62b715e9",
         "type": "github"
       },
       "original": {
