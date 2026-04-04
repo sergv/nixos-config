@@ -450,6 +450,7 @@ in
 
   # Enable commands like ‘nix search’ and flakes.
   nix = {
+    channel.enable = false;
     gc.automatic = false;
     package      = pkgs.unstable.nixVersions.stable;
     settings     = {
