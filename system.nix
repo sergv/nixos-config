@@ -40,6 +40,7 @@ in
     # Disable HDMI audio which is inferior to speakers
     "snd_hda_codec_hdmi"
     "snd_hda_codec_nvhdmi"
+    "kvm.enable_virt_at_load=0"
   ];
 
   boot.extraModprobeConfig = ''
