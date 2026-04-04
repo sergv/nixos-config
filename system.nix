@@ -419,9 +419,10 @@ in
 
   # Enable commands like ‘nix search’ and flakes.
   nix = {
-    gc.automatic = false;
-    package      = pkgs.unstable.nixVersions.stable;
-    settings     = {
+    channel.enable = false;
+    gc.automatic   = false;
+    package        = pkgs.unstable.nixVersions.stable;
+    settings       = {
       allowed-users         = ["@wheel" "nix-ssh"];
       bash-prompt-prefix    = "[nix] ";
       experimental-features = ["nix-command" "flakes"];
