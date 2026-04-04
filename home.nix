@@ -567,6 +567,11 @@ in
       init = {
         defaultBranch = "master";
       };
+      safe = {
+        # Let me decide what is considered ‘dubious ownership in
+        # repository’, i.e. git, shut the fuck up.
+        directory = "*";
+      };
     };
   };
 
