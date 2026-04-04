@@ -123,6 +123,12 @@
     # inputs.hackage-security.url = "github:haskell/hackage-security/hackage-security/v0.6.2.6";
     # inputs.hackage-security.flake = false;
 
+    trix = {
+      url = "github:aanderse/trix";
+      flake = true;
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
   };
 
   outputs =
@@ -144,6 +150,7 @@
       kernel-march-patches,
       linuk-tkg-src,
       ksysguard6-src,
+      trix,
       ...
     }:
     let
@@ -333,6 +340,7 @@
         overlays = [
           ssh-overlay
           zen4-march-overlay
+          trix.overlays.default
           # improve-fetchgit-overlay
 
           # arch-native-overlay
