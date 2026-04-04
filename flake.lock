@@ -1056,7 +1056,8 @@
         "nixpkgs-23-11": "nixpkgs-23-11_2",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "nur": "nur"
+        "nur": "nur",
+        "trix": "trix"
       }
     },
     "stackage": {
@@ -1087,6 +1088,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "trix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1767401921,
+        "narHash": "sha256-kpYv1uA0j87T397TS8xZe+FLN5GMuTF3rkzsZJ1ofAI=",
+        "owner": "aanderse",
+        "repo": "trix",
+        "rev": "10ef25c2370b69b51158629dfe79d9306ad60dc9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "aanderse",
+        "repo": "trix",
         "type": "github"
       }
     }
