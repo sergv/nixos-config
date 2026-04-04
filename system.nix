@@ -438,7 +438,7 @@ in
     #   "experimental-features = nix-command flakes";
 
     daemonCPUSchedPolicy = "idle";
-    daemonIOSchedClass = "idle";
+    daemonIOSchedClass   = "idle";
 
     sshServe = {
       enable  = true;
