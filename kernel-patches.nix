@@ -9,6 +9,7 @@ let
   yes        = lib.mkForce lib.kernel.yes;
   no         = lib.mkForce lib.kernel.no;
   unset      = lib.mkForce lib.kernel.unset;
+  module     = lib.mkForce lib.kernel.module;
   freeform   = x: lib.mkForce (lib.kernel.freeform x);
   patchesDir = "${bore-scheduler-src}/patches/stable/linux-${kernelVersion}-bore";
 
@@ -47,6 +48,22 @@ borePatches
 
     }
   )
+
+  {
+    name = "VirtualBox support";
+    patch = null;
+    structuredExtraConfig = {
+      KVM = yes;
+      # So that it can be loaded and unloaded at will - KVM conflicts with VirtualBox
+      # but is needed for e.g. Android Emulator and QEMU.
+      KVM_AMD = module;
+      KVM_INTEL = module;
+      # Don’t do anything but GentooWiki says these are needed.
+      # CONFIG_MODULES           = yes;
+      # CONFIG_TRIM_UNUSED_KSYMS = no;
+      # CONFIG_VIRTUALIZATION    = yes;
+    };
+  }
 
   {
     name = "Optimise performance";
@@ -251,7 +268,6 @@ borePatches
       STRIP_ASM_SYMS = yes;
 
       # We’re not VM
-      KVM = no;
       KVM_GUEST = unset;
       MOUSE_PS2_VMMOUSE = unset;
       # XEN                    = unset;
@@ -268,7 +284,7 @@ borePatches
       HVC_XEN_FRONTEND = unset;
       INTEL_TDX_GUEST = unset;
       KEXEC_JUMP = unset;
-      KVM_AMD_SEV = unset;
+      KVM_AMD_SEV = no;
       KVM_ASYNC_PF = unset;
       KVM_GENERIC_DIRTYLOG_READ_PROTECT = unset;
       KVM_MMIO = unset;
@@ -307,7 +323,7 @@ borePatches
       UDF_FS = no;
       JFS_FS = no;
       EXT2_FS = no;
-      EXT3_FS = no;
+      # EXT3_FS              = no;
       GFS2_FS = no;
       OCFS2_FS = no;
       # BTRFS_FS             = no;
