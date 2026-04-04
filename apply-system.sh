@@ -21,18 +21,20 @@ fi
 export TMPDIR=/tmp/nix-daemon
 export TEMPDIR=/tmp/nix-daemon
 
-jobs="4"
-export NIX_BUILD_CORES="8"
-export NINJAFLAGS="-j8 -l8"
-
 command="$1"
 shift
 
 # force nixos-rebuild to use nix-daemon
 # NIX_REMOTE=daemon
 
+system_name="home"
+jobs="4"
+cores="8"
+export NIX_BUILD_CORES="$cores"
+export NINJAFLAGS="-j$cores -l$cores"
+
 # --verbose
-nixos-rebuild "${command}" --flake .#home --keep-going -j4 "${@}"
+nixos-rebuild "${command}" --flake ".#${system_name}" --keep-going --cores "$cores" --max-jobs "$jobs" "${@}"
 
 # nixos-rebuild build --flake .#home --verbose --keep-going "${@}"
 # nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
