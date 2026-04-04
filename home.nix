@@ -338,7 +338,14 @@ in
         #export PROMPT_COMMAND="''${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a"
         export PROMPT_COMMAND="history -a"
 
-        export PS1="\u@\h:\w\$ "
+        nix_shell_prompt() {
+            # Check if IN_NIX_SHELL variable is set.
+            if [[ -v IN_NIX_SHELL ]]; then
+                echo "[nix]"
+            fi
+        }
+
+        export PS1='$(nix_shell_prompt)\u@\h:\w\$ '
 
         function genpasswd {
             local len="$1"
@@ -423,6 +430,10 @@ in
       "TEXINPUTS"                 = ".:";
       "EMAIL"                     = "serg.foo@gmail.com";
       "BASHRC_ENV_LOADED"         = "1";
+      # ‘nix-shell’ likes to change prompt. ‘trix’ uses ‘nix-shell’ as underlying mechanism
+      # so is affected too, while ‘nix develop’ doesn’t so set up this variable to make
+      # ‘trix develop’ # behave more like ‘nix develop’.
+      "NIX_SHELL_PRESERVE_PROMPT" = "1";
     };
   };
 

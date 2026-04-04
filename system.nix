@@ -194,6 +194,7 @@ in
       pkgs.pciutils
       pkgs.sudo
       pkgs.strace
+      pkgs.trix
       pkgs.vim
       # pkgs.veracrypt
       #(pkgs.wineFull.override { netapiSupport = false; })
