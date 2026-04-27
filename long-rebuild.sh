@@ -29,5 +29,4 @@ export NIX_BUILD_CORES="$cores"
 export NINJAFLAGS="-j$cores -l$cores"
 
 # nix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j1 --cores $cores --keep-going "${@}"
-trix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result
-#--verbose -j1 --cores $cores --keep-going "${@}"
+trix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result -j1 --cores $cores --keep-going "${@}"
