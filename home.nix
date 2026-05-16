@@ -1239,7 +1239,7 @@ in
       tex-pkg
       wmctrl-pkg
 
-      # emacs-native-wrapped
+      emacs-native-wrapped
       emacs-bytecode-wrapped
       emacs-debug-wrapped
     ]
