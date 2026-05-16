@@ -229,30 +229,102 @@ let
       withNativeCompilation = false;
       noGui = false;
       srcRepo = true;
-      withXwidgets = false;
       withTreeSitter = true;
       withSQLite3 = false;
-      withSelinux = false;
       withPgtk = false;
       withJansson = false; # Use native JSON in Emacs instead, aviailable since version 30.
+
+      withX = true;
       withGTK3 = true;
+      withToolkitScrollBars = false;
+      withCairo = true;
+      withXinput2 = true;
+
+      withAcl = false;
+      withAlsaLib = false;
+      withMailutils = false;
+      withGcMarkTrace = false;
+      withImageMagick = false;
+      withXwidgets = false;
+      withDbus = false;
+      withSelinux = false;
+
+      # Disable General Purpose Mouse (GPM), a background service that
+      # provides mouse support for the Linux console (the text-only
+      # TTY you see before logging into a graphical desktop). Unless
+      # you plan to use Emacs in a bare-metal Linux console (outside
+      # of a terminal emulator like Alacritty, Foot, or GNOME
+      # Terminal), GPM is unnecessary. Modern terminal emulators use
+      # their own internal protocols for mouse interaction that do not
+      # rely on the GPM daemon.
+      withGpm = false;
+
     })).overrideAttrs
       (old: {
-        # NixOS 25.05 patches do not apply to 30.2 any more. Remove throwing away of
-        # nixpkgs patches here when moving to a later NixOS release.
-        # patches        = [];
-        # version        = "30.2";
-        withGTK3 = true;
-        withSQLite3 = false;
-        withTreeSitter = true;
-        configureFlags = old.configureFlags ++ [
-          (pkgs.lib.withFeature false "gc-mark-trace")
-        ];
         src = pkgs.fetchgit {
           url = "https://github.com/sergv/emacs.git";
           rev = "a4319efc7a2e2f334475f7180983fe41743afc9d";
           sha256 = "sha256-zUsDK3jbEDq+orcQI4KSmaBTbeSKHYn8XEX2mu3EB28="; # pkgs.lib.fakeSha256;
         };
+
+        # NixOS 25.05 patches do not apply to 30.2 any more. Remove throwing away of
+        # nixpkgs patches here when moving to a later NixOS release.
+        # patches        = [];
+        # version        = "30.2";
+
+        configureFlags = old.configureFlags ++ [
+          # https://www.jamescherti.com/compiling-emacs/
+          "--enable-link-time-optimization"
+          "--enable-largefile"
+          "--disable-xattr"
+
+          (pkgs.lib.withFeature true "harfbuzz")
+          (pkgs.lib.withFeature true "gnutls")
+
+          (pkgs.lib.withFeature true "gsettings")
+          (pkgs.lib.withFeature true "threads")
+          (pkgs.lib.withFeature true "libgmp")
+          (pkgs.lib.withFeature true "xml2")
+          (pkgs.lib.withFeature true "zlib")
+          (pkgs.lib.withFeatureAs true "file-notification" "inotify")
+
+          (pkgs.lib.withFeature true "wide-int")
+
+          (pkgs.lib.withFeature true "xpm")
+          (pkgs.lib.withFeature true "png")
+          (pkgs.lib.withFeature true "rsvg")
+          (pkgs.lib.withFeature false "tiff")
+          (pkgs.lib.withFeature true "jpeg")
+          (pkgs.lib.withFeature false "gif")
+
+          (pkgs.lib.withFeatureAs true "pdumper" "yes")
+          (pkgs.lib.withFeatureAs true "unexec" "no")
+          (pkgs.lib.withFeatureAs true "dumping" "pdumper")
+
+          (pkgs.lib.withFeature false "xft")
+          (pkgs.lib.withFeature false "libotf")
+          (pkgs.lib.withFeature false "xim")
+          (pkgs.lib.withFeature false "gconf")
+          (pkgs.lib.withFeature false "sound")
+          (pkgs.lib.withFeature false "libsystemd")
+          (pkgs.lib.withFeature false "libsmack")
+          (pkgs.lib.withFeature false "kerberos")
+          (pkgs.lib.withFeature false "pop")
+          (pkgs.lib.withFeature false "kerberos5")
+          (pkgs.lib.withFeature false "hesiod")
+          (pkgs.lib.withFeature false "mail-unlink")
+          (pkgs.lib.withFeature false "lcms2")
+
+          # Disables the X11 Double Buffer Extension. This protocol is
+          # redundant for modern builds because both the PGTK (Wayland)
+          # and GTK3 (X11) layers handle window buffering internally.
+          # Disabling it simplifies the binary and ensures Emacs uses
+          # modern rendering paths.
+          (pkgs.lib.withFeature false "xdbe")
+        ];
+
+        CFLAGS = "-O2 -pipe -march=${arch.gccArch} -mtune=${arch.gccArch} -fno-omit-frame-pointer -fno-plt -flto=auto";
+        LDFLAGS = "-Wl,-O2 -Wl,-z,now -Wl,-z,relro -Wl,--sort-common -Wl,--as-needed -Wl,-z,pack-relative-relocs -flto=auto";
       });
 
   emacs-native-pkg =

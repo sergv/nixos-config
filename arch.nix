@@ -5,6 +5,8 @@
     system = "x86_64-linux";
   };
 
+  gccArch = "znver4";
+
   # replaceStdenv = { pkgs }: pkgs.stdenv;
   # pkgs.gcc12Stdenv;
   #
