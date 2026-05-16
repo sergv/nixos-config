@@ -307,31 +307,36 @@ let wmctrl-pkg = pkgs.wmctrl;
 
     emacs-native-pkg = (emacs-base.override (_: { withNativeCompilation = true; })).overrideAttrs (old: {
       withNativeCompilation = true;
-      patches = (old.patches or []) ++ [
-        (pkgs.substituteAll {
-          src = ./patches/native-comp-driver-options-30.patch;
+      # NixOS 25.05 patches do not apply to 30.2 any more. Remove throwing away of
+      # nixpkgs patches here when moving to a later NixOS release.
+      # patches = (old.patches or []) ++ [
+      patches = [
+        (pkgs.replaceVars
+          ./patches/native-comp-driver-options-30.patch
+          {
+            nativeCpuArch = "${arch.gccArch}";
 
-          backendPath =
-            let libGccJitLibraryPaths = [
-                  "${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc"
-                  "${pkgs.lib.getLib pkgs.stdenv.cc.libc}/lib"
-                ] ++ pkgs.lib.optionals (pkgs.stdenv.cc?cc.lib.libgcc) [
-                  "${pkgs.lib.getLib pkgs.stdenv.cc.cc.lib.libgcc}/lib"
-                ];
-            in
-              pkgs.lib.concatStringsSep " "
-                (builtins.map
-                  (x: ''"-B${x}"'')
-                  ([
-                    # Paths necessary so the JIT compiler finds its libraries:
-                    "${pkgs.lib.getLib pkgs.libgccjit}/lib"
-                  ] ++ libGccJitLibraryPaths ++ [
-                    # Executable paths necessary for compilation (ld, as):
-                    "${pkgs.lib.getBin pkgs.stdenv.cc.cc}/bin"
-                    "${pkgs.lib.getBin pkgs.stdenv.cc.bintools}/bin"
-                    "${pkgs.lib.getBin pkgs.stdenv.cc.bintools.bintools}/bin"
-                  ]));
-        })
+            backendPath =
+              let libGccJitLibraryPaths = [
+                    "${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc"
+                    "${pkgs.lib.getLib pkgs.stdenv.cc.libc}/lib"
+                  ] ++ pkgs.lib.optionals (pkgs.stdenv.cc?cc.lib.libgcc) [
+                    "${pkgs.lib.getLib pkgs.stdenv.cc.cc.lib.libgcc}/lib"
+                  ];
+              in
+                pkgs.lib.concatStringsSep " "
+                  (builtins.map
+                    (x: ''"-B${x}"'')
+                    ([
+                      # Paths necessary so the JIT compiler finds its libraries:
+                      "${pkgs.lib.getLib pkgs.libgccjit}/lib"
+                    ] ++ libGccJitLibraryPaths ++ [
+                      # Executable paths necessary for compilation (ld, as):
+                      "${pkgs.lib.getBin pkgs.stdenv.cc.cc}/bin"
+                      "${pkgs.lib.getBin pkgs.stdenv.cc.bintools}/bin"
+                      "${pkgs.lib.getBin pkgs.stdenv.cc.bintools.bintools}/bin"
+                    ]));
+          })
       ];
     });
 
