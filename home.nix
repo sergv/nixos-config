@@ -333,9 +333,12 @@ let
     })).overrideAttrs
       (old: {
         withNativeCompilation = true;
-        patches = (old.patches or [ ]) ++ [
-          (pkgs.substituteAll {
-            src = ./patches/native-comp-driver-options-30.patch;
+        # NixOS 25.05 patches do not apply to 30.2 any more. Remove throwing away of
+        # nixpkgs patches here when moving to a later NixOS release.
+        # patches = (old.patches or []) ++ [
+        patches = [
+          (pkgs.replaceVars ./patches/native-comp-driver-options-30.patch {
+            nativeCpuArch = "${arch.gccArch}";
 
             backendPath =
               let
