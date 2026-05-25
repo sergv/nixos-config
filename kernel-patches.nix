@@ -319,8 +319,11 @@ borePatches
       DEVICE_PRIVATE = unset;
       MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO = unset;
 
+      # *.iso filesystems
+      UDF_FS = yes;
+      ISO9660_FS = yes;
+
       # no old devices
-      UDF_FS = no;
       JFS_FS = no;
       EXT2_FS = no;
       # EXT3_FS              = no;
@@ -352,10 +355,6 @@ borePatches
 
       # No old graphics
       FB_VESA = unset;
-
-      # no CD ROM (will also limit reads of dual-use flash drive images?)
-      # those images mainly need to be read by your EFI anyway
-      ISO9660_FS = no;
 
       X86_POWERNOW_K8 = no;
       X86_ACPI_CPUFREQ_CPB = no;
