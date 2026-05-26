@@ -5,12 +5,12 @@
   boot.kernelPackages =
     let kernel = pkgs.linuxKernel.kernels.linux_6_18.override (_: {
           argsOverride = {
-            version       = "6.18.21";
-            modDirVersion = "6.18.21";
+            version       = "6.18.33";
+            modDirVersion = "6.18.33";
             src           = pkgs.fetchurl {
-              # url    = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.21.tar.xz";
-              url    = "mirror://kernel/linux/kernel/v6.18.x/linux-6.18.21.tar.xz";
-              sha256 = "sha256-HDghT7E3uuhbgrglN7WYc1hiG5Fasqjk8J5gaXwZR08=";
+              url    = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.33.tar.xz";
+              # url    = "mirror://kernel/linux/kernel/v6.18.x/linux-6.18.33.tar.xz";
+              sha256 = "sha256-bxb/MCWZ9v40dCiQMizwd1cDEF+9h2dEloL8pq8Pt4I=";
             };
           };
         });
