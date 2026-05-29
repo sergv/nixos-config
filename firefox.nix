@@ -16,8 +16,10 @@ in {
   # package = pkgs.firefox;
   enable = true;
 
+  # New versions are at programs.firefox.configPath = "${config.xdg.configHome}/mozilla/firefox".
+  configPath = ".mozilla/firefox";
+
   package = pkgs.wrapFirefox pkgs-pristine.firefox-esr-unwrapped {
-    nativeMessagingHosts = [ pkgs.vdhcoapp ];
   };
 
   # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox

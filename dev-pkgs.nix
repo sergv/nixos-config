@@ -36,6 +36,7 @@ let
     let
       pkgs-haskell   = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.host ];
       pkgs-cross-win = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.cross-win ];
+      # pkgs-cross-win = null;
     in
       haskell-nixpkgs-improvements.lib.derive-haskell-tools
         system
@@ -44,6 +45,7 @@ let
   all-haskell-tools =
     lib.attrsets.unionOfDisjoint
       haskell-tools.tools
+      # haskell-tools.ghc.host;
       (lib.attrsets.unionOfDisjoint
         haskell-tools.ghc.host
         haskell-tools.ghc.cross-win);
@@ -53,14 +55,14 @@ lib.attrsets.unionOfDisjoint all-haskell-tools {
 
   gcc  = pkgs.gcc;
   # Conflicts with gcc regarding ld.gold
-  # clang = pkgs.clang_19;
-  llvm = pkgs.llvm_19;
-  # bintools = pkgs.llvmPackages_19.bintools;
-  # lld   = pkgs.lld_19;
-  lld  = filter-bin "llvmPackages_19.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_19.bintools;
+  # clang = pkgs.clang_22;
+  llvm = pkgs.llvmPackages_22.llvm;
+  # bintools = pkgs.llvmPackages_22.bintools;
+  # lld   = pkgs.lld_22;
+  lld  = filter-bin "llvmPackages_22.bintools" [{ source = "ld"; dest = "lld"; aliases = ["ld.lld"]; }] pkgs.llvmPackages_22.bintools;
 
   # for ‘clang-format’
-  clang-tools     = pkgs.clang-tools;
+  clang-tools     = pkgs.llvmPackages_22.clang-tools;
   cmake           = pkgs.cmake;
   diffutils       = pkgs.diffutils;
   gdb             = pkgs.gdb;
