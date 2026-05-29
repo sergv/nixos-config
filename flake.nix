@@ -4,23 +4,24 @@
   inputs = {
 
     nixpkgs-20-03 = {
-      url = "nixpkgs/nixos-20.03";
+      url = "github:nixos/nixpkgs?ref=nixos-20.03";
     };
 
     nixpkgs-20-09 = {
-      url = "nixpkgs/nixos-20.09";
+      url = "github:nixos/nixpkgs?ref=nixos-20.09";
     };
 
     nixpkgs-22-11 = {
-      url = "nixpkgs/nixos-22.11";
+      url = "github:nixos/nixpkgs?ref=nixos-22.11";
     };
 
     nixpkgs-23-11 = {
-      url = "nixpkgs/nixos-23.11";
+      url = "github:nixos/nixpkgs?ref=nixos-23.11";
     };
 
     nixpkgs-stable = {
-      url = "nixpkgs/nixos-25.11";
+      url = "github:nixos/nixpkgs?ref=release-26.05";
+      # url = "nixpkgs/nixos-26.05";
       # # unstable
       # url = "nixpkgs/nixos-unstable";
       #url = "nixpkgs/nixos-22.05";
@@ -33,7 +34,8 @@
       # url = "nixpkgs/nixos-24.11";
       # url = "nixpkgs/nixos-23.05";
       # url = "nixpkgs/nixos-unstable";
-      url = "nixpkgs/nixos-25.11";
+      # url = "nixpkgs/nixos-26.05";
+      url = "github:nixos/nixpkgs?ref=release-26.05";
     };
 
     # nixpkgs-fresh-ghc = {
@@ -42,7 +44,7 @@
 
     home-manager = {
       # # unstable
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       # url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
@@ -163,6 +165,16 @@
           # Whether to run tests
           doCheck = false;
         });
+      };
+
+      systemd-disable-age-verification-overlay = _: old: {
+        systemd = old.systemd.override {
+          withUserDb = false;
+          withHomed = false; # homed depends on userdb
+        };
+        mariadb-server = builtins.abort "don't wand mariadb";
+        mariadb = builtins.abort "don't wand mariadb";
+        gst-plugins-rs = builtins.abort "don't wand gst-plugins-rs";
       };
 
       # arch-native-overlay = new: old: {
@@ -339,6 +351,7 @@
         // haskell-nixpkgs-improvements.config.host;
         overlays = [
           ssh-overlay
+          systemd-disable-age-verification-overlay
           zen4-march-overlay
           trix.overlays.default
           # improve-fetchgit-overlay

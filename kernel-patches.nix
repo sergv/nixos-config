@@ -335,6 +335,7 @@ borePatches
       ZONEFS_FS = no;
       MISC_FILESYSTEMS = unset;
       NETWORK_FILESYSTEMS = no;
+      FS_DAX = unset;
 
       # # some 3rd party programs may be 32-bit compiled.  But these days, few.
       # IA32_EMULATION       = no;
@@ -599,6 +600,10 @@ borePatches
       MEMORY_HOTREMOVE = unset;
       HOTPLUG_PCI_PCIE = unset;
       HOTPLUG_PCI_ACPI = unset;
+
+      ACPI_HMAT = unset;
+      CRC32_SELFTEST = unset;
+      CRYPTO_TEST = unset;
 
       # # INPUT_TABLET = no;
       # # INPUT_JOYSTICK = no;

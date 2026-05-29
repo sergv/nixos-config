@@ -82,6 +82,8 @@ let
       sha256 = "sha256-rrjeMg/cYSbcbbBtT/VvyXysfNnikMHXRwyiPe5Hguk="; # pkgs.lib.fakeSha256;
     };
 
+    buildInputs = builtins.filter (x: x.name != pkgs.gst_all_1.gst-plugins-rs.name) old.buildInputs;
+
     cmakeFlags =
       (old.cmakeFlags or [ ])
       ++ builtins.map (x: pkgs.lib.cmakeBool x false) [
@@ -161,26 +163,11 @@ let
       python3 = tribler-python;
     });
 
-  wine-pkg = pkgs.wineWowPackages.stagingFull;
+  wine-pkg = pkgs.wineWow64Packages.stagingFull;
 
   winetricks-pkg =
     let
-      # Patch allows to point winetricks to the wine executable via WINE_BIN environment variable.
-      patch = pkgs.fetchurl {
-        url = "https://github.com/Winetricks/winetricks/commit/1d441b422d9a9cc8b0a53fa203557957ca1adc44.patch";
-        hash = "sha256-/y7PkJ046X29QtK8uVN9ziq8co8rATcWDxPNM7Ph45I=";
-      };
-      patched = pkgs.winetricks.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [ patch ];
-        # src = pkgs.fetchFromGitHub {
-        #   owner = "Winetricks";
-        #   repo = "winetricks";
-        #   # rev = "bc91718a5cad45e9f33de9b351a5960d5395bed5";
-        #   # sha256 = "sha256-YTEgb19aoM54KK8/IjrspoChzVnWAEItDlTxpfpS52w="; #pkgs.lib.fakeSha256;
-        #   rev = "5eed63521781ffc2f0c4bbee7ec9e215b13a1243";
-        #   sha256 = "sha256-thEL36C2I/l4R5YAyfVg9H3FttsslVRK06Y8rPg+7Do="; #pkgs.lib.fakeSha256;
-        # };
-      });
+      winetricks = pkgs.winetricks;
     in
     # ‘winetricks’ relies on knowing architecture of the ‘wine’
     # executable, but on NixOS the ‘wine’ executable is a shell
@@ -191,10 +178,10 @@ let
       {
         nativeBuildInputs = [ pkgs.makeWrapper ];
       }
-      # makeWrapper "${patched}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "$(dirname $(readlink -f $(which wine)))/.wine"
+      # makeWrapper "${winetricks}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "$(dirname $(readlink -f $(which wine)))/.wine"
       ''
         mkdir -p "$out/bin"
-        makeWrapper "${patched}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "${wine-pkg}/bin/.wine"
+        makeWrapper "${winetricks}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "${wine-pkg}/bin/.wine"
       ''
 
   # export WINE_BIN=$(dirname $(readlink -f $(which wine)))/.wine
@@ -263,13 +250,13 @@ let
       (old: {
         src = pkgs.fetchgit {
           url = "https://github.com/sergv/emacs.git";
-          rev = "a4319efc7a2e2f334475f7180983fe41743afc9d";
-          sha256 = "sha256-zUsDK3jbEDq+orcQI4KSmaBTbeSKHYn8XEX2mu3EB28="; # pkgs.lib.fakeSha256;
+          rev = "3b9730ce5522861b30e66d1f925baba1ca1fe34b";
+          sha256 = "sha256-56c26FA/RQhy9pnHz9/BJFB2DFyM4Q1wUWzrIKeSiko="; # pkgs.lib.fakeSha256;
         };
 
         # NixOS 25.05 patches do not apply to 30.2 any more. Remove throwing away of
         # nixpkgs patches here when moving to a later NixOS release.
-        # patches        = [];
+        patches = [ ];
         # version        = "30.2";
 
         configureFlags = old.configureFlags ++ [
@@ -1197,7 +1184,7 @@ in
       pkgs.vlc
       pkgs.vorbis-tools
       pkgs.wget
-      pkgs.xorg.xev
+      pkgs.xev
       pkgs.yt-dlp
       pkgs.zip
       # pkgs.yasm
@@ -1217,8 +1204,6 @@ in
 
       qbittorrent-pkg
       # tribler-pkg
-
-      pkgs.vdhcoapp
 
       # byar
 

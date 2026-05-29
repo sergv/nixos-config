@@ -208,8 +208,6 @@ in
     ];
   };
 
-  programs.adb.enable = true;
-
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment = {
@@ -647,8 +645,11 @@ in
     };
   };
 
+  programs.kde-pim.enable = false;
+
   environment.plasma6.excludePackages = [
     pkgs.kdePackages.elisa
+    pkgs.kdePackages.kontact
     pkgs.kdePackages.kpeople
     pkgs.kdePackages.kwallet
     pkgs.kdePackages.kwallet-pam
@@ -902,6 +903,9 @@ in
   security.wrappers.ksgrd_network_helper = {
     enable = pkgs.lib.mkForce false;
   };
+
+  # Disable loading extra kernel modules after boot to avoid security holes.
+  security.lockKernelModules = true;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
