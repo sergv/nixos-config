@@ -546,6 +546,19 @@ in
       options = "grp:shifts_toggle,caps:escape";
     };
 
+    # todo: figure this out on next reboot
+    inputClassSections = [
+      ''
+        Identifier "Gaming keyboard qwerty layout"
+        MatchIsKeyboard "on"
+        MatchVendor "SEMICO"
+        Option "XkbModel" "pc105"
+        Option "XkbLayout" "us"
+        Option "XkbOptions" "caps:escape"
+        Option "XkbVariant" ""
+      ''
+    ];
+
     # Touchpad
     # synaptics  = {
     #   enable          = true;
