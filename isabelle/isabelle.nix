@@ -18,12 +18,12 @@ pkgs.isabelle.overrideAttrs (
   in
   {
     src = pkgs.fetchurl {
-      url    = "https://isabelle.in.tum.de/dist/Isabelle2025_linux.tar.gz";
-      sha256 = "sha256-PR1m3jcYI/4xqormZjj3NXW6wkTwCzGu4dy2LzgUfFY="; # pkgs.lib.fakeSha256;
+      url    = "https://isabelle.in.tum.de/dist/Isabelle2025-2_linux.tar.gz";
+      sha256 = "sha256-ogpQe8fBJw2L6WqfP77AY0U4d4nS3CxNPfYmDUe/szw="; # pkgs.lib.fakeSha256;
     };
     desktopItem  = newDesktopItem;
     patches      =
-      (old.patches or [ ]) ++ (if include-emacs-lsp-fixes then [ ./patches/VCSE-2025.patch ] else [ ]);
+      (old.patches or [ ]) ++ (if include-emacs-lsp-fixes then [ ./patches/VCSE-2025-2.patch ] else [ ]);
     installPhase =
       builtins.replaceStrings
         [

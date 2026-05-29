@@ -45,10 +45,27 @@ in
       availableKernelModules = [ "loop" ];
       kernelModules = [ "loop" ];
 
-      postDeviceCommands = ''
-        dd if=/dev/zero of=/dev/shm/compressed-root bs=1M count=10240
-        ${btrfs}/bin/mkfs.btrfs --force "${backing-store}"
-      '';
+      systemd = {
+        enable = true;
+        services = {
+          nixos-create-root = {
+            description = "Create / backed by tmpfs with compression (implemented with BTRFS)";
+            unitConfig = {
+              DefaultDependencies = "no";
+              Before = "sysroot.mount";
+            };
+            serviceConfig = {
+              Type = "oneshot";
+              Restart = "no";
+              ExecStart = [
+                "dd if=/dev/zero of=/dev/shm/compressed-root bs=1M count=10240"
+                "${btrfs}/bin/mkfs.btrfs --force \"${backing-store}\""
+              ];
+            };
+            wantedBy = [ "sysroot.mount" ];
+          };
+        };
+      };
     };
   };
 
