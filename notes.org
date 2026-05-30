@@ -434,6 +434,11 @@ Pass ~nix build <target> --option substitute false~
 ~sudo mount -o remount,rw /nix/store~
 ~sudo cp file </nix/store/PATH>~
 ~printf '</nix/store/PATH>\n\n0\n' | sudo nix-store --register-validity --reregister~
+** Delete too old or too new system generations
+Find generations ~sudo nix-env --list-generations --profile /nix/var/nix/profiles/system~
+Set current generation ~sudo nix-env --profile /nix/var/nix/profiles/system --switch-generation XXX~
+Remove selected generations ~sudo nix-env --delete-generations --profile /nix/var/nix/profiles/system NNN KKK~
+
 * Wayland TODO
 ** Switch to https://gitlab.com/chinstrap/gammastep instead of redshift
 ** Try xlibre?
