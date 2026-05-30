@@ -66,6 +66,25 @@ borePatches
   }
 
   {
+    name = "ZRAM";
+    patch = null;
+    structuredExtraConfig = {
+      ZRAM = yes;
+      ZRAM_MULTI_COMP = yes;
+      ZRAM_BACKEND_LZO = yes;
+      ZRAM_BACKEND_ZSTD = yes;
+      ZRAM_TRACK_ENTRY_ACTIME = yes;
+
+      ZRAM_MEMORY_TRACKING = no;
+      ZRAM_WRITEBACK = no;
+      ZRAM_BACKEND_DEFLATE = no;
+      ZRAM_BACKEND_842 = no;
+      ZRAM_BACKEND_LZ4 = no;
+      ZRAM_BACKEND_LZ4HC = no;
+    };
+  }
+
+  {
     name = "Optimise performance";
     patch = null;
     structuredExtraConfig = {

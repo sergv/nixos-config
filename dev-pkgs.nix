@@ -73,8 +73,7 @@ lib.attrsets.unionOfDisjoint all-haskell-tools {
   ] pkgs.llvmPackages_22.bintools;
 
   # for ‘clang-format’
-<<<<<<< HEAD
-  clang-tools     = pkgs.clang-tools;
+  clang-tools     = pkgs.llvmPackages_22.clang-tools;
   cmake           = pkgs.cmake;
   diffutils       = pkgs.diffutils;
   gdb             = pkgs.gdb;
@@ -82,15 +81,5 @@ lib.attrsets.unionOfDisjoint all-haskell-tools {
   libtree         = pkgs.libtree;
   patchelf        = pkgs.patchelf;
   pkg-config      = pkgs.pkg-config;
-=======
-  clang-tools = pkgs.llvmPackages_22.clang-tools;
-  cmake = pkgs.cmake;
-  diffutils = pkgs.diffutils;
-  gdb = pkgs.gdb;
-  gnumake = pkgs.gnumake;
-  libtree = pkgs.libtree;
-  patchelf = pkgs.patchelf;
-  pkg-config = pkgs.pkg-config;
->>>>>>> 889af3b (Update to NixOS 26.05)
   universal-ctags = pkgs.universal-ctags;
 }

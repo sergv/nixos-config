@@ -6,11 +6,11 @@
   ...
 }:
 let
-  backing-store = "/dev/shm/compressed-root";
-
-  # Should be enough to use vanilla ‘pkgs.pkgsStatic.btrfs-progs’
-  # but they’re unbuildable in 25.05.
-  btrfs = pkgs.pkgsStatic.btrfs-progs;
+  # Not needed since 26.05
+  # # Should be enough to use vanilla ‘pkgs.pkgsStatic.btrfs-progs’
+  # # but they’re unbuildable in 25.05.
+  # btrfs   = pkgs.pkgsStatic.btrfs-progs;
+  # busybox = pkgs.pkgsStatic.busybox;
 
   # btrfs = pkgs.pkgsMusl.btrfs-progs;
 
@@ -39,45 +39,81 @@ let
 in
 {
 
+  boot.initrd.systemd.emergencyAccess = true;
+  systemd.enableEmergencyMode = true;
+
   # Works before ‘/’ is mounted.
   boot = {
     initrd = {
       availableKernelModules = [ "loop" ];
       kernelModules = [ "loop" ];
+      supportedFilesystems = {
+        btrfs = true;
+      };
+      verbose = true;
 
       systemd = {
         enable = true;
+
+        # These tools are already present.
+        # extraBin = [pkgs.pkgsStatic.btrfs-progs pkgs.pkgsStatic.busybox];
+
         services = {
-          nixos-create-root = {
-            description = "Create / backed by tmpfs with compression (implemented with BTRFS)";
+
+          "zram-init-root" = {
+            after      = [ "dev-zram1.device" ];
+            requires   = [ "dev-zram1.device" ];
+            before     = [ "sysroot.mount" ];
+            requiredBy = [ "sysroot.mount" ];
+            # before     = [ "mkfs-dev-zram1.service" ];
+            # requiredBy = [ "mkfs-dev-zram1.service" ];
+
             unitConfig = {
-              DefaultDependencies = "no";
-              Before = "sysroot.mount";
+              # needed to prevent a cycle
+              DefaultDependencies = false;
             };
+
             serviceConfig = {
-              Type = "oneshot";
-              Restart = "no";
-              ExecStart = [
-                "dd if=/dev/zero of=/dev/shm/compressed-root bs=1M count=10240"
-                "${btrfs}/bin/mkfs.btrfs --force \"${backing-store}\""
-              ];
+              Restart         = "no";
+              Type            = "oneshot";
+              RemainAfterExit = "yes";
+              # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
             };
-            wantedBy = [ "sysroot.mount" ];
+            # NB order of initialization is important
+            # Make ramdisk never occupy more RAM with this:
+            # echo $(( 20 * 1024 * 1024 * 1024 )) > /sys/block/zram1/mem_limit
+            script = ''
+              echo lzo > /sys/block/zram1/comp_algorithm
+              echo "priority=1 level=19" > /sys/block/zram1/algorithm_params
+              echo "algo=zstd priority=1" > /sys/block/zram1/recomp_algorithm
+              echo 20G > /sys/block/zram1/disksize
+
+              mkfs.btrfs --force /dev/zram1
+            '';
           };
         };
       };
     };
   };
 
+  # We only have two zram devices configured, the rest is added via hot add.
+  # KERNEL=="zram[2-9]*", ENV{SYSTEMD_WANTS}="zram-init-%k.service", TAG+="systemd"
+  services.udev.extraRules = ''
+    KERNEL=="zram0", ENV{SYSTEMD_WANTS}="zram-init-swap.service", TAG+="systemd"
+    KERNEL=="zram1", ENV{SYSTEMD_WANTS}="zram-init-root.service", TAG+="systemd"
+  '';
+
   # Compressed tmpfs root, includes /tmp.
   fileSystems."/" = {
     fsType  = "btrfs";
-    device  = "${backing-store}";
+    device  = "/dev/zram1";
     options = [
       "noatime"
       "nodiratime"
       "lazytime"
-      "compress-force=zstd:8" # "noautodefrag"
+      "compress-force=zstd:8"
+      # "x-systemd.after=nixos-create-root.service"
+      # "noautodefrag"
     ];
   };
 }
