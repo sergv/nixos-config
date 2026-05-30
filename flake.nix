@@ -170,16 +170,16 @@
             withUserDb = false;
             withHomed  = false; # homed depends on userdb
           };
-          mariadb-server = builtins.abort "don't wand mariadb";
-          mariadb = builtins.abort "don't wand mariadb";
-          gst-plugins-rs = builtins.abort "don't wand gst-plugins-rs";
+          mariadb-server = builtins.abort "don't want mariadb";
+          mariadb = builtins.abort "don't want mariadb";
+          gst-plugins-rs = builtins.abort "don't want gst-plugins-rs";
         };
 
         # arch-native-overlay = new: old: {
         #   stdenv = old.impureUseNativeOptimizations new.stdenv;
         # };
 
-        # Fixes for building with -march=znver3
+        # Fixes for building with -march=znver4
         zen4-march-overlay = new: old: {
 
           # # llvmPackages_15 = old.llvmPackages_15.extend (_: old2: {

@@ -902,7 +902,6 @@ in
           ".config/startkderc"
           ".config/systemmonitorrc"
           ".config/systemsettingsrc"
-          ".config/user-dirs.dirs"
           ".config/user-dirs.locale"
 
           ".local/share/krunnerstaterc"
@@ -974,19 +973,20 @@ in
     };
     # dataFile."applications/emacs.desktop".text = emacsDesktopItem;
     # dataFile."applications/i2p.desktop".text = i2pDesktopItem;
-  };
 
-  # xdg.userDirs = {
-  #   enable            = true;
-  #   createDirectories = true;
-  #   documents         = "\$HOME/documents";
-  #   download          = "\$HOME/downloads";
-  #   pictures          = "\$HOME/pictures";
-  #   publicShare       = "\$HOME/misc";
-  #   music             = "\$HOME/misc/music";
-  #   templates         = "\$HOME/templates";
-  #   videos            = "\$HOME/misc/videos";
-  # };
+    userDirs = {
+      enable              = true;
+      createDirectories   = true;
+      setSessionVariables = false;
+      desktop             = "$HOME/Desktop";
+      documents           = "$HOME/Documents";
+      download            = "$HOME/Downloads";
+      music               = "$HOME/Music";
+      pictures            = "$HOME/Pictures";
+      videos              = "$HOME/Videos";
+      projects            = null;
+    };
+  };
 
   programs.firefox = import ./firefox.nix {
     inherit pkgs pkgs-pristine;
