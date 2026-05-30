@@ -55,10 +55,13 @@ in
     install snd_hda_codec_nvhdmi /bin/true
   '';
 
-  # boot.kernelParams = [
-  #   "mitigations=off"
-  #   # "preempt=full"
-  # ];
+  boot.kernelParams = [
+    # Mitigations are compiled away in the kernel so there’s no need
+    # to disable them in boot params.
+    # "mitigations=off"
+    "zram.num_devices=2"
+    # "preempt=full"
+  ];
 
   boot.kernel.sysctl = {
     # Allow ‘dmesg’ without root.
@@ -597,19 +600,6 @@ in
       options = "grp:shifts_toggle,caps:escape";
     };
 
-    # todo: figure this out on next reboot
-    inputClassSections = [
-      ''
-        Identifier "Gaming keyboard qwerty layout"
-        MatchIsKeyboard "on"
-        MatchVendor "SEMICO"
-        Option "XkbModel" "pc105"
-        Option "XkbLayout" "us"
-        Option "XkbOptions" "caps:escape"
-        Option "XkbVariant" ""
-      ''
-    ];
-
     # Touchpad
     # synaptics  = {
     #   enable          = true;
@@ -656,6 +646,18 @@ in
         "activate application launcher" = "";
       };
     };
+
+    "X11/xorg.conf.d/01-gaming-keyboard.conf".text = ''
+      Section "InputClass"
+        Identifier "Gaming keyboard qwerty layout"
+        MatchIsKeyboard "on"
+        MatchVendor "SEMICO"
+        Option "XkbModel" "pc105"
+        Option "XkbLayout" "us"
+        Option "XkbOptions" "caps:escape"
+        Option "XkbVariant" ""
+      EndSection
+    '';
   };
 
   programs.kde-pim.enable = false;
@@ -704,7 +706,6 @@ in
 
       #SUBSYSTEM="usb", ATTRS{product}== "FT232R USB UART", GROUP="users", MODE="0666"
 
-
       ## Ergodox EZ keyboard
 
       # UDEV Rules for Teensy boards, http://www.pjrc.com/teensy/
@@ -736,9 +737,106 @@ in
     '';
   };
 
+  swapDevices = [
+    {
+      device = "/dev/zram0";
+      priority = 150;
+      # Unclear whether this has any effect on return of unused or idle pages to OS.
+      # options  = "discard";
+    }
+  ];
+
   systemd = {
+
     services = {
       nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
+
+      "zram-init-swap" = {
+        after = [ "dev-zram0.device" ];
+        requires = [ "dev-zram0.device" ];
+        before = [
+          "dev-zram0.swap"
+          "swap.target"
+        ];
+        requiredBy = [
+          "dev-zram0.swap"
+          "swap.target"
+        ];
+
+        unitConfig = {
+          # needed to prevent a cycle
+          DefaultDependencies = false;
+        };
+
+        serviceConfig = {
+          Restart = "no";
+          Type = "oneshot";
+          RemainAfterExit = "yes";
+          # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
+        };
+        # NB order of initialization is important
+        script = ''
+          echo lzo > /sys/block/zram0/comp_algorithm
+          echo "priority=1 level=19" > /sys/block/zram0/algorithm_params
+          echo "algo=zstd priority=1" > /sys/block/zram0/recomp_algorithm
+          echo 20G > /sys/block/zram0/disksize
+
+          ${pkgs.util-linux}/sbin/mkswap /dev/zram0
+        '';
+        restartIfChanged = false;
+      };
+
+      "zram-finish-swap" = {
+        after = [ "swap.target" ];
+        requires = [ "swap.target" ];
+        before = [ "sysinit.target" ];
+        requiredBy = [ "sysinit.target" ];
+
+        unitConfig = {
+          # needed to prevent a cycle
+          DefaultDependencies = false;
+        };
+
+        serviceConfig = {
+          Restart = "no";
+          Type = "oneshot";
+          RemainAfterExit = "yes";
+        };
+        # NB order of initialization is important
+        script = ''
+          echo "type=idle priority=1" > /sys/block/zram0/recompress
+          # Pages not accessed for a day get marked as idle.
+          echo 86400 > /sys/block/zram0/idle
+        '';
+        restartIfChanged = false;
+      };
+
+      "zram-finish-root" = {
+        after = [ "local-fs.target" ];
+        requires = [ "local-fs.target" ];
+        before = [ "sysinit.target" ];
+        requiredBy = [ "sysinit.target" ];
+
+        unitConfig = {
+          # needed to prevent a cycle
+          DefaultDependencies = false;
+        };
+
+        serviceConfig = {
+          Restart = "no";
+          Type = "oneshot";
+          RemainAfterExit = "yes";
+          # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
+        };
+        # echo $(( 20 * 1024 * 1024 * 1024 )) > /sys/block/zram1/mem_limit
+        # NB order of initialization is important
+        script = ''
+          echo "type=idle priority=1" > /sys/block/zram1/recompress
+          # Pages not accessed for two hours get marked as idle.
+          echo $(( 2 * 60 * 60 )) > /sys/block/zram1/idle
+        '';
+        restartIfChanged = false;
+      };
     };
 
     tmpfiles.rules = [
@@ -752,8 +850,9 @@ in
     settings.Manager = {
       # File limit.
       DefaultLimitNOFILE = "8192:10485760";
-      # Timeout is for starting jobs that hang for any reason.
+      # Timeout for starting jobs that hang for any reason.
       DefaultTimeoutStopSec = "10s";
+      DefaultDeviceTimeoutSec = "10s";
     };
     user = {
       extraConfig = ''
@@ -888,11 +987,11 @@ in
     };
   };
 
-  zramSwap = {
-    enable = true;
-    algorithm = "zstd";
-    memoryPercent = 33;
-  };
+  # zramSwap = {
+  #   enable        = true;
+  #   algorithm     = "zstd";
+  #   memoryPercent = 33;
+  # };
 
   system = {
     nixos.label = "zen4";
