@@ -555,6 +555,18 @@ in
       options = "grp:shifts_toggle,caps:escape";
     };
 
+    config = ''
+      Section "InputClass"
+        Identifier "Gaming keyboard qwerty layout"
+        MatchIsKeyboard "on"
+        MatchVendor "SEMICO"
+        Option "XkbModel" "pc105"
+        Option "XkbLayout" "us"
+        Option "XkbOptions" "caps:escape"
+        Option "XkbVariant" ""
+      EndSection
+    '';
+
     # Touchpad
     # synaptics  = {
     #   enable          = true;
@@ -601,18 +613,6 @@ in
         "activate application launcher" = "";
       };
     };
-
-    "X11/xorg.conf.d/01-gaming-keyboard.conf".text = ''
-      Section "InputClass"
-        Identifier "Gaming keyboard qwerty layout"
-        MatchIsKeyboard "on"
-        MatchVendor "SEMICO"
-        Option "XkbModel" "pc105"
-        Option "XkbLayout" "us"
-        Option "XkbOptions" "caps:escape"
-        Option "XkbVariant" ""
-      EndSection
-    '';
   };
 
   programs.kde-pim.enable = false;
