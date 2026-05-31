@@ -39,8 +39,8 @@ let
 in
 {
 
-  boot.initrd.systemd.emergencyAccess = true;
-  systemd.enableEmergencyMode = true;
+  # boot.initrd.systemd.emergencyAccess = true;
+  # systemd.enableEmergencyMode = true;
 
   # Works before ‘/’ is mounted.
   boot = {
