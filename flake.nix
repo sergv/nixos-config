@@ -173,6 +173,7 @@
           mariadb-server = builtins.abort "don't want mariadb";
           mariadb = builtins.abort "don't want mariadb";
           gst-plugins-rs = builtins.abort "don't want gst-plugins-rs";
+          electron = builtins.abort "don't want electron";
         };
 
         # arch-native-overlay = new: old: {

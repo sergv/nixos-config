@@ -1,7 +1,7 @@
 { pkgs
 , include-emacs-lsp-fixes
 }:
-pkgs.isabelle.overrideAttrs (old:
+(pkgs.isabelle.override (old: { electron = ""; })).overrideAttrs (old:
   let isabelle-icon = ./icons/isabelle.png;
       getExt = x: pkgs.lib.lists.last (pkgs.lib.strings.splitString "." x);
       newDesktopItem = pkgs.makeDesktopItem {
@@ -19,6 +19,11 @@ pkgs.isabelle.overrideAttrs (old:
     };
     desktopItem = newDesktopItem;
     patches = (old.patches or []) ++ (if include-emacs-lsp-fixes then [ ./patches/VCSE-2025-2.patch ] else []);
+
+    postUnpack = old.postUnpack + ''
+      rm -r $sourceRoot/contrib/vscodium*/
+    '';
+
     installPhase =
       builtins.replaceStrings
         [ # "${old.desktopItem}"
@@ -33,9 +38,19 @@ pkgs.isabelle.overrideAttrs (old:
           # "${newDesktopItem}"
         ]
         old.installPhase;
-    # Need to remove some known dangling symlinks or ‘noBrokenSymlinks’ nix check will complain.
-    postPatch = old.postPatch + ''
-      find contrib/e-*/src/lib -xtype l -delete
-    '';
+
+    postPatch =
+      let without-vscodium =
+            pkgs.lib.strings.concatLines
+              (builtins.filter
+                (x:
+                  !(pkgs.lib.strings.hasInfix "/electron" x ||
+                    pkgs.lib.strings.hasInfix "contrib/vscodium" x))
+                (pkgs.lib.strings.splitString "\n" old.postPatch));
+          # Need to remove some known dangling symlinks or ‘noBrokenSymlinks’ nix check will complain.
+          remove-dangling-symlinks = ''
+            find contrib/e-*/src/lib -xtype l -delete
+          '';
+      in without-vscodium + remove-dangling-symlinks;
   }
 )
