@@ -69,6 +69,12 @@ in
     # Allow ‘perf’ without root.
     "kernel.perf_event_paranoid" = -1;
     "kernel.kptr_restrict" = pkgs.lib.mkForce 0;
+
+    # For zram
+    "vm.page-cluster" = pkgs.lib.mkDefault 0;
+    "vm.swappiness" = pkgs.lib.mkDefault 180;
+    "vm.watermark_boost_factor" = pkgs.lib.mkDefault 0;
+    "vm.watermark_scale_factor" = pkgs.lib.mkDefault 125;
   };
 
   # # More for legacy systems, use the GRUB 2 boot loader.
