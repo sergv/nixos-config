@@ -720,7 +720,7 @@ in
         };
         # NB order of initialization is important
         script = ''
-          echo lzo > /sys/block/zram0/comp_algorithm
+          echo lzo-rle > /sys/block/zram0/comp_algorithm
           echo "priority=1 level=19" > /sys/block/zram0/algorithm_params
           echo "algo=zstd priority=1" > /sys/block/zram0/recomp_algorithm
           echo 20G > /sys/block/zram0/disksize

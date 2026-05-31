@@ -77,7 +77,7 @@ in {
             # Make ramdisk never occupy more RAM with this:
             # echo $(( 20 * 1024 * 1024 * 1024 )) > /sys/block/zram1/mem_limit
             script = ''
-              echo lzo > /sys/block/zram1/comp_algorithm
+              echo lzo-rle > /sys/block/zram1/comp_algorithm
               echo "priority=1 level=19" > /sys/block/zram1/algorithm_params
               echo "algo=zstd priority=1" > /sys/block/zram1/recomp_algorithm
               echo 20G > /sys/block/zram1/disksize
