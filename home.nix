@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  pkgs-opt,
   pkgs-cross-win,
   pkgs-pristine,
   haskell-nixpkgs-improvements,
@@ -24,12 +25,8 @@ let
   };
 
   dev-pkgs = import ./dev-pkgs.nix {
-    inherit
-      pkgs
-      haskell-nixpkgs-improvements
-      arch
-      system
-      ;
+    inherit haskell-nixpkgs-improvements arch system;
+    pkgs = pkgs-opt;
   };
 
   cuda-pkgs = import ./cuda-pkgs.nix {
@@ -75,7 +72,7 @@ let
     exec "${steam.run}/bin/steam-run" "''${@}"
   '';
 
-  strawberry-pkg = pkgs.strawberry.overrideAttrs (old: {
+  strawberry-pkg = pkgs-opt.strawberry.overrideAttrs (old: {
     src = pkgs.fetchgit {
       url = "https://github.com/sergv/strawberry.git";
       rev = "fb93e0e09454dcc154c1901c4df196271fe2d549";
@@ -163,7 +160,8 @@ let
       python3 = tribler-python;
     });
 
-  wine-pkg = pkgs.wineWow64Packages.stagingFull;
+  # wine-pkg = arch.use-march-optimizations pkgs pkgs.wineWow64Packages.stagingFull;
+  wine-pkg = pkgs-opt.wineWow64Packages.stagingFull;
 
   winetricks-pkg =
     let
@@ -212,7 +210,7 @@ let
       '';
 
   emacs-base =
-    (pkgs.emacs30.override (_: {
+    (pkgs-opt.emacs30.override (_: {
       withNativeCompilation = false;
       noGui = false;
       srcRepo = true;
@@ -330,25 +328,25 @@ let
             backendPath =
               let
                 libGccJitLibraryPaths = [
-                  "${pkgs.lib.getLib pkgs.libgccjit}/lib/gcc"
-                  "${pkgs.lib.getLib pkgs.stdenv.cc.libc}/lib"
+                  "${pkgs.lib.getLib pkgs-opt.libgccjit}/lib/gcc"
+                  "${pkgs.lib.getLib pkgs-opt.stdenv.cc.libc}/lib"
                 ]
-                ++ pkgs.lib.optionals (pkgs.stdenv.cc ? cc.lib.libgcc) [
-                  "${pkgs.lib.getLib pkgs.stdenv.cc.cc.lib.libgcc}/lib"
+                ++ pkgs.lib.optionals (pkgs-opt.stdenv.cc ? cc.lib.libgcc) [
+                  "${pkgs.lib.getLib pkgs-opt.stdenv.cc.cc.lib.libgcc}/lib"
                 ];
               in
               pkgs.lib.concatStringsSep " " (
                 builtins.map (x: ''"-B${x}"'') (
                   [
                     # Paths necessary so the JIT compiler finds its libraries:
-                    "${pkgs.lib.getLib pkgs.libgccjit}/lib"
+                    "${pkgs.lib.getLib pkgs-opt.libgccjit}/lib"
                   ]
                   ++ libGccJitLibraryPaths
                   ++ [
                     # Executable paths necessary for compilation (ld, as):
-                    "${pkgs.lib.getBin pkgs.stdenv.cc.cc}/bin"
-                    "${pkgs.lib.getBin pkgs.stdenv.cc.bintools}/bin"
-                    "${pkgs.lib.getBin pkgs.stdenv.cc.bintools.bintools}/bin"
+                    "${pkgs.lib.getBin pkgs-opt.stdenv.cc.cc}/bin"
+                    "${pkgs.lib.getBin pkgs-opt.stdenv.cc.bintools}/bin"
+                    "${pkgs.lib.getBin pkgs-opt.stdenv.cc.bintools.bintools}/bin"
                   ]
                 )
               );
@@ -985,6 +983,9 @@ in
   };
 
   xdg = {
+    # Disable xdg-desktop-portal-gtk which brings gnome-settings-daemon as dependency.
+    portal.extraPortals = pkgs.lib.mkForce [ pkgs.xdg-desktop-portal-kde ];
+
     desktopEntries = {
       emacs = {
         type        = "Application";
@@ -1054,7 +1055,7 @@ in
   };
 
   programs.firefox = import ./firefox.nix {
-    inherit pkgs pkgs-pristine;
+    inherit pkgs pkgs-opt pkgs-pristine;
     firefox-addons = pkgs.nur.repos.rycee.firefox-addons;
   };
 
@@ -1146,13 +1147,20 @@ in
       pkgs.curl
       pkgs.dmidecode
       pkgs.fahclient
-      pkgs.ffmpeg-full
+      pkgs-opt.ffmpeg
+      # pkgs-opt.ffmpeg-full
+      # (pkgs-opt.ffmpeg-full.override (old: {
+      #   # frei0r-plugins doesn’t build.
+      #   withFrei0r    = false;
+      #   withSamba     = false;
+      #   withStripping = true;
+      # }))
       pkgs.file
       pkgs.findutils
       pkgs.gimp
       pkgs.gparted
-      pkgs.graphviz
-      pkgs.htop
+      pkgs-opt.graphviz
+      pkgs-opt.htop
       pkgs.imagemagick
       #pkgs.inkscape
       pkgs.iotop
@@ -1162,13 +1170,13 @@ in
       pkgs.kdePackages.okular
       pkgs.kdePackages.oxygen-icons
       pkgs.lsof
-      pkgs.lzip
-      pkgs.lzop
-      pkgs.mc
+      pkgs-opt.lzip
+      pkgs-opt.lzop
+      pkgs-opt.mc
       pkgs.mesa-demos
-      pkgs.mpv
+      pkgs-opt.mpv
       pkgs.nix-index
-      pkgs.p7zip
+      pkgs-opt.p7zip
       pkgs.pavucontrol
 
       # pkgs.pmutils
@@ -1179,16 +1187,16 @@ in
       pkgs.sshfs
       pkgs-pristine.telegram-desktop
       pkgs.unrar
-      pkgs.unzip
+      pkgs-opt.unzip
       pkgs.usbutils
-      pkgs.vlc
-      pkgs.vorbis-tools
+      pkgs-opt.vlc
+      pkgs-opt.vorbis-tools
       pkgs.wget
       pkgs.xev
       pkgs.yt-dlp
-      pkgs.zip
+      pkgs-opt.zip
       # pkgs.yasm
-      pkgs.zstd
+      pkgs-opt.zstd
       # pkgs.z3
 
       # Take from pristine so that it will be picked up from cache. Building thunderbird
@@ -1213,7 +1221,7 @@ in
       wine-pkg
       winetricks-pkg
 
-      pkgs.nix-diff
+      pkgs-opt.nix-diff
 
       isabelle-pkg
       isabelle-lsp-wrapper
