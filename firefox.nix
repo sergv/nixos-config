@@ -1,5 +1,6 @@
 {
   pkgs,
+  pkgs-opt,
   pkgs-pristine,
   firefox-addons,
 }:
@@ -24,8 +25,11 @@ in
   # New versions are at programs.firefox.configPath = "${config.xdg.configHome}/mozilla/firefox".
   configPath = ".mozilla/firefox";
 
-  package = pkgs.wrapFirefox pkgs-pristine.firefox-esr-unwrapped {
-  };
+  package = pkgs-opt.wrapFirefox (pkgs-opt.firefox-esr-unwrapped.override (old: {
+    # Speed up builds.
+    enableDebugSymbols = false;
+    crashreporterSupport = false;
+  })) { };
 
   # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
   policies = {
