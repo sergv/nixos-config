@@ -202,7 +202,8 @@ in
     pubkeyAcceptedKeyTypes = ["ssh-ed25519" "ssh-rsa"];
   };
 
-  security.pki.certificateFiles = [ certificateFile ];
+  # todo
+  # security.pki.certificateFiles = [ certificateFile ];
 
   security.sudo = {
     enable             = true;
