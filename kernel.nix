@@ -3,7 +3,7 @@
 { self, lib, pkgs, ... }: {
 
   boot.kernelPackages =
-    let kernelVersion = "6.18.34";
+    let kernelVersion = "6.18.35";
           kernel = pkgs.linuxKernel.kernels.linux_6_18.override (_: {
           argsOverride = {
             version       = "${kernelVersion}";
@@ -11,7 +11,7 @@
             src           = pkgs.fetchurl {
               url    = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${kernelVersion}.tar.xz";
               # url    = "mirror://kernel/linux/kernel/v6.18.x/linux-${kernelVersion}.tar.xz";
-              sha256 = "sha256-ZAxHMvtChCFm25fgMsH+fl/3LIWomCx1tA90vjVV12A=";
+              sha256 = "sha256-94YCkyIZEl4hHF9b/YTtz9TsXOiPyUT4JIQT9mW+8jY="; #pkgs.lib.fakeSha256;
             };
           };
         });
