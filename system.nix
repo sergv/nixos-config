@@ -214,7 +214,8 @@ in
     ];
   };
 
-  security.pki.certificateFiles = [ certificateFile ];
+  # todo
+  # security.pki.certificateFiles = [ certificateFile ];
 
   security.sudo = {
     enable = true;

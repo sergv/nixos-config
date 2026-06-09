@@ -631,10 +631,10 @@ in
     };
   };
 
-  programs.firefox = import ./firefox.nix {
-    inherit pkgs pkgs-opt pkgs-pristine;
-    firefox-addons = pkgs.nur.repos.rycee.firefox-addons;
-  };
+  # programs.firefox = import ./firefox.nix {
+  #   inherit pkgs pkgs-opt pkgs-pristine;
+  #   firefox-addons = pkgs.nur.repos.rycee.firefox-addons;
+  # };
 
   programs.chromium = {
     enable = true;
