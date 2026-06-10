@@ -62,9 +62,9 @@ in
 
           "zram-init-root" = {
             after      = [ "dev-zram1.device" ];
-            requires   = [ "dev-zram1.device" ];
+            wants      = [ "dev-zram1.device" ];
             before     = [ "sysroot.mount" ];
-            requiredBy = [ "sysroot.mount" ];
+            wantedBy   = [ "sysroot.mount" ];
             # before     = [ "mkfs-dev-zram1.service" ];
             # requiredBy = [ "mkfs-dev-zram1.service" ];
 
