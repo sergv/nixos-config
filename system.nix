@@ -709,9 +709,9 @@ in
 
       "zram-init-swap" = {
         after      = [ "dev-zram0.device" ];
-        requires   = [ "dev-zram0.device" ];
+        wants      = [ "dev-zram0.device" ];
         before     = [ "dev-zram0.swap" "swap.target" ];
-        requiredBy = [ "dev-zram0.swap" "swap.target" ];
+        wantedBy   = [ "dev-zram0.swap" "swap.target" ];
 
         unitConfig = {
           # needed to prevent a cycle
@@ -738,9 +738,9 @@ in
 
       "zram-finish-swap" = {
         after      = [ "swap.target" ];
-        requires   = [ "swap.target" ];
+        wants      = [ "swap.target" ];
         before     = [ "sysinit.target" ];
-        requiredBy = [ "sysinit.target" ];
+        wantedBy   = [ "sysinit.target" ];
 
         unitConfig = {
           # needed to prevent a cycle
@@ -763,9 +763,9 @@ in
 
       "zram-finish-root" = {
         after      = [ "local-fs.target" ];
-        requires   = [ "local-fs.target" ];
+        wants      = [ "local-fs.target" ];
         before     = [ "sysinit.target" ];
-        requiredBy = [ "sysinit.target" ];
+        wantedBy   = [ "sysinit.target" ];
 
         unitConfig = {
           # needed to prevent a cycle
