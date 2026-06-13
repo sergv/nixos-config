@@ -1,0 +1,73 @@
+From c1a8c7bcf26651b4eb4a2157e580c3a4810c38e1 Mon Sep 17 00:00:00 2001
+From: wenzelm <unknown>
+Date: Mon, 9 Mar 2026 16:40:21 +0100
+Subject: [PATCH] recover json_entries from b2857541a531: required for unproven
+ Neovim experiments, see also isabelle.vscode.Pretty_Text_Panel with
+ vscode_html_output=false; renamed "json" to "notification", to emphasize its
+ semantics;
+
+---
+ src/Tools/VSCode/src/lsp.scala              | 9 +++++----
+ src/Tools/VSCode/src/vscode_resources.scala | 4 ++--
+ 2 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/src/Tools/VSCode/src/lsp.scala b/src/Tools/VSCode/src/lsp.scala
+index 0d15446809..55a2015dd8 100644
+--- a/src/Tools/VSCode/src/lsp.scala
++++ b/src/Tools/VSCode/src/lsp.scala
+@@ -552,9 +552,10 @@ object LSP {
+   }
+ 
+   sealed case class Decoration(entries: List[Decoration_Entry]) {
+-    def json(file: JFile): JSON.T =
++    def json_entries: JSON.T = entries.map(_.json)
++    def notification(file: JFile): JSON.T =
+       Notification("PIDE/decoration",
+-        JSON.Object("uri" -> Url.print_file(file), "entries" -> entries.map(_.json)))
++        JSON.Object("uri" -> Url.print_file(file), "entries" -> json_entries))
+   }
+ 
+   object Decoration_Request {
+@@ -599,7 +600,7 @@ object LSP {
+     def apply(content: String, decorations: Option[Decoration] = None): JSON.T =
+       Notification("PIDE/dynamic_output",
+         JSON.Object("content" -> content) ++
+-        JSON.optional("decorations" -> decorations.map(_.json)))
++        JSON.optional("decorations" -> decorations.map(_.json_entries)))
+   }
+ 
+   object Output_Set_Margin {
+@@ -623,7 +624,7 @@ object LSP {
+     ): JSON.T =
+       Notification("PIDE/state_output",
+         JSON.Object("id" -> id, "content" -> content, "auto_update" -> auto_update) ++
+-        JSON.optional("decorations" -> decorations.map(_.json)))
++        JSON.optional("decorations" -> decorations.map(_.json_entries)))
+   }
+ 
+   class State_Id_Notification(name: String) {
+diff --git a/src/Tools/VSCode/src/vscode_resources.scala b/src/Tools/VSCode/src/vscode_resources.scala
+index cb11ed0619..5bb889850c 100644
+--- a/src/Tools/VSCode/src/vscode_resources.scala
++++ b/src/Tools/VSCode/src/vscode_resources.scala
+@@ -316,7 +316,7 @@ extends Resources(session_background, log = log) {
+             channel.write(LSP.PublishDiagnostics(file, rendering.diagnostics_output(diags)))
+           if (pide_extensions) {
+             for (decos <- changed_decos)
+-              channel.write(rendering.decoration_output(decos).json(file))
++              channel.write(rendering.decoration_output(decos).notification(file))
+           }
+           (file, model1)
+         }
+@@ -369,7 +369,7 @@ extends Resources(session_background, log = log) {
+     val rendering1 = rendering(model)
+     val (_, decos, model1) = model.publish_full(rendering1)
+     if (pide_extensions) {
+-      channel.write(rendering1.decoration_output(decos).json(file))
++      channel.write(rendering1.decoration_output(decos).notification(file))
+     }
+   }
+ 
+-- 
+2.54.0
+
