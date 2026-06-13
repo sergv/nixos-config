@@ -18,7 +18,10 @@
       sha256 = "sha256-ogpQe8fBJw2L6WqfP77AY0U4d4nS3CxNPfYmDUe/szw="; #pkgs.lib.fakeSha256;
     };
     desktopItem = newDesktopItem;
-    patches = (old.patches or []) ++ (if include-emacs-lsp-fixes then [ ./patches/VCSE-2025-2.patch ] else []);
+    patches =
+      (old.patches or []) ++
+      (if include-emacs-lsp-fixes then [ ./patches/VCSE-2025-2.patch ] else []) ++
+      [ patches/0001-recover-json_entries-from-b2857541a531-required-for-.patch ];
 
     postUnpack = old.postUnpack + ''
       rm -r $sourceRoot/contrib/vscodium*/
