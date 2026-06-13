@@ -43,7 +43,7 @@
         old.installPhase;
 
     postPatch =
-      let without-vscodium =
+      let old-without-vscodium =
             pkgs.lib.strings.concatLines
               (builtins.filter
                 (x:
@@ -51,9 +51,9 @@
                     pkgs.lib.strings.hasInfix "contrib/vscodium" x))
                 (pkgs.lib.strings.splitString "\n" old.postPatch));
           # Need to remove some known dangling symlinks or ‘noBrokenSymlinks’ nix check will complain.
-          remove-dangling-symlinks = ''
+          new-remove-dangling-symlinks = ''
             find contrib/e-*/src/lib -xtype l -delete
           '';
-      in without-vscodium + remove-dangling-symlinks;
+      in old-without-vscodium + new-remove-dangling-symlinks;
   }
 )
