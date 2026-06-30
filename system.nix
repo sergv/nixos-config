@@ -848,9 +848,10 @@ in
     tmpfiles.rules = [
       "d ${nix-daemon-build-dir} 0755 root root 7d -"
       # Never clear /tmp directory
-      "q /tmp     1777 root root - -"
+      "q /tmp                    1777 root root - -"
+      "q /tmp/tmp                1777 root root - -"
       # Clear /var/tmp whenever as it was by default.
-      "q /var/tmp 1777 root root - 30d"
+      "q /var/tmp                1777 root root - 30d"
     ];
 
     settings.Manager = {
