@@ -403,7 +403,8 @@ in
   # threadscope      = threadscopePkgs.threadscope;
   universal-ctags    = pkgs.universal-ctags;
 
-  clang              = pkgs.clang_13;
+  gcc                = pkgs.gcc;
+  # clang              = pkgs.clang_13;
   llvm               = pkgs.llvm_13;
   lld                = pkgs.lld_13;
 
