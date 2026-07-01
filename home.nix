@@ -537,6 +537,7 @@ in
       "CCACHE_NOSTATS"            = "1";
       # So that latex will pick up .cls/.sty files from current directory
       "TEXINPUTS"                 = ".:";
+      "TMPDIR"                    = "/tmp";
       "EMAIL"                     = "serg.foo@gmail.com";
       "BASHRC_ENV_LOADED"         = "1";
       # ‘nix-shell’ likes to change prompt. ‘trix’ uses ‘nix-shell’ as underlying mechanism
