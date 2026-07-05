@@ -413,6 +413,23 @@ in
     # networkmanager.enable = true;
     #wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
 
+    # MAC address 	IP address
+    # 58:11:22:99:01:e9	192.168.0.11
+    # fc:b2:14:6b:a2:aa	192.168.0.12
+    # 6c:1f:f7:23:cb:fa	192.168.0.13
+    # 04:d6:aa:ca:e5:30	192.168.0.14
+    # bc:54:51:38:2e:90	192.168.0.15
+    # b0:df:3a:0d:9a:70	192.168.0.16
+    extraHosts = ''
+      192.168.0.11 home
+      192.168.0.12 macbook
+      192.168.0.12 macbook-wifi
+      192.168.0.13 macbook-wire
+      192.168.0.14 smartphone
+      192.168.0.15 tablet-10
+      192.168.0.16 tablet-8
+    '';
+
     # Prefer eth0 to eno1 and the like.
     usePredictableInterfaceNames = true;
 
