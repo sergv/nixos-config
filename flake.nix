@@ -60,10 +60,6 @@
       url = "github:edolstra/flake-compat";
     };
 
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-    };
-
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
