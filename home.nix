@@ -670,7 +670,18 @@ in
         user = "git";
         identityFile = homeDir + "/.ssh/haskell-ghc-gitlab-key";
       };
-    };
+    } //
+    builtins.listToAttrs
+      (builtins.map
+        (hostname: {
+          name = hostname;
+          value = {
+            inherit hostname;
+            user         = "sergey";
+            identityFile = homeDir + "/.ssh/macbook.key";
+          };
+        })
+        ["macbook" "macbook-wifi" "macbook-wire"]);
   };
 
   programs.gpg = {
