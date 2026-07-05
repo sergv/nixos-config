@@ -905,6 +905,7 @@ in
         hashedPassword = "Yeah, like I'm going to tell you even my password hash";
       };
       sergey = {
+        home = "/home/sergey";
         extraGroups = [
           "adm"
           "adbusers"

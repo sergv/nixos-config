@@ -1,5 +1,8 @@
 {
+  # home manager config
   config,
+  # NixOS config
+  osConfig,
   pkgs,
   pkgs-opt,
   pkgs-cross-win,
@@ -16,6 +19,8 @@
 
 let
   wmctrl-pkg = pkgs.wmctrl;
+
+  homeDir = osConfig.users.users.sergey.home;
 
   my-fonts = import ./fonts { inherit pkgs; };
 
@@ -410,8 +415,8 @@ in
     #stateVersion = "22.05";
 
     username      = "sergey";
-    homeDirectory = "/home/sergey";
-    stateVersion = "22.05";
+    homeDirectory = homeDir;
+    stateVersion  = "22.05";
 
     keyboard = {
       layout = "us,ru";
@@ -530,7 +535,7 @@ in
     };
     sessionVariables = {
       "HIE_BIOS_CACHE_DIR"        = "/tmp/dist/hie-bios";
-      "EMACS_ROOT"                = "/home/sergey/.emacs.d";
+      "EMACS_ROOT"                = "${homeDir}/.emacs.d";
       "EMACS_SYSTEM_TYPE"         = "(linux home)";
       "CCACHE_COMPRESS"           = "1";
       "CCACHE_DIR"                = "/tmp/.ccache";
@@ -653,17 +658,17 @@ in
       "github.com" = {
         hostname     = "github.com";
         user         = "git";
-        identityFile = "/home/sergey/.ssh/github_sergv_id_rsa";
+        identityFile = homeDir + "/.ssh/github_sergv_id_rsa";
       };
       "gitlab.com" = {
         hostname = "gitlab.com";
         user = "git";
-        identityFile = "/home/sergey/.ssh/anon-gitlab-key";
+        identityFile = homeDir + "/.ssh/anon-gitlab-key";
       };
       "gitlab.haskell.org" = {
         hostname = "gitlab.haskell.org";
         user = "git";
-        identityFile = "/home/sergey/.ssh/haskell-ghc-gitlab-key";
+        identityFile = homeDir + "/.ssh/haskell-ghc-gitlab-key";
       };
     };
   };
@@ -687,20 +692,20 @@ in
   xsession.enable = true;
 
   systemd.user.tmpfiles.rules = [
-    "d /tmp/cache                      0755 sergey users - -"
-    "d /tmp/cache/emacs                0755 sergey users - -"
-    "d /tmp/windows-shared             0755 sergey users - -"
-    "d /home/sergey/.config            0755 -      -     - -"
-    "d /home/sergey/.local             0755 -      -     - -"
-    "d /home/sergey/.java              0755 -      -     - -"
-    "d /home/sergey/Desktop            0755 -      -     - -"
+    "d /tmp/cache                    0755 sergey users - -"
+    "d /tmp/cache/emacs              0755 sergey users - -"
+    "d /tmp/windows-shared           0755 sergey users - -"
+    "d ${homeDir}/.config            0755 -      -     - -"
+    "d ${homeDir}/.local             0755 -      -     - -"
+    "d ${homeDir}/.java              0755 -      -     - -"
+    "d ${homeDir}/Desktop            0755 -      -     - -"
 
     # Forcefully symlink, removing destination if it exists.
-    "L+ /home/sergey/.emacs.d/compiled 0755 -      -     - /tmp/cache/emacs"
+    "L+ ${homeDir}/.emacs.d/compiled 0755 -      -     - /tmp/cache/emacs"
 
-    "L+ /home/sergey/.emacs            0644 -      -     - /permanent/home/sergey/.emacs"
+    "L+ ${homeDir}/.emacs            0644 -      -     - /permanent/home/sergey/.emacs"
 
-    # "L+ /home/sergey/.vimrc            0644 -      -     - /permanent/home/sergey/.vimrc"
+    # "L+ ${homeDir}/.vimrc            0644 -      -     - /permanent/home/sergey/.vimrc"
   ];
 
   home.persistence = {
