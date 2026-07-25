@@ -46,6 +46,7 @@ $ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-mi
   + ~./.~ denotes current directory
   + ~foo/bar~ denotes foo/bar under current directory, same as ~./foo/bar~
   + ~<foo>~ resolves path ~foo~ via ~NIX_PATH~ (list of paths separated by ~:~, similar to PATH)
+  + ~pkgs.lib.path.append : Path -> String -> Path~
 
 ** Composite types
 *** ‘records’ - attribute sets, dicts with string keys
