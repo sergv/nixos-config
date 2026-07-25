@@ -60,6 +60,9 @@ in
     # to disable them in boot params.
     # "mitigations=off"
     "zram.num_devices=2"
+    # Disable hyperthreading.
+    "nosmt=force" # force turned off, cannot enable later
+    # "nosmt" # allow enabling later
     # "preempt=full"
   ];
 
