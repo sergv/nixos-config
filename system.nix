@@ -64,6 +64,20 @@ in
     "nosmt=force" # force turned off, cannot enable later
     # "nosmt" # allow enabling later
     # "preempt=full"
+
+    # Help with PCI problems like
+    # ‘nvme nvme0: I/O tag 768 (0300) QID 5 timeout, completion polled’
+    #
+    # # # General PCI issues, cf https://knightli.com/en/2026/05/24/pci-nomsi-pcie-aspm-off-linux-sata-expansion-card/
+    # # # "pci=nomsi"
+    #
+    # TODO: do in BIOS: switch the SSD mode from RAID to NVME, tweak Intel Volume Management Device (Intel VMD)?
+    # May help with
+    # cf https://askubuntu.com/questions/1557696/ubuntu-24-04-freezes-with-nvme-nvme0-i-o-timeout-error
+    # "pcie_aspm=off"
+    # Likely won’t help
+    # nvme_core.default_ps_max_latency_us=0
+    "pcie_aspm=off"
   ];
 
   boot.kernel.sysctl = {
