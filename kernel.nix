@@ -14,15 +14,15 @@
 
   boot.kernelPackages =
     let
-      kernelVersion = "6.18.35";
+      kernelVersion = "6.18.40";
       kernel = pkgs.linuxKernel.kernels.linux_6_18.override (_: {
         argsOverride = {
           version = "${kernelVersion}";
           modDirVersion = "${kernelVersion}";
           src = pkgs.fetchurl {
-            url = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${kernelVersion}.tar.xz";
+            url    = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${kernelVersion}.tar.xz";
             # url    = "mirror://kernel/linux/kernel/v6.18.x/linux-${kernelVersion}.tar.xz";
-            sha256 = "sha256-94YCkyIZEl4hHF9b/YTtz9TsXOiPyUT4JIQT9mW+8jY="; # pkgs.lib.fakeSha256;
+            sha256 = "sha256-NxL8Hsg55NqsmBF2yFGJEuj0UmUKrt/kOB2kQZYTpDE="; #pkgs.lib.fakeSha256;
           };
         };
       });
@@ -50,8 +50,8 @@
         bootBintools       = null;
         bootBintoolsNoLibc = null;
       };
-      hostLLVM  = pkgs.pkgsBuildHost.${llvmPackages}.override noBintools;
-      buildLLVM = pkgs.pkgsBuildBuild.${llvmPackages}.override noBintools;
+      hostLLVM  = pkgs.pkgsBuildHost."${llvmPackages}".override noBintools;
+      buildLLVM = pkgs.pkgsBuildBuild."${llvmPackages}".override noBintools;
 
       mkLLVMPlatform =
         platform:
@@ -85,7 +85,7 @@
       });
       llvmStdenv = stdenvPlatformLLVM;
 
-      llvm =
+      withLLVM =
         kernel:
         kernel.override (old: {
           stdenv        = llvmStdenv;
@@ -96,7 +96,7 @@
 
       finalPackages =
         (pkgs.linuxKernel.packagesFor (
-          (llvm kernel).override (old: {
+          (withLLVM kernel).override (old: {
             argsOverride = old.argsOverride // {
               kernelPatches = old.kernelPatches ++ patches;
             };
