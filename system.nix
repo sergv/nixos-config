@@ -1059,7 +1059,8 @@ in
   };
 
   # Disable loading extra kernel modules after boot to avoid security holes.
-  security.lockKernelModules = true;
+  # todo: disable to make my joystick work
+  security.lockKernelModules = false;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
