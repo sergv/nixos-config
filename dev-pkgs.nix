@@ -48,7 +48,11 @@ let
       pkgs-cross-win = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.cross-win ];
       # pkgs-cross-win = null;
     in
-    haskell-nixpkgs-improvements.lib.derive-haskell-tools system pkgs-haskell pkgs-cross-win;
+    haskell-nixpkgs-improvements.lib.mk-haskell-tools {
+      inherit system;
+      vanilla-pkgs   = pkgs-haskell;
+      cross-win-pkgs = pkgs-cross-win;
+    };
 
   all-haskell-tools =
     lib.attrsets.unionOfDisjoint haskell-tools.tools
