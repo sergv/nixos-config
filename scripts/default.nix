@@ -4,13 +4,16 @@ let
     name: buildInputs:
     let
       script = (pkgs.writeScriptBin name (builtins.readFile (./. + "/${name}"))).overrideAttrs (old: {
-        buildCommand = "${old.buildCommand}\npatchShebangs \"$out\"";
+        buildCommand = ''
+          ${old.buildCommand}
+          patchShebangs "$out"
+        '';
       });
     in
     pkgs.symlinkJoin {
       inherit name;
       paths = [ script ];
-      postBuild = "wrapProgram \"$out/bin/${name}\" --prefix PATH : \"$out/bin:${pkgs.lib.makeBinPath buildInputs}\"";
+      postBuild = ''wrapProgram "$out/bin/${name}" --prefix PATH : "$out/bin:${pkgs.lib.makeBinPath buildInputs}"'';
       nativeBuildInputs = [ pkgs.makeWrapper ];
     };
   reset-usb = writePatchedScriptBin "reset-usb" [ ];
