@@ -108,6 +108,32 @@
         "type": "github"
       }
     },
+    "dotemacs": {
+      "inputs": {
+        "haskell-nixpkgs-improvements": [
+          "haskell-nixpkgs-improvements"
+        ],
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ],
+        "trix": [
+          "trix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786190750,
+        "narHash": "sha256-tgtSIfA7o5/tj8EtCVivRddMi/hkAXPGTGPY3CQcdEQ=",
+        "owner": "sergv",
+        "repo": "dotemacs",
+        "rev": "11eb3818fe7f394b9fc5665c36b4c2f2df6810f4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sergv",
+        "repo": "dotemacs",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "locked": {
         "lastModified": 1767039857,
@@ -274,11 +300,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785975080,
-        "narHash": "sha256-tZFOS8f5M7tTrMKKKe/Rhjeh/17uO2zSZmkN14I05rM=",
+        "lastModified": 1786194164,
+        "narHash": "sha256-/1+d6KI/ZQsea1hx09k4BI3ujwtHOf6pDzL36RdHj+Q=",
         "owner": "sergv",
         "repo": "haskell-nixpkgs-improvements",
-        "rev": "f62064fb5916a3f749b85db9cc340615b64f9e93",
+        "rev": "9f7aec1808b34bf19ef7706fef25fb7e2c0afe4f",
         "type": "github"
       },
       "original": {
@@ -1028,6 +1054,7 @@
       "inputs": {
         "arkenfox": "arkenfox",
         "bore-scheduler-src": "bore-scheduler-src",
+        "dotemacs": "dotemacs",
         "flake-compat": "flake-compat",
         "git-hooks": "git-hooks",
         "haskell-nixpkgs-improvements": "haskell-nixpkgs-improvements",
