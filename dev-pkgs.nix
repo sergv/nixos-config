@@ -1,13 +1,9 @@
 args@{
-  haskell-nixpkgs-improvements,
   # , nixpkgs-stable
-  arch,
   system,
-  pkgs,
+  pkgs
 }:
 let
-
-  lib = pkgs.lib;
 
   filter-bin =
     name: keep-these: pkg:
@@ -42,26 +38,8 @@ let
         ${builtins.concatStringsSep "\n" (builtins.map f keep-these)}
       '';
 
-  haskell-tools =
-    let
-      pkgs-haskell   = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.host ];
-      pkgs-cross-win = pkgs.appendOverlays [ haskell-nixpkgs-improvements.overlays.cross-win ];
-      # pkgs-cross-win = null;
-    in
-    haskell-nixpkgs-improvements.lib.mk-haskell-tools {
-      inherit system;
-      vanilla-pkgs   = pkgs-haskell;
-      cross-win-pkgs = pkgs-cross-win;
-    };
-
-  all-haskell-tools =
-    lib.attrsets.unionOfDisjoint haskell-tools.tools
-      # haskell-tools.ghc.host;
-      (lib.attrsets.unionOfDisjoint haskell-tools.ghc.host haskell-tools.ghc.cross-win);
-
 in
-lib.attrsets.unionOfDisjoint all-haskell-tools {
-
+{
   gcc = pkgs.gcc;
   # Conflicts with gcc regarding ld.gold
   # clang = pkgs.clang_22;

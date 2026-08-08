@@ -114,6 +114,14 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
+    dotemacs = {
+      url = "github:sergv/dotemacs";
+      flake = true;
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.trix.follows = "trix";
+      inputs.haskell-nixpkgs-improvements.follows = "haskell-nixpkgs-improvements";
+    };
+
     # # inputs.nixpkgs.url = "github:nixos/nixpkgs";
     # inputs.hackage-server.url = "github:bgamari/hackage-server/wip/doc-builder-tls";
     # inputs.cabal.url = "github:haskell/cabal/cabal-install-v3.10.3.0";
@@ -148,6 +156,7 @@
       kernel-march-patches,
       linuk-tkg-src,
       ksysguard6-src,
+      dotemacs,
       trix,
       ...
     }:
@@ -485,6 +494,7 @@
         inherit arkenfox;
         inherit git-proxy-conf;
         inherit haskell-nixpkgs-improvements;
+        inherit dotemacs;
         inherit pkgs-opt;
       };
 
