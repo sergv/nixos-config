@@ -19,18 +19,7 @@
       url = "github:nixos/nixpkgs?ref=nixos-23.11";
     };
 
-    nixpkgs-stable = {
-      url = "github:nixos/nixpkgs?ref=release-26.05";
-      # url = "nixpkgs/nixos-26.05";
-      # # unstable
-      # url = "nixpkgs/nixos-unstable";
-      #url = "nixpkgs/nixos-22.05";
-      #url = "/home/sergey/nix/nixpkgs";
-      # url = "nixpkgs/nixos-23.05";
-      # url = "nixpkgs/nixos-24.11";
-    };
-
-    nixpkgs-unstable = {
+    nixpkgs = {
       # url = "nixpkgs/nixos-24.11";
       # url = "nixpkgs/nixos-23.05";
       # url = "nixpkgs/nixos-unstable";
@@ -46,14 +35,14 @@
       # # unstable
       url = "github:nix-community/home-manager/release-26.05";
       # url = "github:nix-community/home-manager/master";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     impermanence = {
       # url = "github:nix-community/impermanence";
       url = "github:nix-community/impermanence";
       inputs.home-manager.follows = "home-manager";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     flake-compat = {
@@ -62,34 +51,34 @@
 
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
     };
 
     arkenfox = {
       # url = "git+https://github.com/dwarfmaster/arkenfox-nixos?ref=main";
       url = "github:dwarfmaster/arkenfox-nixos";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
       inputs.pre-commit.follows = "git-hooks";
     };
 
     nur = {
       url = "github:nix-community/NUR";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     haskellNix = {
       url = "github:input-output-hk/haskell.nix";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-      inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-unstable.follows = "nixpkgs";
     };
 
     haskell-nixpkgs-improvements = {
       url = "github:sergv/haskell-nixpkgs-improvements";
 
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-      inputs.nixpkgs-unstable.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-unstable.follows = "nixpkgs";
       inputs.haskellNix.follows = "haskellNix";
     };
 
@@ -111,13 +100,13 @@
     ksysguard6-src = {
       url = "github:sergv/ksysguard6";
       flake = true;
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     dotemacs = {
       url = "github:sergv/dotemacs";
       flake = true;
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
       inputs.trix.follows = "trix";
       inputs.haskell-nixpkgs-improvements.follows = "haskell-nixpkgs-improvements";
     };
@@ -132,19 +121,18 @@
     trix = {
       url = "github:aanderse/trix";
       flake = true;
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
   };
 
   outputs =
     {
-      nixpkgs-stable,
       nixpkgs-20-03,
       nixpkgs-20-09,
       nixpkgs-22-11,
       nixpkgs-23-11,
-      nixpkgs-unstable,
+      nixpkgs,
       # , nixpkgs-fresh-ghc
       home-manager,
       impermanence,
@@ -414,7 +402,7 @@
 
       # Mostly for chromium. Never switch to -march=native, the point is to avoid
       # prohibitively expensive builds.
-      pkgs-pristine = import nixpkgs-unstable {
+      pkgs-pristine = import nixpkgs {
         inherit system;
         config = {
           # allowBroken                    = true;
@@ -433,7 +421,7 @@
       arch = import ./arch.nix;
 
       # pkgs = pkgs-pristine;
-      pkgs = import nixpkgs-unstable {
+      pkgs = import nixpkgs {
         inherit system;
         # inherit (arch) localSystem;
         config = {
@@ -458,7 +446,7 @@
         ];
       };
 
-      pkgs-opt = import nixpkgs-unstable {
+      pkgs-opt = import nixpkgs {
         # inherit system;
         inherit (arch) localSystem;
         config = {
@@ -498,17 +486,12 @@
         inherit pkgs-opt;
       };
 
-      overlay-unstable = _: _: {
-        unstable = nixpkgs-unstable.legacyPackages.x86_64-linux;
-        # fresh-ghc = nixpkgs-fresh-ghc.legacyPackages.x86_64-linux;
-      };
-
     in
     {
 
       # System configs
       nixosConfigurations = {
-        home = nixpkgs-unstable.lib.nixosSystem {
+        home = nixpkgs.lib.nixosSystem {
           inherit system;
           inherit pkgs;
 
@@ -518,7 +501,6 @@
 
               nixpkgs.overlays = [
                 nur.overlays.default
-                overlay-unstable
                 ksysguard6-src.overlays.default
                 # Don’t uncomment, otherwise overlays will be applied one more time.
                 # haskell-nixpkgs-improvements.overlay.enable-ghc-unit-ids
@@ -563,7 +545,6 @@
             (_: {
               nixpkgs.overlays = [
                 nur.overlays.default
-                overlay-unstable
               ];
             })
 

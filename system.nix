@@ -494,7 +494,7 @@ in
   nix = {
     channel.enable = false;
     gc.automatic = false;
-    package      = pkgs.unstable.nixVersions.stable;
+    package      = pkgs.nixVersions.stable;
     settings     = {
       allowed-users         = [
         "@wheel"

@@ -9,8 +9,6 @@
   pkgs-pristine,
   haskell-nixpkgs-improvements,
   dotemacs,
-  # , nixpkgs-stable
-  # , nixpkgs-unstable
   arkenfox,
   git-proxy-conf,
   arch,

@@ -22,7 +22,7 @@
           "flake-compat"
         ],
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ],
         "pre-commit": [
           "git-hooks"
@@ -114,7 +114,7 @@
           "haskell-nixpkgs-improvements"
         ],
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ],
         "trix": [
           "trix"
@@ -194,7 +194,7 @@
         ],
         "gitignore": "gitignore",
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -287,7 +287,7 @@
           "haskellNix"
         ],
         "nixpkgs": [
-          "nixpkgs-stable"
+          "nixpkgs"
         ],
         "nixpkgs-18-09": "nixpkgs-18-09",
         "nixpkgs-19-09": "nixpkgs-19-09",
@@ -296,7 +296,7 @@
         "nixpkgs-22-11": "nixpkgs-22-11",
         "nixpkgs-23-11": "nixpkgs-23-11",
         "nixpkgs-unstable": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -340,7 +340,7 @@
         "hpc-coveralls": "hpc-coveralls",
         "iserv-proxy": "iserv-proxy",
         "nixpkgs": [
-          "nixpkgs-stable"
+          "nixpkgs"
         ],
         "nixpkgs-2305": "nixpkgs-2305",
         "nixpkgs-2311": "nixpkgs-2311",
@@ -349,7 +349,7 @@
         "nixpkgs-2505": "nixpkgs-2505",
         "nixpkgs-2511": "nixpkgs-2511",
         "nixpkgs-unstable": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ],
         "old-ghc-nix": "old-ghc-nix",
         "stackage": "stackage"
@@ -608,7 +608,7 @@
     "home-manager": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -648,7 +648,7 @@
           "home-manager"
         ],
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -701,7 +701,7 @@
     "ksysguard6-src": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -731,6 +731,22 @@
       "original": {
         "owner": "Frogging-Family",
         "repo": "linux-tkg",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1781362223,
+        "narHash": "sha256-DnjLEsXUYn23wzY4FgLRApfDGkQs/Ek4iDuvFV1d9vg=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "44b530598435148b317ff8ddad91cd138108929f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "release-26.05",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -980,43 +996,11 @@
         "type": "github"
       }
     },
-    "nixpkgs-stable": {
-      "locked": {
-        "lastModified": 1781362223,
-        "narHash": "sha256-DnjLEsXUYn23wzY4FgLRApfDGkQs/Ek4iDuvFV1d9vg=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "44b530598435148b317ff8ddad91cd138108929f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "release-26.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs-unstable": {
-      "locked": {
-        "lastModified": 1781362223,
-        "narHash": "sha256-DnjLEsXUYn23wzY4FgLRApfDGkQs/Ek4iDuvFV1d9vg=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "44b530598435148b317ff8ddad91cd138108929f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "release-26.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nur": {
       "inputs": {
         "flake-parts": "flake-parts",
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -1064,12 +1048,11 @@
         "kernel-march-patches": "kernel-march-patches",
         "ksysguard6-src": "ksysguard6-src",
         "linuk-tkg-src": "linuk-tkg-src",
+        "nixpkgs": "nixpkgs",
         "nixpkgs-20-03": "nixpkgs-20-03_2",
         "nixpkgs-20-09": "nixpkgs-20-09_2",
         "nixpkgs-22-11": "nixpkgs-22-11_2",
         "nixpkgs-23-11": "nixpkgs-23-11_2",
-        "nixpkgs-stable": "nixpkgs-stable",
-        "nixpkgs-unstable": "nixpkgs-unstable",
         "nur": "nur",
         "trix": "trix"
       }
@@ -1093,7 +1076,7 @@
     "trix": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
