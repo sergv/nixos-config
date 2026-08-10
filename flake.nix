@@ -420,57 +420,38 @@
 
       arch = import ./arch.nix;
 
+      common-nixpkgs-config = {
+        # allowBroken                    = true;
+        allowUnfree = true; # For nvidia drivers.
+        # # May be needed for ghc windows cross-compiler but enabling it
+        # # breaks cuda-pkgs - it starts pulling in wrong dependency
+        # # that doesn’t build.
+        # allowUnsupportedSystem         = true;
+        # virtualbox.enableExtensionPack = true;
+        #inherit (arch) replaceStdenv;
+      }
+        // haskell-nixpkgs-improvements.config.host;
+
+      common-nixpkgs-overlays = [
+        ssh-overlay
+        systemd-disable-age-verification-overlay
+        trix.overlays.default
+        # improve-fetchgit-overlay
+      ];
+
       # pkgs = pkgs-pristine;
       pkgs = import nixpkgs {
         inherit system;
         # inherit (arch) localSystem;
-        config = {
-          # allowBroken                    = true;
-          allowUnfree = true; # For nvidia drivers.
-          # # May be needed for ghc windows cross-compiler but enabling it
-          # # breaks cuda-pkgs - it starts pulling in wrong dependency
-          # # that doesn’t build.
-          # allowUnsupportedSystem         = true;
-          # virtualbox.enableExtensionPack = true;
-          #inherit (arch) replaceStdenv;
-        }
-        // haskell-nixpkgs-improvements.config.host;
-        overlays = [
-          ssh-overlay
-          systemd-disable-age-verification-overlay
-          zen4-march-overlay
-          trix.overlays.default
-          # improve-fetchgit-overlay
-
-          # arch-native-overlay
-        ];
+        config = common-nixpkgs-config;
+        overlays = common-nixpkgs-overlays ++ [zen4-march-overlay];
       };
 
       pkgs-opt = import nixpkgs {
         # inherit system;
         inherit (arch) localSystem;
-        config = {
-          # allowBroken                    = true;
-          allowUnfree = true; # For nvidia drivers.
-          # # May be needed for ghc windows cross-compiler but enabling it
-          # # breaks cuda-pkgs - it starts pulling in wrong dependency
-          # # that doesn’t build.
-          # allowUnsupportedSystem         = true;
-          # virtualbox.enableExtensionPack = true;
-          #inherit (arch) replaceStdenv;
-        }
-        // haskell-nixpkgs-improvements.config.host;
-        overlays = [
-          ssh-overlay
-          systemd-disable-age-verification-overlay
-          # Redundant here.
-          # zen4-march-overlay
-          zen4-march-fixes-overlay
-          trix.overlays.default
-          # improve-fetchgit-overlay
-
-          # arch-native-overlay
-        ];
+        config = common-nixpkgs-config;
+        overlays = common-nixpkgs-overlays ++ [zen4-march-fixes-overlay];
       };
 
       home-manager-extra-args = {
@@ -486,6 +467,17 @@
         inherit pkgs-opt;
       };
 
+      home-manager-module = {
+        home-manager = {
+          useGlobalPkgs    = true;
+          useUserPackages  = true;
+          users.sergey     = import ./home.nix;
+          extraSpecialArgs = home-manager-extra-args;
+          # users.sergey = {
+          #   imports = [ ./home.nix ];
+          # };
+        };
+      };
     in
     {
 
@@ -508,50 +500,40 @@
                 # haskell-nixpkgs-improvements.overlay.smaller-haskell
                 # haskell-nixpkgs-improvements.overlay.disable-checks
                 # zen4-march-overlay
-
-                # arch-native-overlay
               ];
             })
 
-            (import ./system.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
+            ./system.nix
+            ./hardware-configuration.nix
+            ./compressed-root.nix
+            (import ./kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
             impermanence.nixosModules.impermanence
 
             # Enable Home Manager as NixOs module
             home-manager.nixosModules.home-manager
 
-            {
-              home-manager = {
-                useGlobalPkgs    = true;
-                useUserPackages  = true;
-                users.sergey     = import ./home.nix;
-                extraSpecialArgs = home-manager-extra-args;
-                # users.sergey = {
-                #   imports = [ ./home.nix ];
-                # };
-              };
-            }
-
+            home-manager-module
           ];
         };
       };
 
-      # Home configs for user
-      homeManagerConfigurations = {
-        sergey = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [
-
-            (_: {
-              nixpkgs.overlays = [
-                nur.overlays.default
-              ];
-            })
-
-            ./home.nix
-          ];
-          extraSpecialArgs = home-manager-extra-args;
-        };
-      };
+      # # Home configs for user
+      # homeManagerConfigurations = {
+      #   sergey = home-manager.lib.homeManagerConfiguration {
+      #     inherit pkgs;
+      #     modules = [
+      #
+      #       (_: {
+      #         nixpkgs.overlays = [
+      #           nur.overlays.default
+      #         ];
+      #       })
+      #
+      #       ./home.nix
+      #     ];
+      #     extraSpecialArgs = home-manager-extra-args;
+      #   };
+      # };
     };
 }

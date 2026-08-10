@@ -1,26 +1,9 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{
-  bore-scheduler-src,
-  kernel-march-patches,
-  linuk-tkg-src,
-}:
-
 { config, pkgs, ... }:
 
 let
   nix-daemon-build-dir = "/builds-nix-tmp";
 in
 {
-  imports = [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-    ./compressed-root.nix
-    (import ./kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
-  ];
-
   # For booting see https://nixos.wiki/wiki/Bootloader
 
   #boot.initrd.kernelModules = ["amdgpu"];
