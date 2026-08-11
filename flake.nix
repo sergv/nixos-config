@@ -510,7 +510,7 @@
             ./system/zram-swap.nix
             ./system.nix
             ./hardware-configuration.nix
-            (import ./kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
+            (import ./system/kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
             impermanence.nixosModules.impermanence
 
