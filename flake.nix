@@ -506,10 +506,10 @@
               ];
             })
 
+            ./system/compressed-root.nix
             ./system/zram-swap.nix
             ./system.nix
             ./hardware-configuration.nix
-            ./compressed-root.nix
             (import ./kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
             impermanence.nixosModules.impermanence
