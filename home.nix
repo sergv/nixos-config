@@ -9,7 +9,6 @@
   pkgs-pristine,
   haskell-nixpkgs-improvements,
   dotemacs,
-  arkenfox,
   git-proxy-conf,
   arch,
   system,
@@ -238,11 +237,6 @@ let
 
 in
 {
-
-  imports = [
-    arkenfox.hmModules.default
-  ];
-
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home = {
@@ -878,11 +872,6 @@ in
       videos              = "$HOME/Videos";
       projects            = null;
     };
-  };
-
-  programs.firefox = import ./firefox.nix {
-    inherit pkgs pkgs-opt pkgs-pristine;
-    firefox-addons = pkgs.nur.repos.rycee.firefox-addons;
   };
 
   programs.chromium = {

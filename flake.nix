@@ -471,11 +471,14 @@
         home-manager = {
           useGlobalPkgs    = true;
           useUserPackages  = true;
-          users.sergey     = import ./home.nix;
+          # users.sergey     = import ./home.nix;
           extraSpecialArgs = home-manager-extra-args;
-          # users.sergey = {
-          #   imports = [ ./home.nix ];
-          # };
+          users.sergey = {
+            imports = [
+              ./home/firefox.nix
+              ./home.nix
+            ];
+          };
         };
       };
     in
