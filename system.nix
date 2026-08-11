@@ -41,7 +41,7 @@ in
     # Mitigations are compiled away in the kernel so there’s no need
     # to disable them in boot params.
     # "mitigations=off"
-    "zram.num_devices=2"
+
     # Disable hyperthreading.
     "nosmt=force" # force turned off, cannot enable later
     # "nosmt" # allow enabling later
@@ -64,16 +64,10 @@ in
 
   boot.kernel.sysctl = {
     # Allow ‘dmesg’ without root.
-    "kernel.dmesg_restrict" = 0;
+    "kernel.dmesg_restrict"      = 0;
     # Allow ‘perf’ without root.
     "kernel.perf_event_paranoid" = -1;
-    "kernel.kptr_restrict" = pkgs.lib.mkForce 0;
-
-    # For zram
-    "vm.page-cluster" = pkgs.lib.mkDefault 0;
-    "vm.swappiness" = pkgs.lib.mkDefault 180;
-    "vm.watermark_boost_factor" = pkgs.lib.mkDefault 0;
-    "vm.watermark_scale_factor" = pkgs.lib.mkDefault 125;
+    "kernel.kptr_restrict"       = pkgs.lib.mkForce 0;
   };
 
   # # More for legacy systems, use the GRUB 2 boot loader.
@@ -759,106 +753,10 @@ in
     '';
   };
 
-  swapDevices = [
-    {
-      device = "/dev/zram0";
-      priority = 150;
-      # Unclear whether this has any effect on return of unused or idle pages to OS.
-      # options  = "discard";
-    }
-  ];
-
   systemd = {
 
     services = {
       nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
-
-      "zram-init-swap" = {
-        after    = [ "dev-zram0.device" ];
-        wants    = [ "dev-zram0.device" ];
-        before   = [
-          "dev-zram0.swap"
-          "swap.target"
-        ];
-        wantedBy = [
-          "dev-zram0.swap"
-          "swap.target"
-        ];
-
-        unitConfig = {
-          # needed to prevent a cycle
-          DefaultDependencies = false;
-        };
-
-        serviceConfig = {
-          Restart         = "no";
-          Type            = "oneshot";
-          RemainAfterExit = "yes";
-          # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
-        };
-        # NB order of initialization is important
-        script = ''
-          echo lzo-rle > /sys/block/zram0/comp_algorithm
-          echo "priority=1 level=19" > /sys/block/zram0/algorithm_params
-          echo "algo=zstd priority=1" > /sys/block/zram0/recomp_algorithm
-          echo 20G > /sys/block/zram0/disksize
-
-          ${pkgs.util-linux}/sbin/mkswap /dev/zram0
-        '';
-        restartIfChanged = false;
-      };
-
-      "zram-finish-swap" = {
-        after    = [ "swap.target" ];
-        wants    = [ "swap.target" ];
-        before   = [ "sysinit.target" ];
-        wantedBy = [ "sysinit.target" ];
-
-        unitConfig = {
-          # needed to prevent a cycle
-          DefaultDependencies = false;
-        };
-
-        serviceConfig = {
-          Restart = "no";
-          Type = "oneshot";
-          RemainAfterExit = "yes";
-        };
-        # NB order of initialization is important
-        script = ''
-          echo "type=idle priority=1" > /sys/block/zram0/recompress
-          # Pages not accessed for a day get marked as idle.
-          echo 86400 > /sys/block/zram0/idle
-        '';
-        restartIfChanged = false;
-      };
-
-      "zram-finish-root" = {
-        after    = [ "local-fs.target" ];
-        wants    = [ "local-fs.target" ];
-        before   = [ "sysinit.target" ];
-        wantedBy = [ "sysinit.target" ];
-
-        unitConfig = {
-          # needed to prevent a cycle
-          DefaultDependencies = false;
-        };
-
-        serviceConfig = {
-          Restart         = "no";
-          Type            = "oneshot";
-          RemainAfterExit = "yes";
-          # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
-        };
-        # echo $(( 20 * 1024 * 1024 * 1024 )) > /sys/block/zram1/mem_limit
-        # NB order of initialization is important
-        script = ''
-          echo "type=idle priority=1" > /sys/block/zram1/recompress
-          # Pages not accessed for two hours get marked as idle.
-          echo $(( 2 * 60 * 60 )) > /sys/block/zram1/idle
-        '';
-        restartIfChanged = false;
-      };
     };
 
     tmpfiles.rules = [

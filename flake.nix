@@ -506,6 +506,7 @@
               ];
             })
 
+            ./system/zram-swap.nix
             ./system.nix
             ./hardware-configuration.nix
             ./compressed-root.nix

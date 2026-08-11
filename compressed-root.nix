@@ -59,7 +59,6 @@ in
         # extraBin = [pkgs.pkgsStatic.btrfs-progs pkgs.pkgsStatic.busybox];
 
         services = {
-
           "zram-init-root" = {
             after      = [ "dev-zram1.device" ];
             wants      = [ "dev-zram1.device" ];
@@ -93,6 +92,35 @@ in
           };
         };
       };
+    };
+  };
+
+  systemd.services = {
+    "zram-finish-root" = {
+      after    = [ "local-fs.target" ];
+      wants    = [ "local-fs.target" ];
+      before   = [ "sysinit.target" ];
+      wantedBy = [ "sysinit.target" ];
+
+      unitConfig = {
+        # needed to prevent a cycle
+        DefaultDependencies = false;
+      };
+
+      serviceConfig = {
+        Restart         = "no";
+        Type            = "oneshot";
+        RemainAfterExit = "yes";
+        # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
+      };
+      # echo $(( 20 * 1024 * 1024 * 1024 )) > /sys/block/zram1/mem_limit
+      # NB order of initialization is important
+      script = ''
+        echo "type=idle priority=1" > /sys/block/zram1/recompress
+          # Pages not accessed for two hours get marked as idle.
+          echo $(( 2 * 60 * 60 )) > /sys/block/zram1/idle
+      '';
+      restartIfChanged = false;
     };
   };
 
