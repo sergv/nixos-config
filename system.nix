@@ -30,9 +30,8 @@ in
     "kvm.enable_virt_at_load=0"
   ];
 
-  boot.extraModprobeConfig = ''
     #option foo bar=1
-
+  boot.extraModprobeConfig = ''
     # Last resort removal of a module, when other methods of blacklisting failed.
     install snd_hda_codec_hdmi /bin/true
     install snd_hda_codec_nvhdmi /bin/true
@@ -775,9 +774,9 @@ in
       nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
 
       "zram-init-swap" = {
-        after = [ "dev-zram0.device" ];
-        wants = [ "dev-zram0.device" ];
-        before = [
+        after    = [ "dev-zram0.device" ];
+        wants    = [ "dev-zram0.device" ];
+        before   = [
           "dev-zram0.swap"
           "swap.target"
         ];
@@ -792,8 +791,8 @@ in
         };
 
         serviceConfig = {
-          Restart = "no";
-          Type = "oneshot";
+          Restart         = "no";
+          Type            = "oneshot";
           RemainAfterExit = "yes";
           # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
         };
@@ -810,9 +809,9 @@ in
       };
 
       "zram-finish-swap" = {
-        after = [ "swap.target" ];
-        wants = [ "swap.target" ];
-        before = [ "sysinit.target" ];
+        after    = [ "swap.target" ];
+        wants    = [ "swap.target" ];
+        before   = [ "sysinit.target" ];
         wantedBy = [ "sysinit.target" ];
 
         unitConfig = {
@@ -835,9 +834,9 @@ in
       };
 
       "zram-finish-root" = {
-        after = [ "local-fs.target" ];
-        wants = [ "local-fs.target" ];
-        before = [ "sysinit.target" ];
+        after    = [ "local-fs.target" ];
+        wants    = [ "local-fs.target" ];
+        before   = [ "sysinit.target" ];
         wantedBy = [ "sysinit.target" ];
 
         unitConfig = {
@@ -846,8 +845,8 @@ in
         };
 
         serviceConfig = {
-          Restart = "no";
-          Type = "oneshot";
+          Restart         = "no";
+          Type            = "oneshot";
           RemainAfterExit = "yes";
           # ExecStop        = "${pkgs.runtimeShell} -c 'echo 1 > /sys/class/block/zram0/reset'";
         };
@@ -873,9 +872,9 @@ in
 
     settings.Manager = {
       # File limit.
-      DefaultLimitNOFILE = "8192:10485760";
+      DefaultLimitNOFILE      = "8192:10485760";
       # Timeout for starting jobs that hang for any reason.
-      DefaultTimeoutStopSec = "10s";
+      DefaultTimeoutStopSec   = "10s";
       DefaultDeviceTimeoutSec = "10s";
     };
     user = {
@@ -977,19 +976,19 @@ in
     # Enable and configure the Tor relay
     relay = {
       enable = false;
-      role = "relay"; # Set the relay role (e.g., "relay", "bridge")
+      role   = "relay"; # Set the relay role (e.g., "relay", "bridge")
     };
 
     # Configure Tor settings
     settings = {
-      Nickname = "WeAreLegion";
+      Nickname    = "WeAreLegion";
       ContactInfo = "legion@legion.com";
 
       # Bandwidth settings
       MaxAdvertisedBandwidth = "6 MB";
-      BandWidthRate = "5 MB";
-      RelayBandwidthRate = "5 MB";
-      RelayBandwidthBurst = "6 MB";
+      BandWidthRate          = "5 MB";
+      RelayBandwidthRate     = "5 MB";
+      RelayBandwidthBurst    = "6 MB";
 
       # # Restrict exit nodes to a specific country (use the appropriate country code)
       # ExitNodes = "{ch} StrictNodes 1";
@@ -999,10 +998,10 @@ in
 
       # Performance and security settings
       CookieAuthentication = true;
-      AvoidDiskWrites = 1;
-      HardwareAccel = 1;
-      SafeLogging = 1;
-      NumCPUs = 2;
+      AvoidDiskWrites      = 1;
+      HardwareAccel        = 1;
+      SafeLogging          = 1;
+      NumCPUs              = 2;
 
       # Network settings
       ORPort = [
@@ -1024,7 +1023,7 @@ in
   system = {
     nixos.label = "zen4";
     autoUpgrade = {
-      enable = false;
+      enable      = false;
       allowReboot = false;
     };
 
@@ -1033,9 +1032,9 @@ in
   };
 
   fonts.fontconfig = {
-    enable = true;
+    enable        = true;
     hinting.style = "full";
-    antialias = true;
+    antialias     = true;
   };
 
   # Disable ksgrd_network_helper within security.wrappers since the executable
