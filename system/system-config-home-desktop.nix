@@ -1,8 +1,4 @@
 { config, pkgs, ... }:
-
-let
-  nix-daemon-build-dir = "/builds-nix-tmp";
-in
 {
   # For booting see https://nixos.wiki/wiki/Bootloader
 
@@ -14,8 +10,8 @@ in
 
   # For EFI-based systems
   boot.loader.systemd-boot = {
-    enable = true;
-    memtest86.enable = true;
+    enable                 = true;
+    memtest86.enable       = true;
   };
   boot.loader.efi.canTouchEfiVariables = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
@@ -30,7 +26,6 @@ in
     "kvm.enable_virt_at_load=0"
   ];
 
-    #option foo bar=1
   boot.extraModprobeConfig = ''
     # Last resort removal of a module, when other methods of blacklisting failed.
     install snd_hda_codec_hdmi /bin/true
@@ -179,12 +174,6 @@ in
   #   };
   # };
 
-  # Will activate home-manager profiles for each user upon login
-  # This is useful when using ephemeral installations
-  environment.loginShellInit = ''
-    [ -d "$HOME/.nix-profile" ] || /nix/var/nix/profiles/per-user/$USER/home-manager/activate &> /dev/null
-  '';
-
   # environment.etc = {
   #   # Maybe try this if ssh server doesn’t work.
   #   "ssh/ssh_host_rsa_key".source         = "/permanent/etc/ssh/ssh_host_rsa_key";
@@ -193,78 +182,21 @@ in
   #   "ssh/ssh_host_ed25519_key.pub".source = "/permanent/etc/ssh/ssh_host_ed25519_key.pub";
   # };
 
-  environment.persistence."/permanent" = {
-    hideMounts = true;
-
-    directories = [
-      "/etc/NetworkManager/system-connections"
-      "/var/lib"
-      "/var/log"
-    ];
-    files = [
-      "/etc/machine-id"
-      "/etc/ssh/ssh_host_rsa_key"
-      "/etc/ssh/ssh_host_rsa_key.pub"
-      "/etc/ssh/ssh_host_ed25519_key"
-      "/etc/ssh/ssh_host_ed25519_key.pub"
-    ];
-  };
-
-  # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP | grep wget
-  environment = {
-    systemPackages = [
-      pkgs.alsa-tools
-      pkgs.alsa-utils
-      pkgs.killall
-      # pkgs.libnotify # for showing notifications in wm_operate.py
-      # pkgs.libreoffice
-      pkgs.perf
-      pkgs.ltrace
-      pkgs.man
-      pkgs.man-pages
-      pkgs.mkpasswd
-      pkgs.pciutils
-      pkgs.sudo
-      pkgs.strace
-      pkgs.trix
-      pkgs.vim
-      # pkgs.veracrypt
-      #(pkgs.wineFull.override { netapiSupport = false; })
-
-      # pkgs.bumblebee
-      # pkgs.jdk7
-      # pkgs.jdk
-      # pkgs.ocaml
-      # pkgs.octaveFull
-      # pkgs.python36Packages.ipython
-      # pkgs.python36Packages.jupyter
-      # pkgs.python36Packages.jupyter_client
-      # pkgs.python36Packages.matplotlib
-      # pkgs.python36Packages.sympy
-
-      #nix-bash-completions
-
-      # # For Xfce
-      # pkgs.networkmanagerapplet
-    ];
-  };
-
   # For running within a VM
   # virtualisation.virtualbox.guest.enable = true;
   virtualisation = {
     docker = {
       # storageDriver = "overlay2";
       rootless = {
-        enable = true;
+        enable            = true;
         setSocketVariable = true;
-        daemon.settings = {
+        daemon.settings   = {
           storage-driver = "overlay2";
         };
       };
     };
     virtualbox.host = {
-      enable = true;
+      enable              = true;
       enableExtensionPack = true;
     };
   };
@@ -272,11 +204,11 @@ in
   # Enable sound with PipeWire
   services.pulseaudio.enable = false;
   services.pipewire = {
-    enable = true; # Enable PipeWire
-    alsa.enable = true; # Enable ALSA support
+    enable            = true; # Enable PipeWire
+    alsa.enable       = true; # Enable ALSA support
     alsa.support32Bit = true; # Enable 32-bit ALSA support
-    audio.enable = true;
-    pulse.enable = true; # Enable PulseAudio compatibility
+    audio.enable      = true;
+    pulse.enable      = true; # Enable PulseAudio compatibility
     # Optional support for JACK applications
     # jack.enable       = true; #
 
@@ -386,16 +318,6 @@ in
     };
   };
 
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "dvorak";
-  };
-
-  # Select internationalisation properties.
-  i18n = {
-    defaultLocale = "en_GB.UTF-8";
-  };
-
   # List services that you want to enable:
 
   networking = {
@@ -441,12 +363,6 @@ in
     };
 
     firewall = {
-      enable = true;
-      allowPing = false;
-      extraCommands = ''
-        iptables -I OUTPUT 1 -m owner --gid-owner no-internet -j DROP
-      '';
-
       allowedTCPPorts = [
         # For i2p:
         7656 # default sam port
@@ -466,127 +382,21 @@ in
     # };
   };
 
-  # Enable commands like ‘nix search’ and flakes.
   nix = {
-    channel.enable = false;
-    gc.automatic = false;
-    package      = pkgs.nixVersions.stable;
-    settings     = {
-      allowed-users         = [
-        "@wheel"
-        "nix-ssh"
-      ];
-      bash-prompt-prefix    = "[nix] ";
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      # accept-flake-config   = true;
-      # More at https://nixos.org/nix/manual/#conf-system-features.
-      system-features       = [
-        "big-parallel"
-        "gccarch-znver3"
-        "gccarch-znver4"
-      ];
-      build-dir = nix-daemon-build-dir;
-      keep-outputs = true;
-      keep-derivations = true;
-      # Disable global flake registry
-      flake-registry = "";
-    };
-    # extraOptions = pkgs.lib.optionalString (config.nix.package == pkgs.nixVersions.stable)
-    #   "experimental-features = nix-command flakes";
-
-    daemonCPUSchedPolicy = "idle";
-    daemonIOSchedClass = "idle";
-
+    settings.system-features = [
+      "gccarch-znver3"
+      "gccarch-znver4"
+    ];
     sshServe = {
-      enable = true;
-      keys = [ "TODO: add public key here" ];
+      enable  = true;
+      keys    = [ "TODO: add public key here" ];
       trusted = false;
     };
   };
 
-  programs.bash.completion.enable = true;
-
-  # To be able to manipulate gtk settings.
-  programs.dconf.enable = true;
-
-  # Recommendations for secure secure shell, https://stribika.github.io/2015/01/04/secure-secure-shell.html
-  programs.ssh = {
-    ciphers = [
-      "chacha20-poly1305@openssh.com"
-      "aes256-gcm@openssh.com"
-      "aes128-gcm@openssh.com"
-      "aes256-ctr"
-      "aes192-ctr"
-      "aes128-ctr"
-    ];
-    hostKeyAlgorithms = [
-      "ssh-ed25519"
-      "ssh-rsa"
-    ];
-    kexAlgorithms = [
-      "curve25519-sha256@libssh.org"
-      "diffie-hellman-group-exchange-sha256"
-    ];
-    macs = [
-      "hmac-sha2-512-etm@openssh.com"
-      "hmac-sha2-256-etm@openssh.com"
-      "hmac-sha2-512"
-      "hmac-sha2-256"
-    ];
-    pubkeyAcceptedKeyTypes = [
-      "ssh-ed25519"
-      "ssh-rsa"
-    ];
-  };
-
-  security.sudo = {
-    enable = true;
-    execWheelOnly = true;
-    wheelNeedsPassword = true;
-    extraRules = [
-      {
-        users = [ "sergey" ];
-        commands = [
-          {
-            command = "ALL";
-            options = [
-              "SETENV"
-              "NOPASSWD"
-            ];
-          }
-        ];
-      }
-    ];
-  };
-
-  services.acpid.enable = true;
   powerManagement = {
     enable          = true;
     cpuFreqGovernor = "performance";
-  };
-
-  # Do not download any new firmware without my input.
-  services.fwupd.enable = false;
-
-  services.locate = {
-    enable = true;
-    package = pkgs.mlocate;
-    interval = "daily";
-  };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = false;
-
-  location = {
-    # London
-    latitude  = 51.508530;
-    longitude = -0.076132;
-    # Kiev
-    # latitude    = "50.45";
-    # longitude   = "30.5233";
   };
 
   # For Wayland support use https://gitlab.com/chinstrap/gammastep
@@ -603,7 +413,7 @@ in
   # Enable the X11 windowing system.
   services.xserver = {
     autorun = true; # Start automatically at boot time.
-    enable = true;
+    enable  = true;
 
     # # So that Xorg's config will be present in /etc
     # exportConfiguration = false;
@@ -616,6 +426,8 @@ in
       options = "grp:shifts_toggle,caps:escape";
     };
 
+    # Does not seem to work - replugging device does not make it have
+    # qwerty layout.
     config = ''
       Section "InputClass"
         Identifier "Gaming keyboard qwerty layout"
@@ -753,99 +565,6 @@ in
     '';
   };
 
-  systemd = {
-
-    services = {
-      nix-daemon.environment.TMPDIR = nix-daemon-build-dir;
-    };
-
-    tmpfiles.rules = [
-      "d ${nix-daemon-build-dir} 0755 root root 7d -"
-      # Never clear /tmp directory
-      "q /tmp                    1777 root root - -"
-      "q /tmp/tmp                1777 root root - -"
-      # Clear /var/tmp whenever as it was by default.
-      "q /var/tmp                1777 root root - 30d"
-    ];
-
-    settings.Manager = {
-      # File limit.
-      DefaultLimitNOFILE      = "8192:10485760";
-      # Timeout for starting jobs that hang for any reason.
-      DefaultTimeoutStopSec   = "10s";
-      DefaultDeviceTimeoutSec = "10s";
-    };
-    user = {
-      extraConfig = ''
-        DefaultLimitNOFILE=8192:262144
-      '';
-
-      # Disable rootless docker at startup - it will start automatically when docker is used.
-      services.docker.wantedBy = pkgs.lib.mkForce [ ];
-    };
-  };
-
-  # Set your time zone.
-  time.timeZone = "Europe/London";
-
-  users = {
-    # Make sure that users are managed only through configuration.nix
-    mutableUsers = false;
-    groups = {
-      no-internet = { };
-    };
-    users = {
-      #};
-      ## Define a user account. Don't forget to set a password with ‘passwd’.
-      #extraUsers = {
-      root = {
-        hashedPassword = "Yeah, like I'm going to tell you even my password hash";
-      };
-      sergey = {
-        home = "/home/sergey";
-        extraGroups = [
-          "adm"
-          "adbusers"
-          "audio"
-          # # To make joysticks work, cf https://github.com/libsdl-org/SDL/issues/12397
-          # NixOS doesn’t seem to have this group so doesn’t help.
-          # "input"
-          "netdev"
-          "networkmanager"
-          # Doesn’t disable internet per se, but I need to be part of the group
-          # to be able to run ‘no-internet’ script.
-          "no-internet"
-          "plugdev"
-          "sudo"
-          "vboxusers"
-          "video"
-          "wheel"
-        ];
-        description                 = "sergey"; # "Sergey Vinokurov";
-        isNormalUser                = true;
-        uid                         = 1000;
-        shell                       = pkgs.bash;
-        # mkpasswd -m sha-512       <password>
-        hashedPassword              = "Yeah, like I'm going to tell you even my password hash";
-        openssh.authorizedKeys.keys = [
-          "Yeah, like I'm going to tell you even my public key. You'll need to WORK for it."
-        ];
-      };
-    };
-  };
-
-  # This setups a SSH server. Very important if you're setting up a headless system.
-  # Feel free to remove if you don't need it.
-  services.openssh = {
-    enable = true;
-    extraConfig = "PubkeyAcceptedKeyTypes = ssh-rsa,ssh-ed25519";
-    settings = {
-      PermitRootLogin = "no";
-      PasswordAuthentication = false;
-      X11Forwarding = true;
-    };
-  };
-
   services.i2p = {
     enable = true;
   };
@@ -865,13 +584,14 @@ in
   };
 
   services.tor = {
-    enable = true;
+    enable        = true;
     client.enable = true;
 
-    # Disable GeoIP to prevent the Tor client from estimating the locations of Tor nodes it connects to
-    enableGeoIP = false;
+    # Disable GeoIP to prevent the Tor client from estimating the
+    # locations of Tor nodes it connects to.
+    enableGeoIP   = false;
 
-    # Enable and configure the Tor relay
+    # Enable and configure the Tor relay.
     relay = {
       enable = false;
       role   = "relay"; # Set the relay role (e.g., "relay", "bridge")
@@ -912,33 +632,8 @@ in
     };
   };
 
-  # zramSwap = {
-  #   enable        = true;
-  #   algorithm     = "zstd";
-  #   memoryPercent = 33;
-  # };
-
   system = {
     nixos.label = "zen4";
-    autoUpgrade = {
-      enable      = false;
-      allowReboot = false;
-    };
-
-    # Include everything required to build every package on the system.
-    # includeBuildDependencies = true;
-  };
-
-  fonts.fontconfig = {
-    enable        = true;
-    hinting.style = "full";
-    antialias     = true;
-  };
-
-  # Disable ksgrd_network_helper within security.wrappers since the executable
-  # is patched out and does not exist.
-  security.wrappers.ksgrd_network_helper = {
-    enable = pkgs.lib.mkForce false;
   };
 
   # Disable loading extra kernel modules after boot to avoid security holes.

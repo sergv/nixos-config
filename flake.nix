@@ -124,6 +124,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    NixOS-WSL = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "flake-compat";
+    };
+
   };
 
   outputs =
@@ -146,6 +152,7 @@
       ksysguard6-src,
       dotemacs,
       trix,
+      NixOS-WSL,
       ...
     }:
     let
@@ -436,6 +443,9 @@
         ssh-overlay
         systemd-disable-age-verification-overlay
         trix.overlays.default
+
+        nur.overlays.default
+        ksysguard6-src.overlays.default
         # improve-fetchgit-overlay
       ];
 
@@ -443,14 +453,14 @@
       pkgs = import nixpkgs {
         inherit system;
         # inherit (arch) localSystem;
-        config = common-nixpkgs-config;
+        config   = common-nixpkgs-config;
         overlays = common-nixpkgs-overlays ++ [zen4-march-overlay];
       };
 
       pkgs-opt = import nixpkgs {
         # inherit system;
         inherit (arch) localSystem;
-        config = common-nixpkgs-config;
+        config   = common-nixpkgs-config;
         overlays = common-nixpkgs-overlays ++ [zen4-march-fixes-overlay];
       };
 
@@ -491,32 +501,32 @@
           inherit pkgs;
 
           modules = [
-
-            ({ config, pkgs, ... }: {
-
-              nixpkgs.overlays = [
-                nur.overlays.default
-                ksysguard6-src.overlays.default
-                # Don’t uncomment, otherwise overlays will be applied one more time.
-                # haskell-nixpkgs-improvements.overlay.enable-ghc-unit-ids
-                # ssh-overlay
-                # haskell-nixpkgs-improvements.overlay.smaller-haskell
-                # haskell-nixpkgs-improvements.overlay.disable-checks
-                # zen4-march-overlay
-              ];
-            })
-
             ./system/compressed-root.nix
             ./system/zram-swap.nix
-            ./system.nix
             ./hardware-configuration.nix
             (import ./system/kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
-            impermanence.nixosModules.impermanence
+            (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
+            ./system/system-config-home-desktop.nix
 
-            # Enable Home Manager as NixOs module
+            (import ./system/volatile-root.nix { inherit impermanence; })
+
             home-manager.nixosModules.home-manager
+            home-manager-module
+          ];
+        };
 
+        wsl = nixpkgs.lib.nixosSystem {
+          inherit system;
+          inherit pkgs;
+
+          modules = [
+            NixOS-WSL.nixosModules.wsl
+
+            (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
+            ./system/system-config-wsl.nix
+
+            home-manager.nixosModules.home-manager
             home-manager-module
           ];
         };
