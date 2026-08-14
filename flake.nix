@@ -222,20 +222,20 @@
         builtins.listToAttrs (
           builtins.map (x: {
             name = x;
-            value = arch.use-march-optimizations old (builtins.getAttr x old);
+            value = utils.use-march-optimizations arch-zen4 old (builtins.getAttr x old);
           }) packages-to-optimize
         )
         // {
 
           # kdePackages = old.kdePackages // {
-          #   mkKdeDerivation = arch.use-march-optimizations old old.mkKdeDerivation;
-          #   # plasma-desktop = arch.use-march-optimizations old old.kdePackages.plasma-desktop;
-          #   # kwin           = arch.use-march-optimizations old old.kdePackages.kwin;
-          #   # kwin-x11       = arch.use-march-optimizations old old.kdePackages.kwin-x11;
+          #   mkKdeDerivation = utils.use-march-optimizations arch-zen4 old old.mkKdeDerivation;
+          #   # plasma-desktop = utils.use-march-optimizations arch-zen4 old old.kdePackages.plasma-desktop;
+          #   # kwin           = utils.use-march-optimizations arch-zen4 old old.kdePackages.kwin;
+          #   # kwin-x11       = utils.use-march-optimizations arch-zen4 old old.kdePackages.kwin-x11;
           # };
 
           # wineWow64Packages = old.wineWow64Packages // {
-          #   stagingFull = arch.use-march-optimizations old old.wineWow64Packages.stagingFull;
+          #   stagingFull = utils.use-march-optimizations arch-zen4 old old.wineWow64Packages.stagingFull;
           # };
 
           # # llvmPackages_15 = old.llvmPackages_15.extend (_: old2: {
@@ -342,7 +342,7 @@
       # Fixes for building packages with -march=znver4
       zen4-march-fixes-overlay = new: old: {
 
-        # libtpms = arch.disable-march-optimizations old old.libtpms;
+        # libtpms = utils.disable-march-optimizations arch-zen4 old old.libtpms;
         libtpms = old.libtpms.overrideAttrs (_: {
           doCheck = false;
         });
@@ -352,7 +352,7 @@
         });
 
         # Doesn’t build either way, easier to do without until I really need this.
-        # frei0r = arch.disable-march-optimizations old old.frei0r;
+        # frei0r = utils.disable-march-optimizations arch-zen4 old old.frei0r;
         # (old.frei0r.overrideAttrs (old: {
         #   version = "2.5.6";
         #   src = pkgs.fetchFromGitHub {
@@ -425,7 +425,8 @@
         # ];
       };
 
-      arch = import ./arch.nix;
+      arch-zen4 = import ./arch-zen4.nix;
+      utils = import ./utils.nix;
 
       common-nixpkgs-config = {
         # allowBroken                    = true;
@@ -435,7 +436,7 @@
         # # that doesn’t build.
         # allowUnsupportedSystem         = true;
         # virtualbox.enableExtensionPack = true;
-        #inherit (arch) replaceStdenv;
+        #inherit (arch-zen4) replaceStdenv;
       }
         // haskell-nixpkgs-improvements.config.host;
 
@@ -452,31 +453,33 @@
       # pkgs = pkgs-pristine;
       pkgs = import nixpkgs {
         inherit system;
-        # inherit (arch) localSystem;
+        # inherit (arch-zen4) localSystem;
         config   = common-nixpkgs-config;
         overlays = common-nixpkgs-overlays ++ [zen4-march-overlay];
       };
 
       pkgs-opt = import nixpkgs {
         # inherit system;
-        inherit (arch) localSystem;
+        inherit (arch-zen4) localSystem;
         config   = common-nixpkgs-config;
         overlays = common-nixpkgs-overlays ++ [zen4-march-fixes-overlay];
       };
 
       home-manager-extra-args =
-        { pkgs-optimised, ... }:
+        { pkgs-optimised, arch, ... }:
         {
           # inherit nixpkgs-fresh-ghc;
           # NixOS will provide its own pkgs.
           # inherit pkgs;
-          inherit arch system;
+          inherit system;
           inherit pkgs-pristine;
           inherit arkenfox;
           inherit git-proxy-conf;
           inherit haskell-nixpkgs-improvements;
           inherit dotemacs;
           inherit pkgs-optimised;
+          inherit arch;
+          inherit utils;
         };
 
       home-manager-module =
@@ -518,6 +521,7 @@
 
             home-manager.nixosModules.home-manager
             (home-manager-module {
+              arch           = arch-zen4;
               pkgs-optimised = pkgs-opt;
               extra-mods     = [
                 ./home/firefox.nix
@@ -539,6 +543,7 @@
 
             home-manager.nixosModules.home-manager
             (home-manager-module {
+              arch           = null;
               pkgs-optimised = null;
               extra-mods     = [
                 ./home/wsl-specific.nix

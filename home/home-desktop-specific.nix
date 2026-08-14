@@ -5,6 +5,7 @@
   pkgs,
   pkgs-pristine,
   pkgs-optimised,
+  utils,
   ...
 }:
 let
@@ -116,7 +117,7 @@ let
       python3 = tribler-python;
     });
 
-  # wine-pkg = arch.use-march-optimizations pkgs pkgs.wineWow64Packages.stagingFull;
+  # wine-pkg = utils.use-march-optimizations arch pkgs pkgs.wineWow64Packages.stagingFull;
   wine-pkg = pkgs-opt.wineWow64Packages.stagingFull;
 
   winetricks-pkg =

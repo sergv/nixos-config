@@ -58,7 +58,7 @@ let
   emacs = (dotemacs.lib.mk-emacs-config {
     inherit system;
     inherit haskell-tools;
-    arch = arch.gccArch;
+    arch = if arch == null then null else arch.gccArch;
     pkgs = pkgs-opt;
   }).native;
 
