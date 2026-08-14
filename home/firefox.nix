@@ -1,10 +1,13 @@
 {
   pkgs,
-  pkgs-opt,
+  pkgs-optimised,
   pkgs-pristine,
   arkenfox,
   ...
 }:
+let
+  pkgs-opt = if pkgs-optimised == null then pkgs else pkgs-optimised;
+in
 {
   imports = [ arkenfox.hmModules.default ];
 

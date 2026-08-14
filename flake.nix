@@ -464,33 +464,38 @@
         overlays = common-nixpkgs-overlays ++ [zen4-march-fixes-overlay];
       };
 
-      home-manager-extra-args = {
-        # inherit nixpkgs-fresh-ghc;
-        # NixOS will provide its own pkgs.
-        # inherit pkgs;
-        inherit arch system;
-        inherit pkgs-pristine;
-        inherit arkenfox;
-        inherit git-proxy-conf;
-        inherit haskell-nixpkgs-improvements;
-        inherit dotemacs;
-        inherit pkgs-opt;
-      };
+      home-manager-extra-args =
+        { pkgs-optimised, ... }:
+        {
+          # inherit nixpkgs-fresh-ghc;
+          # NixOS will provide its own pkgs.
+          # inherit pkgs;
+          inherit arch system;
+          inherit pkgs-pristine;
+          inherit arkenfox;
+          inherit git-proxy-conf;
+          inherit haskell-nixpkgs-improvements;
+          inherit dotemacs;
+          inherit pkgs-optimised;
+        };
 
-      home-manager-module = {
-        home-manager = {
-          useGlobalPkgs    = true;
-          useUserPackages  = true;
-          # users.sergey     = import ./home.nix;
-          extraSpecialArgs = home-manager-extra-args;
-          users.sergey = {
-            imports = [
-              ./home/firefox.nix
-              ./home.nix
-            ];
+      home-manager-module =
+        args@{ extra-mods, ... }:
+        {
+          home-manager = {
+            useGlobalPkgs    = true;
+            useUserPackages  = true;
+            extraSpecialArgs = home-manager-extra-args args;
+            users.sergey = {
+              imports =
+                [
+                  ./home/common.nix
+                  ./isabelle/isabelle-module.nix
+                ] ++
+                extra-mods;
+            };
           };
         };
-      };
     in
     {
 
@@ -503,7 +508,7 @@
           modules = [
             ./system/compressed-root.nix
             ./system/zram-swap.nix
-            ./hardware-configuration.nix
+            ./system/home-desktop-hardware-config.nix
             (import ./system/kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
             (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
@@ -512,7 +517,13 @@
             (import ./system/volatile-root.nix { inherit impermanence; })
 
             home-manager.nixosModules.home-manager
-            home-manager-module
+            (home-manager-module {
+              pkgs-optimised = pkgs-opt;
+              extra-mods     = [
+                ./home/firefox.nix
+                ./home/home-desktop-specific.nix
+              ];
+            })
           ];
         };
 
@@ -527,7 +538,12 @@
             ./system/system-config-wsl.nix
 
             home-manager.nixosModules.home-manager
-            home-manager-module
+            (home-manager-module {
+              pkgs-optimised = null;
+              extra-mods     = [
+                ./home/wsl-specific.nix
+              ];
+            })
           ];
         };
       };
@@ -546,7 +562,7 @@
       #
       #       ./home.nix
       #     ];
-      #     extraSpecialArgs = home-manager-extra-args;
+      #     extraSpecialArgs = home-manager-extra-args { pkgs-optimised = pkgs-opt; };
       #   };
       # };
     };

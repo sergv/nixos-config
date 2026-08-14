@@ -66,6 +66,7 @@
             "todo"
             "torrents"
             "travelling"
+            "vim"
 
             # Supreme Commander FAF
             # ".gapforever"
@@ -275,4 +276,10 @@
           ];
     };
   };
+
+  # systemd.user.tmpfiles.rules = [
+  #   # "L+ ${homeDir}/.vimrc            0644 -      -     - /permanent/home/sergey/.vimrc"
+  #   # "L+ ${homeDir}/vim               0644 -      -     - /permanent/home/sergey/vim"
+  # ];
+
 }
