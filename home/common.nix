@@ -181,7 +181,7 @@ in
       "diff"                = "diff --unified --recursive --ignore-tab-expansion --ignore-blank-lines";
       "diffw"               = "diff --unified --recursive --ignore-tab-expansion --ignore-space-change --ignore-blank-lines";
 
-      "baobab-new"          = "nohup dbus-run-session baobab >/dev/null";
+      "disk-usage"          = ''if command -v filelight >/dev/null 2>&1 then filelight; elif command -v baobab >/dev/null 2>&1; then nohup dbus-run-session baobab >/dev/null; else echo "Cannot find neither filelight nor baobab executables to show disk usage" >&2; fi'';
     };
     sessionVariables = {
       "HIE_BIOS_CACHE_DIR"        = "/tmp/dist/hie-bios";
