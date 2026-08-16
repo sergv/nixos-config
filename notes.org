@@ -407,6 +407,7 @@ Pass ~nix build <target> --option substitute false~
   ~nix develop .#packages.x86_64-linux.foo~
 - List all available commands: ~declare -F~ - nix phases will be bash functions
   ~declare -F | grep -i phase~
+  ~printPhases~
 - Show all commands with definitions: ~typeset -f~
 - Optional: get sources with ~unpackPhase~
 – ~configurePhase~ or ~cmakeConfigurePhase~ or equivalent depending on flake
