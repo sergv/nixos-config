@@ -640,6 +640,9 @@
   # todo: disable to make my joystick work
   security.lockKernelModules = false;
 
+  # The platform the configuration will be used on.
+  nixpkgs.hostPlatform = "x86_64-linux";
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.

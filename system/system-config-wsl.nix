@@ -120,6 +120,9 @@ in
   # Disable loading extra kernel modules after boot to avoid security holes.
   security.lockKernelModules = true;
 
+  # The platform the configuration will be used on.
+  nixpkgs.hostPlatform = "x86_64-linux";
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
