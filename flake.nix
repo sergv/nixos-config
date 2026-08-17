@@ -130,10 +130,16 @@
       inputs.flake-compat.follows = "flake-compat";
     };
 
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
   outputs =
     {
+      self,
       nixpkgs-20-03,
       nixpkgs-20-09,
       nixpkgs-22-11,
@@ -153,10 +159,10 @@
       dotemacs,
       trix,
       NixOS-WSL,
+      nix-darwin,
       ...
     }:
     let
-      system = "x86_64-linux";
 
       # In configuration.nix
       ssh-overlay = _: old: {
@@ -217,12 +223,11 @@
       ];
 
       # Build some packages with -march=znver4
-      zen4-march-overlay =
-        new: old:
+      march-overlay = arch: new: old:
         builtins.listToAttrs (
           builtins.map (x: {
-            name = x;
-            value = utils.use-march-optimizations arch-zen4 old (builtins.getAttr x old);
+            name  = x;
+            value = utils.use-march-optimizations arch old (builtins.getAttr x old);
           }) packages-to-optimize
         )
         // {
@@ -339,8 +344,10 @@
 
         };
 
+      maybe-add-march-overlay = arch: overlays: if arch == null then overlays else overlays ++ [ (march-overlay arch) ];
+
       # Fixes for building packages with -march=znver4
-      zen4-march-fixes-overlay = new: old: {
+      march-fixes-overlay = new: old: {
 
         # libtpms = utils.disable-march-optimizations arch-zen4 old old.libtpms;
         libtpms = old.libtpms.overrideAttrs (_: {
@@ -409,35 +416,38 @@
 
       # Mostly for chromium. Never switch to -march=native, the point is to avoid
       # prohibitively expensive builds.
-      pkgs-pristine = import nixpkgs {
-        inherit system;
-        config = {
-          # allowBroken                    = true;
-          allowUnfree = true;
-          # virtualbox.enableExtensionPack = true;
+      mk-pkgs-pristine =
+        system:
+        import nixpkgs {
+          inherit system;
+          config = {
+            # allowBroken                    = true;
+            allowUnfree = true;
+            # virtualbox.enableExtensionPack = true;
+          };
+          # # NB keep this really pristine, any overlay here invalidates
+          # # cache.
+          # overlays = [
+          #   # ssh-overlay
+          #   # improve-fetchgit-overlay
+          #   # haskell-nixpkgs-improvements.overlay.enable-ghc-unit-ids
+          # ];
         };
-        # # NB keep this really pristine, any overlay here invalidates
-        # # cache.
-        # overlays = [
-        #   # ssh-overlay
-        #   # improve-fetchgit-overlay
-        #   # haskell-nixpkgs-improvements.overlay.enable-ghc-unit-ids
-        # ];
-      };
 
       arch-zen4 = import ./arch-zen4.nix;
       utils = import ./utils.nix;
 
-      common-nixpkgs-config = {
-        # allowBroken                    = true;
-        allowUnfree = true; # For nvidia drivers.
-        # # May be needed for ghc windows cross-compiler but enabling it
-        # # breaks cuda-pkgs - it starts pulling in wrong dependency
-        # # that doesn’t build.
-        # allowUnsupportedSystem         = true;
-        # virtualbox.enableExtensionPack = true;
-        #inherit (arch-zen4) replaceStdenv;
-      }
+      common-nixpkgs-config =
+        {
+          # allowBroken                    = true;
+          allowUnfree = true; # For nvidia drivers.
+          # # May be needed for ghc windows cross-compiler but enabling it
+          # # breaks cuda-pkgs - it starts pulling in wrong dependency
+          # # that doesn’t build.
+          # allowUnsupportedSystem         = true;
+          # virtualbox.enableExtensionPack = true;
+          #inherit (arch-zen4) replaceStdenv;
+        }
         // haskell-nixpkgs-improvements.config.host;
 
       common-nixpkgs-overlays = [
@@ -450,29 +460,33 @@
         # improve-fetchgit-overlay
       ];
 
-      # pkgs = pkgs-pristine;
-      pkgs = import nixpkgs {
-        inherit system;
-        # inherit (arch-zen4) localSystem;
-        config   = common-nixpkgs-config;
-        overlays = common-nixpkgs-overlays ++ [zen4-march-overlay];
-      };
+      # mk-pkgs = _system: pkgs-pristine;
+      mk-pkgs =
+        system: arch:
+        import nixpkgs {
+          inherit system;
+          # inherit (arch) localSystem;
+          config   = common-nixpkgs-config;
+          overlays = maybe-add-march-overlay arch common-nixpkgs-overlays;
+        };
 
-      pkgs-opt = import nixpkgs {
-        # inherit system;
-        inherit (arch-zen4) localSystem;
-        config   = common-nixpkgs-config;
-        overlays = common-nixpkgs-overlays ++ [zen4-march-fixes-overlay];
-      };
+      mk-pkgs-opt =
+        arch:
+        import nixpkgs {
+          # inherit system;
+          inherit (arch) localSystem;
+          config   = common-nixpkgs-config;
+          overlays = common-nixpkgs-overlays ++ [march-fixes-overlay];
+        };
 
       home-manager-extra-args =
-        { pkgs-optimised, arch, ... }:
+        { pkgs-optimised, arch, system, ... }:
         {
           # inherit nixpkgs-fresh-ghc;
           # NixOS will provide its own pkgs.
           # inherit pkgs;
           inherit system;
-          inherit pkgs-pristine;
+          pkgs-pristine = mk-pkgs-pristine system;
           inherit arkenfox;
           inherit git-proxy-conf;
           inherit haskell-nixpkgs-improvements;
@@ -483,7 +497,7 @@
         };
 
       home-manager-module =
-        args@{ extra-mods, ... }:
+        args@{ extra-mods, system, ... }:
         {
           home-manager = {
             useGlobalPkgs    = true;
@@ -499,58 +513,103 @@
             };
           };
         };
+
+      common-system-args = {
+        flake-self = self;
+      };
+
     in
     {
 
       # System configs
       nixosConfigurations = {
-        home = nixpkgs.lib.nixosSystem {
-          inherit system;
-          inherit pkgs;
+        "home" =
+          let
+            system = "x86_64-linux";
+            arch   = arch-zen4;
+          in
+          nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = common-system-args;
+            pkgs        = mk-pkgs system arch;
 
-          modules = [
-            ./system/compressed-root.nix
-            ./system/zram-swap.nix
-            ./system/home-desktop-hardware-config.nix
-            (import ./system/kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
+            modules = [
+              ./system/compressed-root.nix
+              ./system/zram-swap.nix
+              ./system/home-desktop-hardware-config.nix
+              (import ./system/kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
-            (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
-            ./system/system-config-home-desktop.nix
+              (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
+              ./system/system-config-linux-common.nix
+              ./system/system-config-home-desktop.nix
 
-            (import ./system/volatile-root.nix { inherit impermanence; })
+              (import ./system/volatile-root.nix { inherit impermanence; })
 
-            home-manager.nixosModules.home-manager
-            (home-manager-module {
-              arch           = arch-zen4;
-              pkgs-optimised = pkgs-opt;
-              extra-mods     = [
-                ./home/firefox.nix
-                ./home/home-desktop-specific.nix
-              ];
-            })
-          ];
-        };
+              home-manager.nixosModules.home-manager
+              (home-manager-module {
+                inherit system;
+                inherit arch;
+                pkgs-optimised = mk-pkgs-opt arch;
+                extra-mods     = [
+                  ./home/firefox.nix
+                  ./home/home-desktop-specific.nix
+                ];
+              })
+            ];
+          };
 
-        wsl = nixpkgs.lib.nixosSystem {
-          inherit system;
-          inherit pkgs;
+        "wsl" =
+          let
+            system = "x86_64-linux";
+            arch   = null;
+          in
+          nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = common-system-args;
+            pkgs        = mk-pkgs system arch;
 
-          modules = [
-            NixOS-WSL.nixosModules.wsl
+            modules = [
+              NixOS-WSL.nixosModules.wsl
+              (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
+              ./system/system-config-linux-common.nix
+              ./system/system-config-wsl.nix
 
-            (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
-            ./system/system-config-wsl.nix
+              home-manager.nixosModules.home-manager
+              (home-manager-module {
+                inherit system arch;
+                pkgs-optimised = null;
+                extra-mods     = [
+                  ./home/wsl-specific.nix
+                ];
+              })
+            ];
+          };
+      };
 
-            home-manager.nixosModules.home-manager
-            (home-manager-module {
-              arch           = null;
-              pkgs-optimised = null;
-              extra-mods     = [
-                ./home/wsl-specific.nix
-              ];
-            })
-          ];
-        };
+      darwinConfigurations = {
+        "macbook" =
+          let
+            system = "aarch64-darwin";
+            arch   = null;
+          in
+          nix-darwin.lib.darwinSystem {
+            inherit system;
+            specialArgs = common-system-args;
+            pkgs        = mk-pkgs system arch;
+
+            modules = [
+              ./system/system-config-macos.nix
+
+              home-manager.darwinModules.home-manager
+              (home-manager-module {
+                inherit system arch;
+                pkgs-optimised = null;
+                extra-mods     = [
+                  # ./home/macos-specific.nix
+                ];
+              })
+            ];
+          };
       };
 
       # # Home configs for user
