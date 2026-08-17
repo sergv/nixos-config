@@ -22,13 +22,16 @@
 $ nix-instantiate hello-minimalistic.nix
 warning: you did not specify '--add-root'; the result might be removed by the garbage collector
 /nix/store/6ygk7vjfdyqnjkn12r44w04xqjlhxx70-hello-minimalistic.drv
-$ nix-store -r /nix/store/6ygk7vjfdyqnjkn12r44w04xqjlhxx70-hello-minimalistic.drv
+$ nix-store --realise /nix/store/6ygk7vjfdyqnjkn12r44w04xqjlhxx70-hello-minimalistic.drv
 warning: you did not specify '--add-root'; the result might be removed by the garbage collector
 /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
-$ nix-store -q --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
+$ nix-store --query --references /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
 /nix/store/hp2fa1cjwkyyfhrd6jdr7i2bqbgp4alh-glibc-2.34-210
 /nix/store/x75rn4ym1pl3pin5rg9gf5s357ayzmqa-hello-minimalistic
 #+END_EXAMPLE
+
+** Show everything used to produce OUTPUT
+~nix-store --query --tree $(nix-store --query --deriver OUTPUT)~
 
 ** Atomic types
 - booleans: ~true~, ~false~, &&, ||, !
