@@ -73,10 +73,7 @@
     gc.automatic   = false;
     package        = pkgs.nixVersions.stable;
     settings       = {
-      allowed-users         = [
-        "@wheel"
-        "nix-ssh"
-      ];
+      allowed-users         = [ "@wheel" "nix-ssh" ];
       bash-prompt-prefix    = "[nix] ";
       # Enable commands like ‘nix search’ and flakes.
       experimental-features = [ "nix-command" "flakes" ];
@@ -251,9 +248,9 @@
   };
 
   services.openssh = {
-    enable = true;
+    enable      = true;
     extraConfig = "PubkeyAcceptedKeyTypes = ssh-rsa,ssh-ed25519";
-    settings = {
+    settings    = {
       PermitRootLogin        = "no";
       PasswordAuthentication = false;
       UsePAM                 = false;
