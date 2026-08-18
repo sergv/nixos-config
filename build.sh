@@ -20,12 +20,23 @@ export NINJAFLAGS="-j16 -l16"
 # nix build .#nixosConfigurations."wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j4 --cores 16 --keep-going "${@}"
 
 declare -a targets
+declare -a opts
 
-for target in "${@}"; do
-    targets+=(".#nixosConfigurations.\"$target\".config.system.build.toplevel")
+for x in "${@}"; do
+    case "$x" in
+        "macbook" )
+            targets+=(".#darwinConfigurations.\"${x}\".config.system.build.toplevel")
+            ;;
+        "home" | "wsl" )
+            targets+=(".#nixosConfigurations.\"${x}\".config.system.build.toplevel")
+            ;;
+        * )
+            opts+=("$x")
+            ;;
+    esac
 done
 
-nix build --out-link /tmp/nixos-rebuild-result/result --verbose -j4 --cores 16 --keep-going "${targets}"
+nix build --out-link /tmp/nixos-rebuild-result/result --verbose -j4 --cores 16 --keep-going "${targets[@]}" "${opts[@]}"
 
 
 # trix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result -j2 --cores 16 --keep-going "${@}" "${@}"
