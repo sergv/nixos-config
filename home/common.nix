@@ -362,15 +362,6 @@ in
     };
   };
 
-  programs.chromium = {
-    enable = true;
-    # Take from pristine so that it will be picked up from cache. Building chromium
-    # is almost impossible.
-    # pkgs-pristine.chromium
-    # pkgs.google-chrome
-    package = pkgs-pristine.ungoogled-chromium;
-  };
-
   # Same as "github:NixOS/nixpkgs/nixpkgs-unstable";
   nix.registry = {
     "nixpkgs-unstable" = {
@@ -447,14 +438,6 @@ in
       pkgs.cpu-x
       pkgs.curl
       pkgs.dmidecode
-      pkgs-opt.ffmpeg
-      # pkgs-opt.ffmpeg-full
-      # (pkgs-opt.ffmpeg-full.override (old: {
-      #   # frei0r-plugins doesn’t build.
-      #   withFrei0r    = false;
-      #   withSamba     = false;
-      #   withStripping = true;
-      # }))
       pkgs.file
       pkgs.findutils
       pkgs.gimp
@@ -474,10 +457,8 @@ in
       pkgs-opt.lzop
       pkgs-opt.mc
       pkgs.mesa-demos
-      pkgs-opt.mpv
       pkgs.nix-index
       pkgs-opt.p7zip
-      pkgs.pavucontrol
 
       # pkgs.pmutils
       pkgs.pv
@@ -489,16 +470,10 @@ in
       pkgs-opt.vorbis-tools
       pkgs.wget
       pkgs.xev
-      pkgs.yt-dlp
       pkgs-opt.zip
       # pkgs.yasm
       pkgs-opt.zstd
       # pkgs.z3
-
-      # Take from pristine so that it will be picked up from cache. Building thunderbird
-      # is almost impossible - linking consumes too much memory.
-      pkgs-pristine.thunderbird
-      pkgs-pristine.libreoffice
 
       pkgs.xd
 

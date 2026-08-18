@@ -247,6 +247,15 @@ in
     # dataFile."applications/i2p.desktop".text = i2pDesktopItem;
   };
 
+  programs.chromium = {
+    enable = true;
+    # Take from pristine so that it will be picked up from cache. Building chromium
+    # is almost impossible.
+    # pkgs-pristine.chromium
+    # pkgs.google-chrome
+    package = pkgs-pristine.ungoogled-chromium;
+  };
+
   home.packages =
     [
       pkgs-pristine.anki
@@ -256,7 +265,25 @@ in
       # for shsplit
       pkgs.shntool
       pkgs-pristine.telegram-desktop
+
+      pkgs-opt.ffmpeg
+      # pkgs-opt.ffmpeg-full
+      # (pkgs-opt.ffmpeg-full.override (old: {
+      #   # frei0r-plugins doesn’t build.
+      #   withFrei0r    = false;
+      #   withSamba     = false;
+      #   withStripping = true;
+      # }))
+
+      pkgs.pavucontrol
+      pkgs-opt.mpv
       pkgs-opt.vlc
+      pkgs.yt-dlp
+
+      # Take from pristine so that it will be picked up from cache. Building thunderbird
+      # is almost impossible - linking consumes too much memory.
+      pkgs-pristine.thunderbird
+      pkgs-pristine.libreoffice
 
       # Music
       strawberry-pkg
