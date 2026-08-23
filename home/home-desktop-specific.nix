@@ -4,13 +4,11 @@
   # pkgs created by nixos configuration
   pkgs,
   pkgs-pristine,
-  pkgs-optimised,
+  pkgs-opt,
   utils,
   ...
 }:
 let
-  pkgs-opt = if pkgs-optimised == null then pkgs else pkgs-optimised;
-
   homeDir = osConfig.users.users.sergey.home;
 
   cuda-pkgs = import ./cuda-pkgs.nix {

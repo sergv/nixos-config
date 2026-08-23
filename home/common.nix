@@ -6,7 +6,7 @@
   # pkgs created by nixos configuration
   pkgs,
   # my special args
-  pkgs-optimised,
+  pkgs-opt,
   pkgs-cross-win,
   pkgs-pristine,
   haskell-nixpkgs-improvements,
@@ -20,9 +20,7 @@
 let
   wmctrl-pkg = pkgs.wmctrl;
 
-  pkgs-opt = if pkgs-optimised == null then pkgs else pkgs-optimised;
-
-  homeDir = osConfig.users.users.sergey.home;
+  homeDir = osConfig.sergv.user.homeDirectory;
 
   my-fonts = import ../fonts { inherit pkgs; };
 

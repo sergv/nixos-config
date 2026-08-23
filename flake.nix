@@ -164,227 +164,6 @@
     }:
     let
 
-      # In configuration.nix
-      ssh-overlay = _: old: {
-        openssh = old.openssh.overrideAttrs (old: {
-          patches = (old.patches or [ ]) ++ [ patches/openssh-disable-permission-check.patch ];
-          # Whether to run tests
-          doCheck = false;
-        });
-      };
-
-      systemd-disable-age-verification-overlay = _: old: {
-        systemd = old.systemd.override {
-          withUserDb = false;
-          withHomed = false; # homed depends on userdb
-
-          withAcl = false;
-          withApparmor = false;
-          withAudit = false;
-          withTpm2Tss = false;
-        };
-        mariadb-server = builtins.abort "don't want mariadb";
-        mariadb = builtins.abort "don't want mariadb";
-        gst-plugins-rs = builtins.abort "don't want gst-plugins-rs";
-        electron = builtins.abort "don't want electron";
-        # gnome-settings-daemon = builtins.abort "don't want grone-settings-daemon";
-        # xdg-desktop-portal-gnome = builtins.abort "don't want xdg-desktop-portal-gnome";
-        # xdg-desktop-portal-gtk = builtins.abort "don't want xdg-desktop-portal-gtk";
-      };
-
-      packages-to-optimize = [
-        # "cairo"
-        # "harfbuzz"
-        # "gtk3-x11"
-        # "tree-sitter"
-        #
-        # "isabelle"
-        #
-        # "gimp"
-        # "graphviz"
-        # "mpv"
-        # "p7zip"
-        # "strawberry"
-        # "vlc"
-        # "zstd"
-
-        # "qt6"
-        "libxcomposite"
-        "libxcursor"
-        "libxcvt"
-        "libxfixes"
-        "libxext"
-        "libxft"
-        "libxrandr"
-        "libxrender"
-        "xorg-server"
-        "xf86-input-libinput"
-        "xf86-input-evdev"
-      ];
-
-      # Build some packages with -march=znver4
-      march-overlay = arch: new: old:
-        builtins.listToAttrs (
-          builtins.map (x: {
-            name  = x;
-            value = utils.use-march-optimizations arch old (builtins.getAttr x old);
-          }) packages-to-optimize
-        )
-        // {
-
-          # kdePackages = old.kdePackages // {
-          #   mkKdeDerivation = utils.use-march-optimizations arch-zen4 old old.mkKdeDerivation;
-          #   # plasma-desktop = utils.use-march-optimizations arch-zen4 old old.kdePackages.plasma-desktop;
-          #   # kwin           = utils.use-march-optimizations arch-zen4 old old.kdePackages.kwin;
-          #   # kwin-x11       = utils.use-march-optimizations arch-zen4 old old.kdePackages.kwin-x11;
-          # };
-
-          # wineWow64Packages = old.wineWow64Packages // {
-          #   stagingFull = utils.use-march-optimizations arch-zen4 old old.wineWow64Packages.stagingFull;
-          # };
-
-          # # llvmPackages_15 = old.llvmPackages_15.extend (_: old2: {
-          # #   libllvm = old2.libllvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # #   llvm = old2.llvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # # });
-          # #
-          # # # llvmPackages_16 = old.llvmPackages_16.override {
-          # # #   stdenv = old.clangStdenv;
-          # # # };
-          # #
-          # # llvmPackages_16 = old.llvmPackages_16.extend (_: old2: {
-          # #   libllvm = old2.libllvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # #   llvm = old2.llvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # # });
-          # #
-          # # llvmPackages_17 = old.llvmPackages_17.extend (_: old2: {
-          # #   libllvm = old2.libllvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # #   llvm = old2.llvm.override (_: {
-          # #     # Cannot be built with gcc 13.2 because the compiler segfaults.
-          # #     stdenv = old.clangStdenv;
-          # #   });
-          # # });
-
-          # # libvorbis = old.libvorbis.override (_: {
-          # #
-          # #   # GCC 13.2 leads to segfault during testing. If we ignore tests
-          # #   # then other package’s tests will segfault, libvorbis is somehow not
-          # #   # functional with GCC 13.2.
-          # #   stdenv = old.clangStdenv; #old.overrideCC old.stdenv old.gcc12;
-          # #
-          # #   # Disable -march and -mtune for a package.
-          # #   # stdenv = old.stdenv.override (old2: old2 // {
-          # #   #   hostPlatform   = old2.hostPlatform // {
-          # #   #     gcc = {};
-          # #   #   };
-          # #   #   buildPlatform  = old2.buildPlatform // {
-          # #   #     gcc = {};
-          # #   #   };
-          # #   #   targetPlatform = old2.targetPlatform // {
-          # #   #     gcc = {};
-          # #   #   };
-          # #   # });
-          # # });
-
-          # # libvorbis = old.libvorbis.overrideAttrs (_: {
-          # #   # doCheck = false;
-          # # });
-
-          # gsl = old.gsl.overrideAttrs (_: {
-          #   doCheck = false;
-          # });
-
-          # tzdata = old.tzdata.overrideAttrs (_: {
-          #   doCheck = false;
-          # });
-
-          # virtualbox = old.virtualbox.overrideAttrs (old2: {
-          #   patches = (old2.patches or []) ++ [patches/vitrualbox-fix-bin2c-with-march.patch];
-          # });
-
-          # libreoffice = old.libreoffice.override (old2: {
-          #   unwrapped = old2.unwrapped.overrideAttrs (_: {
-          #     doCheck = false;
-          #   });
-          # });
-
-          # python311 = old.python311.override {
-          #   packageOverrides = _: old2: {
-          #     pandas = old2.pandas.overrideAttrs (old-pandas-attrs: {
-          #       doCheck        = false;
-          #       doInstallCheck = false;
-          #     });
-          #   };
-          # };
-
-          # qt5 = old.qt5 // {
-          #   qtwebengine = builtins.abort "Don't build qtwebengine5";
-          # };
-
-          # qt5 = old.qt5 // {
-          #   qtwebengine = old.qt5.qtwebengine.override (_: {
-          #     stdenv = new.clangStdenv;
-          #   });
-          # };
-
-        };
-
-      maybe-add-march-overlay = arch: overlays: if arch == null then overlays else overlays ++ [ (march-overlay arch) ];
-
-      # Fixes for building packages with -march=znver4
-      march-fixes-overlay = new: old: {
-
-        # libtpms = utils.disable-march-optimizations arch-zen4 old old.libtpms;
-        libtpms = old.libtpms.overrideAttrs (_: {
-          doCheck = false;
-        });
-
-        rapidjson = old.rapidjson.overrideAttrs (_: {
-          doCheck = false;
-        });
-
-        # Doesn’t build either way, easier to do without until I really need this.
-        # frei0r = utils.disable-march-optimizations arch-zen4 old old.frei0r;
-        # (old.frei0r.overrideAttrs (old: {
-        #   version = "2.5.6";
-        #   src = pkgs.fetchFromGitHub {
-        #     owner = "dyne";
-        #     repo  = "frei0r";
-        #     rev   = "530f7e6388c6931f20aa2ca9e4ea33a60df7aca7";
-        #     hash  = "sha256-EUFNPAAdsa96mYiCoLbD7v5PweU4atCsKh345zTDGo0=";
-        #   };
-        # }));
-
-        # upower = old.upower.overrideAttrs (_: {
-        #   doCheck = false;
-        # });
-
-        python313 = old.python313.override {
-          packageOverrides = _: old2: {
-            scipy = old2.scipy.overrideAttrs (old-attrs: {
-              doCheck        = false;
-              doInstallCheck = false;
-            });
-          };
-        };
-
-      };
-
       # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
       #
       # git-proxy-conf = {
@@ -405,9 +184,9 @@
         #     fetchgit-improved = old.fetchgit // {
         #       __functor = self : args :
         #         (old.fetchgit.__functor self args).overrideAttrs (oldAttrs: {
-        #           GIT_SSL_NO_VERIFY         = true;
-        #           GIT_HTTP_PROXY_AUTHMETHOD = "basic";
-        #           https_proxy               = git-proxy;
+        #           GIT_SSL_NO_VERIFY         = !git-proxy-conf.sslverify;
+        #           GIT_HTTP_PROXY_AUTHMETHOD = git-proxy-conf.proxyAuthMethod;
+        #           https_proxy               = git-proxy-conf;
         #         });
         #     };
         #
@@ -441,46 +220,48 @@
         {
           # allowBroken                    = true;
           allowUnfree = true; # For nvidia drivers.
+          warnUndeclaredOptions = true;
+
           # # May be needed for ghc windows cross-compiler but enabling it
           # # breaks cuda-pkgs - it starts pulling in wrong dependency
           # # that doesn’t build.
           # allowUnsupportedSystem         = true;
           # virtualbox.enableExtensionPack = true;
           #inherit (arch-zen4) replaceStdenv;
+
+          # Useful for proxies on WSL:
+          # gitConfigFile =
+          #   pkgs.writeText
+          #     "git-proxy-config"
+          #     ''
+          #       [http]
+          #       proxyAuthMethod = "basic"
+          #       sslverify = false
+          #
+          # hashedMirrors = [ "mirror" ];
+          #
+          # rewriteURL = url: "new-url";
         }
         // haskell-nixpkgs-improvements.config.host;
 
-      common-nixpkgs-overlays = [
-        ssh-overlay
-        systemd-disable-age-verification-overlay
+      common-nixpkgs-overlays = builtins.attrValues (import ./overlays) ++ [
         trix.overlays.default
-
         nur.overlays.default
         ksysguard6-src.overlays.default
-        # improve-fetchgit-overlay
       ];
 
       # mk-pkgs = _system: pkgs-pristine;
       mk-pkgs =
-        system: arch:
+        system:
         import nixpkgs {
           inherit system;
           # inherit (arch) localSystem;
           config   = common-nixpkgs-config;
-          overlays = maybe-add-march-overlay arch common-nixpkgs-overlays;
-        };
-
-      mk-pkgs-opt =
-        arch:
-        import nixpkgs {
-          # inherit system;
-          inherit (arch) localSystem;
-          config   = common-nixpkgs-config;
-          overlays = common-nixpkgs-overlays ++ [march-fixes-overlay];
+          overlays = common-nixpkgs-overlays;
         };
 
       home-manager-extra-args =
-        { pkgs-optimised, arch, system, ... }:
+        { arch, system, ... }:
         {
           # inherit nixpkgs-fresh-ghc;
           # NixOS will provide its own pkgs.
@@ -491,7 +272,6 @@
           inherit git-proxy-conf;
           inherit haskell-nixpkgs-improvements;
           inherit dotemacs;
-          inherit pkgs-optimised;
           inherit arch;
           inherit utils;
         };
@@ -516,6 +296,10 @@
 
       common-system-args = {
         flake-self = self;
+        sergv      = {
+          flake-self = self;
+          inherit utils;
+        };
       };
 
     in
@@ -531,9 +315,51 @@
           nixpkgs.lib.nixosSystem {
             inherit system;
             specialArgs = common-system-args;
-            pkgs        = mk-pkgs system arch;
+            pkgs        = mk-pkgs system;
 
             modules = [
+              ./modules/shared
+
+              (_: {
+                config = {
+                  sergv.native-optimizations = {
+                    enable                        = true;
+                    gccArch                       = "znver4";
+                    gccTune                       = "znver4";
+                    packages-to-optimise-globally =
+                      [
+                        # "cairo"
+                        # "harfbuzz"
+                        # "gtk3-x11"
+                        # "tree-sitter"
+                        #
+                        # "isabelle"
+                        #
+                        # "gimp"
+                        # "graphviz"
+                        # "mpv"
+                        # "p7zip"
+                        # "strawberry"
+                        # "vlc"
+                        # "zstd"
+
+                        # "qt6"
+                        "libxcomposite"
+                        "libxcursor"
+                        "libxcvt"
+                        "libxfixes"
+                        "libxext"
+                        "libxft"
+                        "libxrandr"
+                        "libxrender"
+                        "xorg-server"
+                        "xf86-input-libinput"
+                        "xf86-input-evdev"
+                      ];
+                  };
+                };
+              })
+
               ./system/compressed-root.nix
               ./system/zram-swap.nix
               ./system/home-desktop-hardware-config.nix
@@ -549,8 +375,7 @@
               (home-manager-module {
                 inherit system;
                 inherit arch;
-                pkgs-optimised = mk-pkgs-opt arch;
-                extra-mods     = [
+                extra-mods = [
                   ./home/firefox.nix
                   ./home/home-desktop-specific.nix
                 ];
@@ -566,9 +391,11 @@
           nixpkgs.lib.nixosSystem {
             inherit system;
             specialArgs = common-system-args;
-            pkgs        = mk-pkgs system arch;
+            pkgs        = mk-pkgs system;
 
             modules = [
+              ./modules/shared
+
               NixOS-WSL.nixosModules.wsl
               (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
               ./system/system-config-linux-common.nix
@@ -577,8 +404,7 @@
               home-manager.nixosModules.home-manager
               (home-manager-module {
                 inherit system arch;
-                pkgs-optimised = null;
-                extra-mods     = [
+                extra-mods = [
                   ./home/wsl-specific.nix
                 ];
               })
@@ -595,16 +421,16 @@
           nix-darwin.lib.darwinSystem {
             inherit system;
             specialArgs = common-system-args;
-            pkgs        = mk-pkgs system arch;
+            pkgs        = mk-pkgs system;
 
             modules = [
               ./system/system-config-macos.nix
 
               home-manager.darwinModules.home-manager
+
               (home-manager-module {
                 inherit system arch;
-                pkgs-optimised = null;
-                extra-mods     = [
+                extra-mods = [
                   # ./home/macos-specific.nix
                 ];
               })
@@ -626,7 +452,7 @@
       #
       #       ./home.nix
       #     ];
-      #     extraSpecialArgs = home-manager-extra-args { pkgs-optimised = pkgs-opt; };
+      #     extraSpecialArgs = home-manager-extra-args;
       #   };
       # };
     };

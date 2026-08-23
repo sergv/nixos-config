@@ -3,7 +3,9 @@ let
     arch: pkgs: stdenv:
     pkgs.overrideMkDerivationArgs (args: {
       env = (args.env or { }) // {
-        NIX_CFLAGS_COMPILE = builtins.toString (args.NIX_CFLAGS_COMPILE or "") + " -march=${arch.gccArch}";
+        NIX_CFLAGS_COMPILE =
+          builtins.toString (args.NIX_CFLAGS_COMPILE or "") +
+          " -march=${arch} -mtune=${arch}";
       };
       preferLocalBuild = true;
       allowSubstitutes = false;
@@ -13,9 +15,11 @@ let
     arch: pkgs: stdenv:
     pkgs.overrideMkDerivationArgs (args: {
       env = (args.env or { }) // {
-        NIX_CFLAGS_COMPILE = builtins.replaceStrings [ "-march=${arch.gccArch}" ] [ "" ] (
-          builtins.toString (args.NIX_CFLAGS_COMPILE or "")
-        );
+        NIX_CFLAGS_COMPILE =
+          builtins.replaceStrings
+            [ "-march=${arch}" "-mtune=${arch}" ]
+            [ "" "" ]
+            (builtins.toString (args.NIX_CFLAGS_COMPILE or ""));
       };
       preferLocalBuild = true;
       allowSubstitutes = false;
