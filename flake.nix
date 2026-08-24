@@ -295,12 +295,11 @@
         };
 
       common-system-args = isLinux: {
-        flake-self = self;
-        sergv      = {
-          flake-self = self;
+        sergv = {
           inherit utils;
-          isLinux = isLinux;
-          isDarwin = !isLinux;
+          flake-self = self;
+          isLinux    = isLinux;
+          isDarwin   = !isLinux;
         };
       };
 

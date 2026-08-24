@@ -83,6 +83,7 @@
 
           environment.shells = [ pkgs.bash ];
 
+          system.configurationRevision = sergv.flake-self.rev or sergv.flake-self.dirtyRev or null;
         }
 
         (lib.optionalAttrs sergv.isLinux

@@ -1,4 +1,4 @@
-{ config, pkgs, flake-self, ... }:
+{ config, pkgs, ... }:
 {
   # Will activate home-manager profiles for each user upon login
   # This is useful when using ephemeral installations
@@ -89,7 +89,4 @@
   security.wrappers.ksgrd_network_helper = {
     enable = pkgs.lib.mkForce false;
   };
-
-  system.configurationRevision = flake-self.rev or flake-self.dirtyRev or null;
-
 }
