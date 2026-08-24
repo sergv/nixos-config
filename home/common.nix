@@ -22,8 +22,6 @@ let
 
   homeDir = osConfig.sergv.user.homeDirectory;
 
-  my-fonts = import ../fonts { inherit pkgs; };
-
   scripts = import ../scripts {
     inherit pkgs;
     wmctrl = wmctrl-pkg;
@@ -200,6 +198,16 @@ in
     };
   };
 
+
+  # programs.git.signing.key = "~/.ssh/signing_key.pub";
+  # programs.git.signing.format = "ssh";
+  # programs.git.signing.signByDefault = true;
+
+  # todo:
+  # url."git@github.com:".pushInsteadOf = "https://github.com/";
+    # core.precomposeunicode = true;
+    # core.untrackedCache = true;
+    # core.preloadindex = true;
   programs.git = {
     enable  = true;
     signing = {
@@ -360,18 +368,6 @@ in
     };
   };
 
-  # Same as "github:NixOS/nixpkgs/nixpkgs-unstable";
-  nix.registry = {
-    "nixpkgs-unstable" = {
-      to = {
-        owner = "NixOS";
-        repo  = "nixpkgs";
-        ref   = "nixpkgs-unstable";
-        type  = "github";
-      };
-    };
-  };
-
   home.packages =
     let
       tex-pkg = (
@@ -484,7 +480,6 @@ in
     ]
     ++ builtins.attrValues dev-pkgs
     ++ builtins.attrValues all-haskell-tools
-    ++ builtins.attrValues my-fonts
     ++ builtins.attrValues scripts
 
     # Btrfs utils

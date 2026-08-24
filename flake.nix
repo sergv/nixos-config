@@ -218,8 +218,8 @@
 
       common-nixpkgs-config =
         {
-          # allowBroken                    = true;
-          allowUnfree = true; # For nvidia drivers.
+          allowUnfree = true;
+          # allowBroken = true;
           warnUndeclaredOptions = true;
 
           # # May be needed for ghc windows cross-compiler but enabling it
@@ -294,11 +294,13 @@
           };
         };
 
-      common-system-args = {
+      common-system-args = isLinux: {
         flake-self = self;
         sergv      = {
           flake-self = self;
           inherit utils;
+          isLinux = isLinux;
+          isDarwin = !isLinux;
         };
       };
 
@@ -314,7 +316,7 @@
           in
           nixpkgs.lib.nixosSystem {
             inherit system;
-            specialArgs = common-system-args;
+            specialArgs = common-system-args true;
             pkgs        = mk-pkgs system;
 
             modules = [
@@ -322,6 +324,7 @@
 
               (_: {
                 config = {
+                  sergv.system.nix-daemon-build-dir = "/builds-nix-tmp";
                   sergv.native-optimizations = {
                     enable                        = true;
                     gccArch                       = "znver4";
@@ -365,7 +368,7 @@
               ./system/home-desktop-hardware-config.nix
               (import ./system/kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
 
-              (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
+              (import ./system/system-config-common.nix)
               ./system/system-config-linux-common.nix
               ./system/system-config-home-desktop.nix
 
@@ -390,14 +393,20 @@
           in
           nixpkgs.lib.nixosSystem {
             inherit system;
-            specialArgs = common-system-args;
+            specialArgs = common-system-args true;
             pkgs        = mk-pkgs system;
 
             modules = [
               ./modules/shared
 
+              (_: {
+                config = {
+                  sergv.system.nix-daemon-build-dir = "/builds-nix-tmp";
+                };
+              })
+
               NixOS-WSL.nixosModules.wsl
-              (import ./system/system-config-common.nix { nix-daemon-build-dir = "/builds-nix-tmp"; })
+              (import ./system/system-config-common.nix)
               ./system/system-config-linux-common.nix
               ./system/system-config-wsl.nix
 
@@ -420,10 +429,12 @@
           in
           nix-darwin.lib.darwinSystem {
             inherit system;
-            specialArgs = common-system-args;
+            specialArgs = common-system-args false;
             pkgs        = mk-pkgs system;
 
             modules = [
+              ./modules/shared
+
               ./system/system-config-macos.nix
 
               home-manager.darwinModules.home-manager
