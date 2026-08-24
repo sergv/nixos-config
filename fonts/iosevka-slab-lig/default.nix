@@ -1,9 +1,10 @@
 { pkgs }:
 
-# stdenvNoCC is a packaging environment without compilers; we don't need them for fonts
+# stdenvNoCC is a packaging environment without compilers; we don't
+# need them for fonts
 pkgs.stdenvNoCC.mkDerivation {
   name = "iosevka-slab-lig";
-  version = "32.4.0";
+  version = "34.6.1";
 
   srcs = [
     ./iosevka-slab-lig-normalbolditalic.ttf
