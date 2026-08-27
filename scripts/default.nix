@@ -21,7 +21,7 @@ in
 {
   inherit reset-usb;
 
-  # Must be a clean script without mess produced wrapProgram or sg won’t work with errors like
+  # Must be a clean script without mess produced by wrapProgram or sg won’t work with errors like
   # > setgroups: Operation not permitted
   # > setgid: Operation not permitted
   no-internet = pkgs.writeScriptBin "no-internet" ''
