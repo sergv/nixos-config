@@ -265,7 +265,6 @@
             arch   = arch-zen4;
           in
           nixpkgs.lib.nixosSystem {
-            inherit system;
             specialArgs = common-system-args system true;
             pkgs        = mk-pkgs system {};
 
@@ -348,7 +347,6 @@
             arch   = null;
           in
           nixpkgs.lib.nixosSystem {
-            inherit system;
             specialArgs = common-system-args system true;
             pkgs        = mk-pkgs system (fetchgit-basic-proxy-config system);
 
@@ -397,7 +395,6 @@
             arch   = null;
           in
           nix-darwin.lib.darwinSystem {
-            inherit system;
             specialArgs = common-system-args system false;
             pkgs        = mk-pkgs system {};
 
