@@ -32,7 +32,7 @@
           networking = {
             hostName = "nixos"; # Define your hostname.
             #hostName              = ""; # Use dhcp-provided hostname.
-            networkmanager.enable = true;
+            # networkmanager.enable = true;
             # wireless.enable       = true;  # Enables wireless support via wpa_supplicant.
 
             # Prefer eth0 to eno1 and the like.
@@ -41,6 +41,8 @@
             nameservers = [
               # Todo, e.g. "8.8.8.8"
             ];
+
+            proxy.noProxy = "127.0.0.1,localhost";
           };
 
           systemd = {
@@ -63,7 +65,6 @@
                 };
                 wantedBy = [ "sysinit.target" ];
               };
-
             };
           };
 

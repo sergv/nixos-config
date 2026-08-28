@@ -8,7 +8,8 @@
       type        = lib.types.nullOr (lib.types.submodule {
         options = {
           proxy = lib.mkOption {
-            type        = lib.types.str;
+            type        = lib.types.nullOr lib.types.str;
+            default     = config.networking.proxy.default;
             example     = "http://LOGIN:PASSWORD@HOST:PORT";
             description = "Proxy URL";
           };

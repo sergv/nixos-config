@@ -379,7 +379,9 @@
                   # will be set automatically
                   #   sslCAInfo       = "path";
                   #   sslCAPath       = "path";
-                  sergv.programs.git.proxy          = builtins.warn ("WSL proxy not set in " + __curPos.file) null;
+                  sergv.programs.git.proxy          = builtins.warn ("WSL git proxy not set in " + __curPos.file) null;
+
+                  networking.proxy.default          = builtins.warn ("WSL proxy not set in " + __curPos.file) null;
 
                   sergv.wsl.certificate-file        = builtins.warn ("WSL certificate file not set in " + __curPos.file) null;
                 };
