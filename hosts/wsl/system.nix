@@ -102,8 +102,8 @@
         (lib.mkIf (config.sergv.wsl.certificate-file != null)
           {
             security.pki.certificateFiles = [ config.sergv.wsl.certificate-file ];
-            sergv.programs.git.proxy.sslCAInfo = config.sergv.wsl.certificate-file;
-            sergv.programs.git.proxy.sslCAPath = config.sergv.wsl.certificate-file;
+            sergv.programs.git.proxy.sslCAInfo = builtins.toString config.sergv.wsl.certificate-file;
+            sergv.programs.git.proxy.sslCAPath = builtins.toString config.sergv.wsl.certificate-file;
 
             # Not strictly required: default nixpkgs setup seems to be enough.
             # systemd.services =

@@ -27,12 +27,12 @@
           };
 
           sslCAInfo = lib.mkOption {
-            type        = lib.types.path;
+            type        = lib.types.str;
             description = "Path to certificate file";
           };
 
           sslCAPath = lib.mkOption {
-            type        = lib.types.path;
+            type        = lib.types.str;
             description = "Path to certificate file";
           };
         };
