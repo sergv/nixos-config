@@ -2,15 +2,8 @@
 #
 # This module provides system-wide configuration that applies to both NixOS and Darwin systems.
 # It includes Nix configuration, fonts, environment variables, and shell setup.
+{ config, lib, pkgs, sergv, ... }:
 {
-  config,
-  lib,
-  pkgs,
-  sergv,
-  ...
-}:
-{
-
   config =
     lib.mkMerge
       [
@@ -65,6 +58,9 @@
                   nrBuildUsers = 4;
                 })
             ];
+
+          # The platform the configuration will be used on.
+          nixpkgs.hostPlatform = sergv.host-platform;
 
           environment.systemPackages =
             [

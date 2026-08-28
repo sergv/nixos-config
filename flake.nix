@@ -138,7 +138,7 @@
   };
 
   outputs =
-    {
+    inputs@{
       self,
       nixpkgs-20-03,
       nixpkgs-20-09,
@@ -164,35 +164,6 @@
     }:
     let
 
-      # git-proxy = "http://LOGIN:PASSWORD@HOST:PORT";
-      #
-      # git-proxy-conf = {
-      #   proxy           = git-proxy;
-      #   sslCAInfo       = "path";
-      #   sslCAPath       = "path";
-      #   sslverify       = false;
-      #   proxyAuthMethod = "basic";
-      # };
-
-      git-proxy-conf = { };
-
-      # Make git invoked via nixpkgs’s fetchgit work behind proxy.
-      improve-fetchgit-overlay = final: old: {
-        # fetchgit =
-        #   let
-        #     # From https://stackoverflow.com/questions/58169512/call-fetchgit-without-ssl-verify
-        #     fetchgit-improved = old.fetchgit // {
-        #       __functor = self : args :
-        #         (old.fetchgit.__functor self args).overrideAttrs (oldAttrs: {
-        #           GIT_SSL_NO_VERIFY         = !git-proxy-conf.sslverify;
-        #           GIT_HTTP_PROXY_AUTHMETHOD = git-proxy-conf.proxyAuthMethod;
-        #           https_proxy               = git-proxy-conf;
-        #         });
-        #     };
-        #
-        #   in fetchgit-improved;
-      };
-
       # Mostly for chromium. Never switch to -march=native, the point is to avoid
       # prohibitively expensive builds.
       mk-pkgs-pristine =
@@ -208,7 +179,6 @@
           # # cache.
           # overlays = [
           #   # ssh-overlay
-          #   # improve-fetchgit-overlay
           #   # haskell-nixpkgs-improvements.overlay.enable-ghc-unit-ids
           # ];
         };
@@ -229,14 +199,6 @@
           # virtualbox.enableExtensionPack = true;
           #inherit (arch-zen4) replaceStdenv;
 
-          # Useful for proxies on WSL:
-          # gitConfigFile =
-          #   pkgs.writeText
-          #     "git-proxy-config"
-          #     ''
-          #       [http]
-          #       proxyAuthMethod = "basic"
-          #       sslverify = false
           #
           # hashedMirrors = [ "mirror" ];
           #
@@ -244,65 +206,54 @@
         }
         // haskell-nixpkgs-improvements.config.host;
 
+      # Useful for proxies on WSL:
+      fetchgit-basic-proxy-config =
+        system:
+        {
+          gitConfigFile =
+            nixpkgs.legacyPackages."${system}".writeText
+              "git-basic-proxy-config"
+              ''
+                [http]
+                  proxyAuthMethod = "basic"
+                  sslverify = false
+              '';
+        };
+
       common-nixpkgs-overlays = builtins.attrValues (import ./overlays) ++ [
         trix.overlays.default
         nur.overlays.default
-        ksysguard6-src.overlays.default
       ];
 
       # mk-pkgs = _system: pkgs-pristine;
       mk-pkgs =
-        system:
+        system: extra-config:
         import nixpkgs {
           inherit system;
           # inherit (arch) localSystem;
-          config   = common-nixpkgs-config;
+          config   = common-nixpkgs-config // extra-config;
           overlays = common-nixpkgs-overlays;
         };
 
-      home-manager-extra-args =
-        { arch, system, ... }:
-        {
-          # inherit nixpkgs-fresh-ghc;
-          # NixOS will provide its own pkgs.
-          # inherit pkgs;
-          inherit system;
-          pkgs-pristine = mk-pkgs-pristine system;
-          inherit arkenfox;
-          inherit git-proxy-conf;
-          inherit haskell-nixpkgs-improvements;
-          inherit dotemacs;
-          inherit arch;
-          inherit utils;
-        };
+      icons    = import ./icons;
+      packages = import ./packages;
 
-      home-manager-module =
-        args@{ extra-mods, system, ... }:
-        {
-          home-manager = {
-            useGlobalPkgs    = true;
-            useUserPackages  = true;
-            extraSpecialArgs = home-manager-extra-args args;
-            users.sergey = {
-              imports =
-                [
-                  ./home/common.nix
-                  ./isabelle/isabelle-module.nix
-                ] ++
-                extra-mods;
-            };
-          };
-        };
-
-      common-system-args = isLinux: {
-        sergv = {
-          inherit utils;
-          flake-self = self;
-          isLinux    = isLinux;
-          isDarwin   = !isLinux;
-        };
+      common-user-config = _: {
+        sergv.programs.git.enable           = true;
+        sergv.programs.isabelle.enable      = true;
+        sergv.desktop.dev.host-ghc-versions = ["default" "ghc912" "ghc910"];
       };
 
+      common-system-args = system: isLinux: {
+        sergv = {
+          inherit utils inputs icons packages;
+          flake-self    = self;
+          isLinux       = isLinux;
+          isDarwin      = !isLinux;
+          hostPlatform  = if isLinux then "x86_64-linux" else "aarch64-darwin";
+          pkgs-pristine = mk-pkgs-pristine system;
+        };
+      };
     in
     {
 
@@ -315,15 +266,40 @@
           in
           nixpkgs.lib.nixosSystem {
             inherit system;
-            specialArgs = common-system-args true;
-            pkgs        = mk-pkgs system;
+            specialArgs = common-system-args system true;
+            pkgs        = mk-pkgs system {};
 
             modules = [
               ./modules/shared
+              ./modules/linux
+              ./hosts/home
+
+              common-user-config
 
               (_: {
                 config = {
-                  sergv.system.nix-daemon-build-dir = "/builds-nix-tmp";
+                  sergv.system.nix-daemon-build-dir          = "/builds-nix-tmp";
+
+                  sergv.system.compressed-root.enable        = true;
+                  sergv.system.zram-swap.enable              = true;
+
+                  sergv.system.kde.enable                    = true;
+                  sergv.programs.ksysguard.enable            = true;
+
+                  sergv.system.nvidia.enable                 = true;
+                  sergv.system.optimized-linux-kernel.enable = true;
+                  sergv.persistence.enable                   = true;
+
+                  sergv.programs.firefox.enable              = true;
+                  sergv.programs.no-internet.enable          = true;
+
+                  sergv.desktop.keybindings.enable           = true;
+
+                  sergv.i2p.enable                           = true;
+                  sergv.tor.enable                           = true;
+                  sergv.tor.nickname                         = builtins.warn ("Tor nickname not set in " + __curPos.file) "todo";
+                  sergv.tor.email                            = builtins.warn ("Tor email not set in " + __curPos.file) "todo@example.com";
+
                   sergv.native-optimizations = {
                     enable                        = true;
                     gccArch                       = "znver4";
@@ -362,26 +338,7 @@
                 };
               })
 
-              ./system/compressed-root.nix
-              ./system/zram-swap.nix
-              ./system/home-desktop-hardware-config.nix
-              (import ./system/kernel.nix { inherit bore-scheduler-src kernel-march-patches linuk-tkg-src; })
-
-              (import ./system/system-config-common.nix)
-              ./system/system-config-linux-common.nix
-              ./system/system-config-home-desktop.nix
-
-              (import ./system/volatile-root.nix { inherit impermanence; })
-
               home-manager.nixosModules.home-manager
-              (home-manager-module {
-                inherit system;
-                inherit arch;
-                extra-mods = [
-                  ./home/firefox.nix
-                  ./home/home-desktop-specific.nix
-                ];
-              })
             ];
           };
 
@@ -392,29 +349,42 @@
           in
           nixpkgs.lib.nixosSystem {
             inherit system;
-            specialArgs = common-system-args true;
-            pkgs        = mk-pkgs system;
+            specialArgs = common-system-args system true;
+            pkgs        = mk-pkgs system (fetchgit-basic-proxy-config system);
 
             modules = [
               ./modules/shared
+              ./modules/linux
+              ./hosts/wsl
 
               (_: {
                 config = {
                   sergv.system.nix-daemon-build-dir = "/builds-nix-tmp";
+                  sergv.persistence.enable          = false;
+                  sergv.programs.ksysguard.enable   = true;
+                  sergv.programs.no-internet.enable = true;
+
+                  sergv.desktop.keybindings.enable  = false;
+
+                  sergv.programs.git.enable         = true;
+                  sergv.user.gpgKey                 = null;
+
+                  # sergv.user.name                   = builtins.warn ("WSL user name not set in " + __curPos.file) "todo";
+                  sergv.user.fullName               = builtins.warn ("WSL full user name not set in " + __curPos.file) "todo";
+                  sergv.user.email                  = builtins.warn ("WSL user email not set in " + __curPos.file) "todo@example.com";
+
+                  # {
+                  #   proxy           = "http://LOGIN:PASSWORD@HOST:PORT";
+                  #   sslverify       = false;
+                  #   proxyAuthMethod = "basic";
+                  # };
+                  # will be set automatically
+                  #   sslCAInfo       = "path";
+                  #   sslCAPath       = "path";
+                  sergv.programs.git.proxy          = builtins.warn ("WSL proxy not set in " + __curPos.file) null;
+
+                  sergv.wsl.certificate-file        = builtins.warn ("WSL certificate file not set in " + __curPos.file) null;
                 };
-              })
-
-              NixOS-WSL.nixosModules.wsl
-              (import ./system/system-config-common.nix)
-              ./system/system-config-linux-common.nix
-              ./system/system-config-wsl.nix
-
-              home-manager.nixosModules.home-manager
-              (home-manager-module {
-                inherit system arch;
-                extra-mods = [
-                  ./home/wsl-specific.nix
-                ];
               })
             ];
           };
@@ -428,22 +398,14 @@
           in
           nix-darwin.lib.darwinSystem {
             inherit system;
-            specialArgs = common-system-args false;
-            pkgs        = mk-pkgs system;
+            specialArgs = common-system-args system false;
+            pkgs        = mk-pkgs system {};
 
             modules = [
               ./modules/shared
+              ./modules/darwin
 
-              ./system/system-config-macos.nix
-
-              home-manager.darwinModules.home-manager
-
-              (home-manager-module {
-                inherit system arch;
-                extra-mods = [
-                  # ./home/macos-specific.nix
-                ];
-              })
+              common-user-config
             ];
           };
       };

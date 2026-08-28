@@ -19,13 +19,8 @@
       description = "User email address";
     };
 
-    workEmail = lib.mkOption {
-      type        = lib.types.str;
-      description = "Work email address";
-    };
-
     gpgKey = lib.mkOption {
-      type        = lib.types.str;
+      type        = lib.types.nullOr lib.types.str;
       default     = "47E4DA2E6A3F58FE3F0198F4D6CD29530F98D6B8";
       description = "User GPG key";
     };

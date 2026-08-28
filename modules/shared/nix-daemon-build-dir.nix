@@ -4,7 +4,7 @@
     nix-daemon-build-dir = lib.mkOption {
       type        = lib.types.nullOr lib.types.str;
       default     = null;
-      description = "Where nix-daemon will put builds on Linux";
+      description = "Where nix-daemon will perform builds";
     };
   };
 
