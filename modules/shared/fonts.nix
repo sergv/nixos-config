@@ -6,7 +6,7 @@
         {
           packages =
             let
-              my-fonts = import ../../fonts { inherit pkgs; };
+              my-fonts = import sergv.packages.fonts { inherit pkgs; };
             in
             builtins.attrValues my-fonts;
         }

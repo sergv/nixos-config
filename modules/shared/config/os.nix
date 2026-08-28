@@ -17,10 +17,10 @@
     persistence = {
       enable = lib.mkEnableOption "Enable persistence/impermanence";
 
-      dataPrefix = lib.mkOption {
+      permanent-storage-path = lib.mkOption {
         type        = lib.types.str;
         default     = "/permanent";
-        description = "Prefix for persistent data storage";
+        description = "Where real data is located";
       };
     };
   };
@@ -28,7 +28,5 @@
   config.sergv = {
     isLinux  = pkgs.stdenv.isLinux;
     isDarwin = pkgs.stdenv.isDarwin;
-
-    persistence.enable = lib.mkDefault config.sergv.isLinux;
   };
 }
