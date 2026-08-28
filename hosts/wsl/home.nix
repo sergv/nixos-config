@@ -20,7 +20,7 @@
     };
 
     home.packages = [
-      pkgs.maxima
+      # pkgs.maxima
     ];
   };
 }
