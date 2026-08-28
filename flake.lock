@@ -133,6 +133,7 @@
     },
     "dotemacs": {
       "inputs": {
+        "emacs-src": "emacs-src",
         "haskell-nixpkgs-improvements": [
           "haskell-nixpkgs-improvements"
         ],
@@ -144,16 +145,33 @@
         ]
       },
       "locked": {
-        "lastModified": 1786190750,
-        "narHash": "sha256-tgtSIfA7o5/tj8EtCVivRddMi/hkAXPGTGPY3CQcdEQ=",
+        "lastModified": 1787867580,
+        "narHash": "sha256-E0uuFN7f8MrgC1CO17+N9PGpoyWg86N06V8DKH5kMb8=",
         "owner": "sergv",
         "repo": "dotemacs",
-        "rev": "11eb3818fe7f394b9fc5665c36b4c2f2df6810f4",
+        "rev": "fb17ce63aa57b358f6cb6b332f1eb2ec66f78e32",
         "type": "github"
       },
       "original": {
         "owner": "sergv",
         "repo": "dotemacs",
+        "type": "github"
+      }
+    },
+    "emacs-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787258858,
+        "narHash": "sha256-bOoTZbinie1mQcclowd97YEzjXwwRIJuwRJEwFu8Mb8=",
+        "owner": "sergv",
+        "repo": "emacs",
+        "rev": "1ccf96b3617c24d49eefd885852c5d03d1e22d9c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sergv",
+        "ref": "dev-30",
+        "repo": "emacs",
         "type": "github"
       }
     },
