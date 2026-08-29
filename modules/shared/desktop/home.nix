@@ -49,16 +49,21 @@
       # (pkgs.lib.attrsets.unionOfDisjoint haskell-tools.ghc.host haskell-tools.ghc.cross-win);
 
       dev-pkgs = import ./dev-pkgs.nix {
-        inherit sergv;
+        inherit sergv lib;
         pkgs = pkgs-opt;
       };
 
-      emacs = (sergv.inputs.dotemacs.lib.mk-emacs-config {
+      select-emacs = x:
+        if sergv.isDarwin
+        then x.bytecode
+        else x.native;
+
+      emacs = select-emacs (sergv.inputs.dotemacs.lib.mk-emacs-config {
         inherit (pkgs) system;
         inherit haskell-tools;
         arch = config.sergv.native-optimizations.gccArch;
         pkgs = pkgs-opt;
-      }).native;
+      });
 
     in
     {
@@ -119,7 +124,10 @@
           enable           = true;
           defaultCacheTtl  = 3600000000;
           maxCacheTtl      = 3600000000;
-          pinentry.package = sergv.pkgs-pristine.pinentry-qt;
+          pinentry.package =
+            if sergv.isDarwin
+            then pkgs.pinentry_mac
+            else sergv.pkgs-pristine.pinentry-qt;
         };
 
         dconf.settings = {
@@ -182,34 +190,22 @@
               d.uk
             ]))
             # pkgs.autoconf
-            pkgs.baobab
             # pkgs.ccache
             # pkgs.clang
             # pkgs.clang-tools
             pkgs.clinfo
             pkgs.cloc
             # pkgs.coq
-            pkgs.cpu-x
             pkgs.curl
-            pkgs.dmidecode
             pkgs.file
             pkgs.findutils
-            pkgs.gimp
-            pkgs.gparted
             pkgs-opt.graphviz
             pkgs-opt.htop
             pkgs.imagemagick
-            #pkgs.inkscape
-            pkgs.iotop
-            pkgs.kdePackages.ark
-            pkgs.kdePackages.filelight # Disk usage visualization tool, alternative to baobab
-            pkgs.kdePackages.okular
-            pkgs.kdePackages.oxygen-icons
             pkgs.lsof
             pkgs-opt.lzip
             pkgs-opt.lzop
             pkgs-opt.mc
-            pkgs.mesa-demos
             pkgs.nix-index
             pkgs-opt.p7zip
 
@@ -226,8 +222,6 @@
             # pkgs.yasm
             pkgs-opt.zstd
             # pkgs.z3
-
-            pkgs.xd
 
             pkgs-opt.nix-diff
 
