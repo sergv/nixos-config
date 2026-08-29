@@ -403,6 +403,7 @@
             modules = [
               ./modules/shared
               ./modules/darwin
+              ./hosts/macbook
 
               common-user-config
             ];
