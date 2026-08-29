@@ -1,4 +1,4 @@
-{ sergv, pkgs }:
+{ lib, pkgs, sergv }:
 {
   gcc = pkgs.gcc;
   # Conflicts with gcc regarding ld.gold
@@ -20,8 +20,9 @@
   diffutils       = pkgs.diffutils;
   gdb             = pkgs.gdb;
   gnumake         = pkgs.gnumake;
-  libtree         = pkgs.libtree;
   patchelf        = pkgs.patchelf;
   pkg-config      = pkgs.pkg-config;
   universal-ctags = pkgs.universal-ctags;
+} // lib.optionalAttrs sergv.isLinux {
+  libtree = pkgs.libtree;
 }

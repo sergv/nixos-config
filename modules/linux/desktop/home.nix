@@ -17,6 +17,29 @@
         "L+ ${config.sergv.user.homeDirectory}/.emacs.d/compiled 0755 -      -     - /tmp/cache/emacs"
       ];
 
+      programs.bash.shellAliases = {
+        "disk-usage" = ''if command -v filelight >/dev/null 2>&1 then filelight; elif command -v baobab >/dev/null 2>&1; then nohup dbus-run-session baobab >/dev/null; else echo "Cannot find neither filelight nor baobab executables to show disk usage" >&2; fi'';
+      };
+
+      home.packages =
+        [
+          pkgs.baobab
+          pkgs.cpu-x
+          pkgs.dmidecode
+          pkgs.gimp
+          pkgs.gparted
+          #pkgs.inkscape
+          pkgs.iotop
+
+          pkgs.kdePackages.ark
+          pkgs.kdePackages.filelight # Disk usage visualization tool, alternative to baobab
+          pkgs.kdePackages.okular
+          pkgs.kdePackages.oxygen-icons
+
+          pkgs.mesa-demos
+
+          pkgs.xd
+        ];
     };
   };
 }

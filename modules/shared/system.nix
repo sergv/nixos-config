@@ -77,8 +77,6 @@
           programs.bash.enable = true;
           programs.bash.completion.enable = true;
 
-          environment.shells = [ pkgs.bash ];
-
           system.configurationRevision = sergv.flake-self.rev or sergv.flake-self.dirtyRev or null;
         }
 

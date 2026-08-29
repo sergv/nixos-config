@@ -70,6 +70,9 @@
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment = {
+
+    shells = [ pkgs.bash ];
+
     systemPackages = [
       pkgs.alsa-tools
       pkgs.alsa-utils

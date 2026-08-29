@@ -406,6 +406,14 @@
               ./hosts/macbook
 
               common-user-config
+
+              # (_: {
+              #     sergv.native-optimizations = {
+              #       enable                        = true;
+              #       gccArch                       = "apple-m5";
+              #       gccTune                       = "apple-m5";
+              #     };
+              # })
             ];
           };
       };
