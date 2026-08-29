@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /usr/bin/env bash
 #
 # File: long-rebuild.sh
 #
@@ -7,26 +7,68 @@
 
 # treat undefined variable substitutions as errors
 set -u
+# propagate errors from all parts of pipes
+set -o pipefail
 
-# if [[ "$EUID" != 0 ]] ; then
-#   echo "This must be run as root!"
-#   exit 1
-# fi
+[[ ! -v TMPDIR ]] && export TMPDIR=/tmp/nix-daemon
+[[ ! -v TEMPDIR ]] && export TEMPDIR=/tmp/nix-daemon
 
-export TMPDIR=/tmp/nix-daemon
-export TEMPDIR=/tmp/nix-daemon
+# ssh-agent
+# ssh-add /home/sergey/.ssh/nix-cache-ro.key
+# --option extra-substituters ssh://nix-ssh@192.168.1.226?trusted=true
 
-# export NIX_BUILD_CORES="10"
-# export NINJAFLAGS="-j10 -l10"
-#
-# nixos-rebuild build --flake .#home --verbose --max-jobs 1 --cores 10 --keep-going "${@}"
-# # # Consider this instead because things like qtwebkit can require around 40gb of RAM (on 32 cores, perhaps less is better).
-# # nixos-rebuild build --flake .#home --verbose --max-jobs 1 --cores 32 --keep-going "${@}"
+# nix build .#nixosConfigurations."wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j4 --cores 16 --keep-going "${@}"
 
-cores="16"
+declare -a targets
+declare -a opts
+targets=()
+opts=()
+
+for x in "${@}"; do
+    case "$x" in
+        "macbook" )
+            targets+=(".#darwinConfigurations.\"${x}\".config.system.build.toplevel")
+            ;;
+        "home" | "wsl" )
+            targets+=(".#nixosConfigurations.\"${x}\".config.system.build.toplevel")
+            ;;
+        * )
+            opts+=("$x")
+            ;;
+    esac
+done
+
+if [[ "${#targets[@]}" == 0 ]]; then
+    echo "No targets" >&2
+    exit 1
+fi
+
+cores="1"
+jobs="1"
+if [[ -v NIX_BUILD_CORES ]]; then
+    cores="$NIX_BUILD_CORES"
+else
+    cores="$(getconf _NPROCESSORS_ONLN)"
+    if [[ "$OSTYPE" == "linux-gnu" ]] && command -v lscpu >/dev/null 2>&1; then
+        threads_per_core=$(lscpu | awk '/^ *Thread\(s\) per core:/ { print $NF; }')
+        cores=$(( "$cores" / "$threads_per_core" ))
+        # cores=$(lscpu | awk 'BEGIN { cores = 0; threads = 0; } /^ *CPU\(s\):/ { cores = $NF; } /^ *Thread\(s\) per core:/ { threads = $NF; } END { print (cores / threads); }')
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        cores="$cores"
+        # cores=$(sysctl machdep.cpu.core_count | cut -w -f2)
+    elif [[ -e /proc/cpuinfo ]]; then
+        cores="$(awk '/processor/' /proc/cpuinfo | wc -l)"
+    fi
+fi
 
 export NIX_BUILD_CORES="$cores"
 export NINJAFLAGS="-j$cores -l$cores"
 
-# nix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j1 --cores $cores --keep-going "${@}"
-trix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result -j1 --cores $cores --keep-going "${@}"
+nix build --out-link /tmp/nixos-rebuild-result/result --verbose -j "$jobs" --cores "$cores" --keep-going "${targets[@]}" "${opts[@]}"
+
+
+# trix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result -j2 --cores 16 --keep-going "${@}" "${@}"
+
+# exec ./apply-system.sh build "${@}"
+
+
