@@ -1,38 +1,200 @@
 _:
 {
   config = {
-    security.pam.services.sudo_local.touchIdAuth = true;
+
+    security.pam.services.sudo_local = {
+      enable      = true;
+      touchIdAuth = true;
+      reattach    = true;
+    };
 
     # Used for backwards compatibility, please read the changelog before changing.
     # $ darwin-rebuild changelog
     system.stateVersion = 6;
 
-    # system.defaults = {
-    #   dock = {
-    #     autohide = true;
-    #     mru-spaces = false;
-    #     show-recents = false;
-    #   };
-    #   finder = {
-    #     FXEnableExtensionChangeWarning = false;
-    #     _FXShowPosixPathInTitle = true;
-    #   };
-    #   NSGlobalDomain = {
-    #     AppleShowAllExtensions = true;
-    #     AppleInterfaceStyleSwitchesAutomatically = true;
-    #     NSDocumentSaveNewDocumentsToCloud = false;
-    #   };
-    #   CustomUserPreferences."com.apple.desktopservices" = {
-    #     DSDontWriteNetworkStores = true;
-    #     DSDontWriteUSBStores = true;
-    #   };
-    # };
+    # nix.extraOptions = ''
+    #   gc-keep-derivations = true
+    #   gc-keep-outputs = true
+    #   min-free = 17179870000
+    #   max-free = 17179870000
+    #   log-lines = 128
+    # '';
+
+    system.defaults = {
+      # dock = {
+      #   autohide = true;
+      #   mru-spaces = false;
+      #   show-recents = false;
+      # };
+
+      LaunchServices.LSQuarantine = false;
+
+      dock = {
+        # Whether to automatically rearrange spaces based on most recent use
+        mru-spaces                = false;
+
+        autohide                  = true; # automatically put away the dock when not in use
+        orientation               = "left";
+        mineffect                 = "scale"; # set the minimization animation to scaling
+        minimize-to-application   = true; # minimize to app icon
+        # show-process-indicators   = false; # do not show process indicators
+        # show-recents              = false; # do not show recent applications
+        expose-animation-duration = 0.0; # dock resize time
+        autohide-time-modifier    = 0.0;
+        autohide-delay            = 0.5;
+
+        wvous-tr-corner           = 3; # top right hot corner displays all windows of focused app
+        wvous-tl-corner           = 1; # top left hot corner is disabled
+        wvous-br-corner           = 1; # bottom right hot corner is disabled
+        wvous-bl-corner           = 1; # bottom left hot corner is disabled
+      };
+
+      WindowManager = {
+        EnableStandardClickToShowDesktop = false; # clicking the desktop will not put the windows out of the way
+        # StandardHideDesktopIcons=true; # hide icons on desktop
+      };
+
+      finder = {
+        _FXShowPosixPathInTitle        = true;
+        NewWindowTarget                = "Desktop"; # open new finder windows at ~/Desktop
+        CreateDesktop                  = false; # do not show icons on Desktop
+        AppleShowAllExtensions         = true; # show all file extensions by default
+        AppleShowAllFiles              = true; # show dotfiles
+        FXEnableExtensionChangeWarning = false; # do not show warnings when changing file extensions
+        FXPreferredViewStyle           = "icnv"; # list folder contents as icons
+        ShowPathbar                    = true; # show the pathbar
+        ShowStatusBar                  = true; # show statusbar
+        _FXEnableColumnAutoSizing      = true; # automatically expand columns to fit filenames
+      };
+
+      trackpad = {
+        Clicking                = true;
+        TrackpadRightClick      = true;
+        TrackpadThreeFingerDrag = false;
+      };
+
+      NSGlobalDomain = {
+        AppleShowAllExtensions                   = true;
+        AppleInterfaceStyleSwitchesAutomatically = true;
+        NSDocumentSaveNewDocumentsToCloud        = false;
+
+        _HIHideMenuBar                           = true;
+        AppleTemperatureUnit                     = "Celsius";
+        AppleICUForce24HourTime                  = true;
+        AppleMetricUnits                         = 1;
+        AppleMeasurementUnits                    = "Centimeters";
+        AppleInterfaceStyle                      = "Dark";
+        # May be useful, need to confirm first.
+        # NSDisableAutomaticTermination          = true;
+        AppleShowScrollBars                      = "WhenScrolling";
+        AppleIconAppearanceTheme                 = "RegularDark";
+        AppleFontSmoothing                       = 2;
+        AppleEnableMouseSwipeNavigateWithScrolls = true;
+        AppleEnableSwipeNavigateWithScrolls      = true;
+        ApplePressAndHoldEnabled                 = false;
+        NSAutomaticCapitalizationEnabled         = false;
+        NSAutomaticInlinePredictionEnabled       = false;
+        NSAutomaticDashSubstitutionEnabled       = false;
+        NSAutomaticPeriodSubstitutionEnabled     = false;
+        NSAutomaticQuoteSubstitutionEnabled      = false;
+        NSAutomaticSpellingCorrectionEnabled     = false;
+        NSScrollAnimationEnabled                 = true; # enable smooth scrolling
+        NSNavPanelExpandedStateForSaveMode       = true; # always use the expanded save panel
+        NSNavPanelExpandedStateForSaveMode2      = true; # always use the expanded save panel
+        AppleScrollerPagingBehavior              = true; # jump to the clicked section when clicked on scrollbar
+        InitialKeyRepeat                         = 10;
+        KeyRepeat                                = 1; # faster key repeat
+
+        # 3 allows Tab key navigation through all UI elements including buttons, checkboxes, and other controls in dialogs.
+        AppleKeyboardUIMode = 3;
+      };
+
+      CustomUserPreferences = {
+        "com.apple.desktopservices" = {
+          # Avoid creating .DS_Store files on network or USB volumes
+          DSDontWriteNetworkStores = true;
+          DSDontWriteUSBStores     = true;
+        };
+
+        # "com.apple.symbolichotkeys" = {
+        #   AppleSymbolicHotKeys = {
+        #     # disable "save picture of screen as a file" (cmd + shift + 3)
+        #     "28" = { enabled = false; };
+        #     # disable "copy picture of screen to the clipboard" (ctrl + cmd + shift + 3)
+        #     "29" = { enabled = false; };
+        #     # disable "save picture of selected area as a file" (cmd + shift + 4)
+        #     "30" = { enabled = false; };
+        #     # disable "copy picture of selected area to the clipboard" (ctrl + cmd + shift + 4)
+        #     "31" = { enabled = false; };
+        #     # disable "screenshot and recording options" (cmd + shift + 5)
+        #     "184" = { enabled = false; };
+        #
+        #     "64" = {
+        #       enabled = false;
+        #       value = {
+        #         parameters = [ 32 49 1048576 ];
+        #         type = "standard";
+        #       };
+        #     };
+        #   };
+        # };
+      };
+
+      # hitoolbox.AppleFnUsageType = "Do Nothing"; # fn key does nothing.
+      SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false; # disable automatic software updates
+      spaces.spans-displays = false; # displays have seperate spaces = true (its counter-intuitive)
+
+    };
+
+
+    # Disable Spotlight metadata collection.
+    system.activationScripts.disableSpotlight.text = ''
+      mdutil -i off -d /
+      mdutil -E /
+    '';
+
+
+    # system.activationScripts.postActivation.text = ''
+    #   echo "Purging .DS_Store files from configuration tree..."
+    #   find /Users/hadal84/nix-darwin -name ".DS_Store" -type f -delete
+    # '';
+
+    # system.activationScripts.afterActivation.text = ''
+    #   # Following line should allow us to avoid a logout/login cycle
+    #   sudo /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    # '';
+
+    system.keyboard = {
+      enableKeyMapping = true;  # enable key mapping so that we can use `option` as `control`
+
+      # NOTE: do NOT support remap capslock to both control and escape at the same time
+      remapCapsLockToControl = false;  # remap caps lock to control, useful for emac users
+      remapCapsLockToEscape  = true;   # remap caps lock to escape, useful for vim users
+
+      # # swap left command and left alt
+      # # so it matches common keyboard layout: `ctrl | command | alt`
+      # #
+      # # disabled, caused only problems!
+      # swapLeftCommandAndLeftAlt = false;
+    };
 
     # programs.bash.initExtra = lib.mkAfter ''
     #   if [ "$(ulimit -n)" -lt 10240 ]; then
     #     ulimit -n 65536 2>/dev/null || ulimit -n 10240
     #   fi
     # '';
+
+    launchd.daemons.sysctl-max-files = {
+      serviceConfig = {
+        Label = "org.nixos.sysctl-max-files";
+        ProgramArguments = [
+          "/bin/sh"
+          "-c"
+          "/usr/sbin/sysctl -w kern.maxfiles=1048576 kern.maxfilesperproc=524288 && /bin/launchctl limit maxfiles 65536 524288"
+        ];
+        RunAtLoad = true;
+      };
+    };
 
     # # Fully declarative dock using the latest from Nix Store
     # local = {
