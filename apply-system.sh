@@ -27,14 +27,36 @@ shift
 # force nixos-rebuild to use nix-daemon
 # NIX_REMOTE=daemon
 
-system_name="home"
-jobs="4"
-cores="8"
+cores="1"
+jobs="1"
+if [[ -v NIX_BUILD_CORES ]]; then
+    cores="$NIX_BUILD_CORES"
+else
+    cores="$(getconf _NPROCESSORS_ONLN)"
+    if [[ "$OSTYPE" == "linux-gnu" ]] && command -v lscpu >/dev/null 2>&1; then
+        threads_per_core=$(lscpu | awk '/^ *Thread\(s\) per core:/ { print $NF; }')
+        cores=$(( "$cores" / "$threads_per_core" ))
+        # cores=$(lscpu | awk 'BEGIN { cores = 0; threads = 0; } /^ *CPU\(s\):/ { cores = $NF; } /^ *Thread\(s\) per core:/ { threads = $NF; } END { print (cores / threads); }')
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        cores="$cores"
+        # cores=$(sysctl machdep.cpu.core_count | cut -w -f2)
+    elif [[ -e /proc/cpuinfo ]]; then
+        cores="$(awk '/processor/' /proc/cpuinfo | wc -l)"
+    fi
+fi
+
 export NIX_BUILD_CORES="$cores"
 export NINJAFLAGS="-j$cores -l$cores"
 
+system_name="home"
+rebuild="nixos-rebuild"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    system_name="macbook"
+    rebuild="darwin-rebuild"
+fi
+
 # --verbose
-nixos-rebuild "${command}" --flake ".#${system_name}" --keep-going --cores "$cores" --max-jobs "$jobs" "${@}"
+"$rebuild" "${command}" --flake ".#${system_name}" --keep-going --cores "$cores" --max-jobs "$jobs" "${@}"
 
 # nixos-rebuild build --flake .#home --verbose --keep-going "${@}"
 # nixos-rebuild test --flake .#home --verbose --keep-going "${@}"
