@@ -31,17 +31,19 @@ _:
         # show-process-indicators   = false; # do not show process indicators
         # show-recents              = false; # do not show recent applications
         autohide                  = true; # automatically put away the dock when not in use
-        autohide-delay            = 0.5;
-        autohide-time-modifier    = 0.0;
-        expose-animation-duration = 0.0; # dock resize time
+        autohide-delay            = 0.1;
+        autohide-time-modifier    = 0.5;
+        expose-animation-duration = 0.5; # dock resize time
         mineffect                 = "scale"; # set the minimization animation to scaling
         minimize-to-application   = true; # minimize to app icon
-        orientation               = "left";
+        orientation               = "bottom";
 
-        wvous-tr-corner           = 3; # top right hot corner displays all windows of focused app
-        wvous-tl-corner           = 1; # top left hot corner is disabled
-        wvous-br-corner           = 1; # bottom right hot corner is disabled
-        wvous-bl-corner           = 1; # bottom left hot corner is disabled
+        # 1 - disabled
+        # 3 - display all windows of focused app
+        wvous-tr-corner           = 1; # top right hot corner
+        wvous-tl-corner           = 1; # top left hot corner
+        wvous-br-corner           = 1; # bottom right hot corner
+        wvous-bl-corner           = 1; # bottom left hot corner
         # persistent-apps =
         #   [
         #     "/System/Applications/Apps.app"
