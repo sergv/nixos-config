@@ -8,6 +8,7 @@
     programs.bash = {
       sessionVariables = {
         "EMACS_SYSTEM_TYPE" = "(macos home)";
+        "LANG"              = "en_US.UTF-8";
       };
     };
 
