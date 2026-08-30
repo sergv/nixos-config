@@ -407,6 +407,10 @@
 
               common-user-config
 
+              (_: {
+                sergv.system.nix-daemon-build-dir = "/tmp/nix-daemon";
+              })
+
               # (_: {
               #     sergv.native-optimizations = {
               #       enable                        = true;
