@@ -59,7 +59,7 @@ _:
         CreateDesktop                  = false; # do not show icons on Desktop
         FXEnableExtensionChangeWarning = false; # do not show warnings when changing file extensions
         FXPreferredViewStyle           = "icnv"; # list folder contents as icons
-        NewWindowTarget                = "Desktop"; # open new finder windows at ~/Desktop
+        NewWindowTarget                = "Home"; # open new finder windows at
         ShowPathbar                    = true; # show the pathbar
         ShowStatusBar                  = true; # show statusbar
         _FXEnableColumnAutoSizing      = true; # automatically expand columns to fit filenames
