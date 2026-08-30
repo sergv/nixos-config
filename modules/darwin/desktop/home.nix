@@ -12,6 +12,7 @@
     };
 
     home.packages = [
+      pkgs.djview
       # pkgs.maxima
     ];
   };
