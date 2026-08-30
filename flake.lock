@@ -145,11 +145,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788094259,
-        "narHash": "sha256-feQ9YICV8fMd+NQaQp/iBKrMGf0m4P42Y2vcqZq9U2A=",
+        "lastModified": 1788105422,
+        "narHash": "sha256-cUijBxIXl9RFcgFLIJZBTainAJnZFswx4WTQwKpr28o=",
         "owner": "sergv",
         "repo": "dotemacs",
-        "rev": "1f5597a6dd562b99f19c4da7c81898653a81b4f4",
+        "rev": "6effd5773602668979d162d9aa4b37f652cdfbaa",
         "type": "github"
       },
       "original": {
