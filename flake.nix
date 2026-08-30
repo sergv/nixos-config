@@ -119,7 +119,7 @@
     # inputs.hackage-security.flake = false;
 
     trix = {
-      url = "github:aanderse/trix";
+      url = "github:sergv/trix";
       flake = true;
       inputs.nixpkgs.follows = "nixpkgs";
     };
