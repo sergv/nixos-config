@@ -235,6 +235,20 @@ _:
       };
     };
 
+    launchd.daemons.mount-tmp-as-tmpfs = {
+      serviceConfig = {
+        Label = "org.nixos.mount-tmp-as-tmpfs";
+        ProgramArguments = [
+          "mount_tmpfs"
+          "-e" # case-sensitive filesystem
+          "-s"
+          "10g"
+          "/private/tmp"
+        ];
+        RunAtLoad = true;
+      };
+    };
+
     # launchd.daemons.llm-sandbox-pf = {
     #   script = ''
     #     /sbin/pfctl -q -a ${anchor} -f ${rules}
