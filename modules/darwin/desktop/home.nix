@@ -13,7 +13,7 @@
 
     home.packages = [
       pkgs.djview
-      # pkgs.maxima
+      pkgs.xz
     ];
   };
 }
