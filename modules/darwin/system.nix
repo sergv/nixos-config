@@ -21,50 +21,53 @@ _:
     # '';
 
     system.defaults = {
-      # dock = {
-      #   autohide = true;
-      #   mru-spaces = false;
-      #   show-recents = false;
-      # };
-
+      # Disable the "Are you sure you want to open this application?" dialog
       LaunchServices.LSQuarantine = false;
 
       dock = {
         # Whether to automatically rearrange spaces based on most recent use
         mru-spaces                = false;
 
-        autohide                  = true; # automatically put away the dock when not in use
-        orientation               = "left";
-        mineffect                 = "scale"; # set the minimization animation to scaling
-        minimize-to-application   = true; # minimize to app icon
         # show-process-indicators   = false; # do not show process indicators
         # show-recents              = false; # do not show recent applications
-        expose-animation-duration = 0.0; # dock resize time
-        autohide-time-modifier    = 0.0;
+        autohide                  = true; # automatically put away the dock when not in use
         autohide-delay            = 0.5;
+        autohide-time-modifier    = 0.0;
+        expose-animation-duration = 0.0; # dock resize time
+        mineffect                 = "scale"; # set the minimization animation to scaling
+        minimize-to-application   = true; # minimize to app icon
+        orientation               = "left";
 
         wvous-tr-corner           = 3; # top right hot corner displays all windows of focused app
         wvous-tl-corner           = 1; # top left hot corner is disabled
         wvous-br-corner           = 1; # bottom right hot corner is disabled
         wvous-bl-corner           = 1; # bottom left hot corner is disabled
-      };
-
-      WindowManager = {
-        EnableStandardClickToShowDesktop = false; # clicking the desktop will not put the windows out of the way
-        # StandardHideDesktopIcons=true; # hide icons on desktop
+        # persistent-apps =
+        #   [
+        #     "/System/Applications/Apps.app"
+        #     "/Applications/Nix Apps/Google Chrome.app"
+        #     "/Applications/Xcode.app"
+        #     "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
+        #   ];
       };
 
       finder = {
-        _FXShowPosixPathInTitle        = true;
-        NewWindowTarget                = "Desktop"; # open new finder windows at ~/Desktop
-        CreateDesktop                  = false; # do not show icons on Desktop
         AppleShowAllExtensions         = true; # show all file extensions by default
         AppleShowAllFiles              = true; # show dotfiles
+        CreateDesktop                  = false; # do not show icons on Desktop
         FXEnableExtensionChangeWarning = false; # do not show warnings when changing file extensions
         FXPreferredViewStyle           = "icnv"; # list folder contents as icons
+        NewWindowTarget                = "Desktop"; # open new finder windows at ~/Desktop
         ShowPathbar                    = true; # show the pathbar
         ShowStatusBar                  = true; # show statusbar
         _FXEnableColumnAutoSizing      = true; # automatically expand columns to fit filenames
+        _FXShowPosixPathInTitle        = true;
+      };
+
+      screensaver = {
+        # Require password immediately after sleep or screen saver begins
+        askForPassword = true;
+        askForPasswordDelay = 0;
       };
 
       trackpad = {
@@ -73,47 +76,37 @@ _:
         TrackpadThreeFingerDrag = false;
       };
 
-      NSGlobalDomain = {
-        AppleShowAllExtensions                   = true;
-        AppleInterfaceStyleSwitchesAutomatically = true;
-        NSDocumentSaveNewDocumentsToCloud        = false;
-
-        _HIHideMenuBar                           = true;
-        AppleTemperatureUnit                     = "Celsius";
-        AppleICUForce24HourTime                  = true;
-        AppleMetricUnits                         = 1;
-        AppleMeasurementUnits                    = "Centimeters";
-        AppleInterfaceStyle                      = "Dark";
-        # May be useful, need to confirm first.
-        # NSDisableAutomaticTermination          = true;
-        AppleShowScrollBars                      = "WhenScrolling";
-        AppleIconAppearanceTheme                 = "RegularDark";
-        AppleFontSmoothing                       = 2;
-        AppleEnableMouseSwipeNavigateWithScrolls = true;
-        AppleEnableSwipeNavigateWithScrolls      = true;
-        ApplePressAndHoldEnabled                 = false;
-        NSAutomaticCapitalizationEnabled         = false;
-        NSAutomaticInlinePredictionEnabled       = false;
-        NSAutomaticDashSubstitutionEnabled       = false;
-        NSAutomaticPeriodSubstitutionEnabled     = false;
-        NSAutomaticQuoteSubstitutionEnabled      = false;
-        NSAutomaticSpellingCorrectionEnabled     = false;
-        NSScrollAnimationEnabled                 = true; # enable smooth scrolling
-        NSNavPanelExpandedStateForSaveMode       = true; # always use the expanded save panel
-        NSNavPanelExpandedStateForSaveMode2      = true; # always use the expanded save panel
-        AppleScrollerPagingBehavior              = true; # jump to the clicked section when clicked on scrollbar
-        InitialKeyRepeat                         = 10;
-        KeyRepeat                                = 1; # faster key repeat
-
-        # 3 allows Tab key navigation through all UI elements including buttons, checkboxes, and other controls in dialogs.
-        AppleKeyboardUIMode = 3;
-      };
-
       CustomUserPreferences = {
+        NSGlobalDomain = {
+          AppleActionOnDoubleClick = "Fill";
+        };
+
         "com.apple.desktopservices" = {
           # Avoid creating .DS_Store files on network or USB volumes
           DSDontWriteNetworkStores = true;
           DSDontWriteUSBStores     = true;
+        };
+
+        "com.apple.finder" = {
+          # Keep Finder animations
+          DisableAllAnimations = false;
+          # Sidebar order
+          SidebarZoneOrder1 = [
+            "favorites"
+            "devices"
+            "locations"
+            # "icloud_drive"
+            "tags"
+          ];
+          # Disable iCloud synchronization.
+          FXICloudDriveEnabled   = false;
+          FXICloudDriveDesktop   = false;
+          FXICloudDriveDocuments = false;
+        };
+
+        "com.apple.systempreferences" = {
+          # Disable Resume system-wide
+          NSQuitAlwaysKeepsWindows = false;
         };
 
         # "com.apple.symbolichotkeys" = {
@@ -140,6 +133,49 @@ _:
         # };
       };
 
+      NSGlobalDomain = {
+        # May be useful, need to confirm first.
+        # NSDisableAutomaticTermination          = true;
+        AppleEnableMouseSwipeNavigateWithScrolls = true;
+        AppleEnableSwipeNavigateWithScrolls      = true;
+        AppleFontSmoothing                       = 2;
+        AppleICUForce24HourTime                  = true;
+        AppleIconAppearanceTheme                 = "RegularDark";
+        AppleInterfaceStyle                      = "Dark";
+        AppleInterfaceStyleSwitchesAutomatically = true;
+        AppleMeasurementUnits                    = "Centimeters";
+        AppleMetricUnits                         = 1;
+        ApplePressAndHoldEnabled                 = false; # Disable press-and-hold for keys in favor of key repeat
+        AppleScrollerPagingBehavior              = true; # jump to the clicked section when clicked on scrollbar
+        AppleShowAllExtensions                   = true;
+        AppleShowScrollBars                      = "WhenScrolling";
+        AppleTemperatureUnit                     = "Celsius";
+        InitialKeyRepeat                         = 10;
+        KeyRepeat                                = 1; # faster key repeat
+        NSAutomaticCapitalizationEnabled         = false;
+        NSAutomaticDashSubstitutionEnabled       = false;
+        NSAutomaticInlinePredictionEnabled       = false;
+        NSAutomaticPeriodSubstitutionEnabled     = false;
+        NSAutomaticQuoteSubstitutionEnabled      = false;
+        NSAutomaticSpellingCorrectionEnabled     = false;
+        NSDocumentSaveNewDocumentsToCloud        = false;
+        NSNavPanelExpandedStateForSaveMode       = true; # always use the expanded save panel
+        NSNavPanelExpandedStateForSaveMode2      = true; # always use the expanded save panel
+        NSScrollAnimationEnabled                 = true; # enable smooth scrolling
+        _HIHideMenuBar                           = true;
+
+        # Enable keyboard navigation.
+        # 3 allows Tab key navigation through all UI elements
+        # including buttons, checkboxes, and other controls in
+        # dialogs.
+        AppleKeyboardUIMode                      = 3;
+      };
+
+      WindowManager = {
+        EnableStandardClickToShowDesktop = false; # clicking the desktop will not put the windows out of the way
+        # StandardHideDesktopIcons=true; # hide icons on desktop
+      };
+
       # hitoolbox.AppleFnUsageType = "Do Nothing"; # fn key does nothing.
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false; # disable automatic software updates
       spaces.spans-displays = false; # displays have seperate spaces = true (its counter-intuitive)
@@ -153,6 +189,9 @@ _:
       mdutil -E /
     '';
 
+    # services = {
+    #   skhd.enable = true;
+    # };
 
     # system.activationScripts.postActivation.text = ''
     #   echo "Purging .DS_Store files from configuration tree..."
@@ -186,15 +225,82 @@ _:
 
     launchd.daemons.sysctl-max-files = {
       serviceConfig = {
-        Label = "org.nixos.sysctl-max-files";
+        Label = "org.nixos.sysctl-limits";
         ProgramArguments = [
           "/bin/sh"
           "-c"
-          "/usr/sbin/sysctl -w kern.maxfiles=1048576 kern.maxfilesperproc=524288 && /bin/launchctl limit maxfiles 65536 524288"
+          "/usr/sbin/sysctl -w kern.maxfiles=1048576 kern.maxfilesperproc=524288 && /bin/launchctl limit maxfiles 65536 524288 && /bin/launchctl limit maxproc 65536 524288"
         ];
         RunAtLoad = true;
       };
     };
+
+    # launchd.daemons.llm-sandbox-pf = {
+    #   script = ''
+    #     /sbin/pfctl -q -a ${anchor} -f ${rules}
+    #     /sbin/pfctl -q -E
+    #     '';
+    #   serviceConfig = {
+    #     RunAtLoad = true;
+    #     StandardErrorPath = "/var/log/llm-sandbox-pf.log";
+    #     StandardOutPath = "/var/log/llm-sandbox-pf.log";
+    #   };
+    # };
+
+    # # Keys without a dot become `local.<key>` in launchd; keys with a dot become
+    # # `org.nixos.<key>`. Keep keys dot-free so the generated label matches
+    # # `services.json` (which expects `local.litellm`/`local.ollama`).
+    # launchd.daemons."litellm" = {
+    #   serviceConfig = {
+    #     # Explicit label to match services.json (which expects local.litellm).
+    #     # Without this, nix-darwin auto-generates org.nixos.litellm.
+    #     Label = "local.litellm";
+    #     # macOS 26+ SIP blocks unsigned Nix store binaries for system daemons
+    #     # with non-root UserName (EX_CONFIG 78). /bin/sh is Apple-signed and
+    #     # ref: macos-service-hardening.instructions.md -- SIP /bin/sh wrapper
+    #     ProgramArguments = [
+    #       "/bin/sh"
+    #       "-c"
+    #       "exec ${litellmDaemon}/bin/nucleus-litellm-daemon '${litellmConfig}' '60' ${
+    #         lib.concatStringsSep " " (map (arg: "'${arg}'") keyArgs)
+    #       }"
+    #     ];
+    #     KeepAlive = true;
+    #     RunAtLoad = true;
+    #     UserName = username;
+    #     EnvironmentVariables = litellmEnv;
+    #     StandardOutPath = "${config.nucleus.logging.systemLogDir}/litellm/stdout.log";
+    #     StandardErrorPath = "${config.nucleus.logging.systemLogDir}/litellm/stderr.log";
+    #   };
+    # };
+    #
+    # launchd.daemons."ollama" = {
+    #   serviceConfig = {
+    #     # Explicit label to match services.json (which expects local.ollama).
+    #     Label = "local.ollama";
+    #     # macOS 26+ SIP blocks unsigned Nix store binaries for system daemons
+    #     # with non-root UserName (EX_CONFIG 78). /bin/sh is Apple-signed and
+    #     # ref: macos-service-hardening.instructions.md -- SIP /bin/sh wrapper
+    #     ProgramArguments = [
+    #       "/bin/sh"
+    #       "-c"
+    #       "exec ${pkgs.ollama}/bin/ollama serve"
+    #     ];
+    #     KeepAlive = true;
+    #     RunAtLoad = true;
+    #     UserName = username;
+    #     # Source: src/modules/lib/env-catalog.nix (OLLAMA_* entries).
+    #     # The catalog is the single source of truth for these values.  OLLAMA_HOST
+    #     # is excluded so the daemon binds to the default port (11434).  OLLAMA_HOST
+    #     # is set by the gui-env LaunchAgent for CLI clients.
+    #     EnvironmentVariables = ollamaEnv;
+    #     StandardOutPath = "${config.nucleus.logging.systemLogDir}/ollama/stdout.log";
+    #     StandardErrorPath = "${config.nucleus.logging.systemLogDir}/ollama/stderr.log";
+    #   };
+    # };
+
+
+
 
     # # Fully declarative dock using the latest from Nix Store
     # local = {
