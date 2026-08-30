@@ -83,8 +83,8 @@
           "fgrep"               = "grep -FHn --color=auto";
 
           "ls"                  = "ls --color=always";
-          "lla"                 = "ls --human-readable -AlFa --color=always";
-          "ll"                  = "ls --human-readable -AlF --color=always";
+          "lla"                 = "ls -AlFah --color=always";
+          "ll"                  = "ls -AlFh --color=always";
           "la"                  = "ls -A --color=always";
           "l"                   = "ls -CF --color=always";
 
