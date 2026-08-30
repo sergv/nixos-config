@@ -13,62 +13,8 @@ set -o pipefail
 [[ ! -v TMPDIR ]] && export TMPDIR=/tmp/nix-daemon
 [[ ! -v TEMPDIR ]] && export TEMPDIR=/tmp/nix-daemon
 
-# ssh-agent
-# ssh-add /home/sergey/.ssh/nix-cache-ro.key
-# --option extra-substituters ssh://nix-ssh@192.168.1.226?trusted=true
+export ROOT="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-# nix build .#nixosConfigurations."wsl".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result --verbose -j4 --cores 16 --keep-going "${@}"
-
-declare -a targets
-declare -a opts
-targets=()
-opts=()
-
-for x in "${@}"; do
-    case "$x" in
-        "macbook" )
-            targets+=(".#darwinConfigurations.\"${x}\".config.system.build.toplevel")
-            ;;
-        "home" | "wsl" )
-            targets+=(".#nixosConfigurations.\"${x}\".config.system.build.toplevel")
-            ;;
-        * )
-            opts+=("$x")
-            ;;
-    esac
-done
-
-if [[ "${#targets[@]}" == 0 ]]; then
-    echo "No targets" >&2
-    exit 1
-fi
-
-cores="1"
-jobs="1"
-if [[ -v NIX_BUILD_CORES ]]; then
-    cores="$NIX_BUILD_CORES"
-else
-    cores="$(getconf _NPROCESSORS_ONLN)"
-    if [[ "$OSTYPE" == "linux-gnu" ]] && command -v lscpu >/dev/null 2>&1; then
-        threads_per_core=$(lscpu | awk '/^ *Thread\(s\) per core:/ { print $NF; }')
-        cores=$(( "$cores" / "$threads_per_core" ))
-        # cores=$(lscpu | awk 'BEGIN { cores = 0; threads = 0; } /^ *CPU\(s\):/ { cores = $NF; } /^ *Thread\(s\) per core:/ { threads = $NF; } END { print (cores / threads); }')
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        cores="$cores"
-        # cores=$(sysctl machdep.cpu.core_count | cut -w -f2)
-    elif [[ -e /proc/cpuinfo ]]; then
-        cores="$(awk '/processor/' /proc/cpuinfo | wc -l)"
-    fi
-fi
-
-export NIX_BUILD_CORES="$cores"
-export NINJAFLAGS="-j$cores -l$cores"
-
-nix build --out-link /tmp/nixos-rebuild-result/result --verbose -j "$jobs" --cores "$cores" --keep-going "${targets[@]}" "${opts[@]}"
-
-
-# trix build .#nixosConfigurations."home".config.system.build.toplevel --out-link /tmp/nixos-rebuild-result/result -j2 --cores 16 --keep-going "${@}" "${@}"
-
-# exec ./apply-system.sh build "${@}"
-
+export NIX_BUILD_JOBS=1
+"$ROOT/build.sh" "${@}"
 

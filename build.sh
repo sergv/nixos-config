@@ -41,7 +41,7 @@ if [[ "${#targets[@]}" == 0 ]]; then
 fi
 
 cores="1"
-jobs="4"
+jobs="${NIX_BUILD_JOBS:-4}"
 if [[ -v NIX_BUILD_CORES ]]; then
     cores="$NIX_BUILD_CORES"
 else
@@ -51,7 +51,11 @@ else
         cores=$(( "$cores" / "$threads_per_core" ))
         # cores=$(lscpu | awk 'BEGIN { cores = 0; threads = 0; } /^ *CPU\(s\):/ { cores = $NF; } /^ *Thread\(s\) per core:/ { threads = $NF; } END { print (cores / threads); }')
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        cores="$(( cores - 2 ))"
+        adjustment=2
+        if [[ "$jobs" == "1" ]]; then
+            adjustment=0
+        fi
+        cores="$(( cores - adjustment ))"
         jobs="2"
         # cores=$(sysctl machdep.cpu.core_count | cut -w -f2)
     elif [[ -e /proc/cpuinfo ]]; then
