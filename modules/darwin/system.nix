@@ -55,7 +55,7 @@ _:
 
       finder = {
         AppleShowAllExtensions         = true; # show all file extensions by default
-        AppleShowAllFiles              = true; # show dotfiles
+        AppleShowAllFiles              = false; # don’t show hidden files
         CreateDesktop                  = false; # do not show icons on Desktop
         FXEnableExtensionChangeWarning = false; # do not show warnings when changing file extensions
         FXPreferredViewStyle           = "icnv"; # list folder contents as icons
