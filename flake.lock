@@ -145,11 +145,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788105422,
-        "narHash": "sha256-cUijBxIXl9RFcgFLIJZBTainAJnZFswx4WTQwKpr28o=",
+        "lastModified": 1788303300,
+        "narHash": "sha256-t6ASv+nhfnqwFZc4awOtVgn+e6Q5uiALWRqt4xbTu4k=",
         "owner": "sergv",
         "repo": "dotemacs",
-        "rev": "6effd5773602668979d162d9aa4b37f652cdfbaa",
+        "rev": "defcd4710bda071973c5895eab293ecb2d170abc",
         "type": "github"
       },
       "original": {
@@ -161,16 +161,16 @@
     "emacs-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1787258858,
-        "narHash": "sha256-bOoTZbinie1mQcclowd97YEzjXwwRIJuwRJEwFu8Mb8=",
+        "lastModified": 1788204179,
+        "narHash": "sha256-QoAfuC0n1NO2yE1mxFb43GvBbu1fmf5pQsdWKpA2Ip4=",
         "owner": "sergv",
         "repo": "emacs",
-        "rev": "1ccf96b3617c24d49eefd885852c5d03d1e22d9c",
+        "rev": "d9d2271f0c2708dc49f1dece4d2bb6babbd798a5",
         "type": "github"
       },
       "original": {
         "owner": "sergv",
-        "ref": "dev-30",
+        "ref": "dev-31",
         "repo": "emacs",
         "type": "github"
       }
