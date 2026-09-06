@@ -49,6 +49,11 @@
 
                   "VirtualBox VMs"
                 ];
+
+            files =
+              [
+                ".bash_history"
+              ];
           };
 
           # Regular persistent things
@@ -169,7 +174,6 @@
                 "O0DGDxpMBNs.jpg"
                 ".aspell.en.prepl"
                 ".aspell.en.pws"
-                ".bash_history"
                 ".rtorrent.rc"
                 ".vimrc"
                 ".config/Audaciousrc"
