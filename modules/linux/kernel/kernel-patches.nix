@@ -676,6 +676,17 @@ borePatches
   }
 
   {
+    name = "Preload important filesystems";
+    patch = null;
+    structuredExtraConfig = {
+      XFS_FS   = yes;
+      F2FS_FS  = yes;
+      EXT4_FS  = yes;
+      BTRFS_FS = yes;
+    };
+  }
+
+  {
     name = "Keep only used CPU governors";
     patch = null;
     structuredExtraConfig = {
