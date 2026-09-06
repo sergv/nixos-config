@@ -472,7 +472,7 @@
         arkenfox = {
           enable = true; # Decide how we want to handle these things
           # version = "128.0";
-          version = "140.0";
+          version = "144.0";
         };
 
         profiles =
