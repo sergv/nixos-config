@@ -9,7 +9,7 @@
       boot.kernelPackages =
         let
           # kernelVersion = "6.18.46";
-          kernelVersion = "6.18.44";
+          kernelVersion = "6.18.49";
           kernel = pkgs.linuxKernel.kernels.linux_6_18.override (_: {
             argsOverride = {
               version       = "${kernelVersion}";
@@ -17,7 +17,7 @@
               src           = pkgs.fetchurl {
                 url    = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${kernelVersion}.tar.xz";
                 # url    = "mirror://kernel/linux/kernel/v6.18.x/linux-${kernelVersion}.tar.xz";
-                sha256 = "sha256-D3LZOPBoKOgskEBRdP5XIofbe/4Ini/EZXKpmn8kDUM="; #pkgs.lib.fakeSha256;
+                sha256 = "sha256-roJvMxEf6m8dJ53ecpnXRjyN/SBK63Wo+1QyvGCigZE="; #pkgs.lib.fakeSha256;
               };
             };
           });

@@ -6,20 +6,22 @@
   kernelVersion,
 }:
 let
-  yes        = lib.mkForce lib.kernel.yes;
-  no         = lib.mkForce lib.kernel.no;
-  unset      = lib.mkForce lib.kernel.unset;
-  module     = lib.mkForce lib.kernel.module;
-  freeform   = x: lib.mkForce (lib.kernel.freeform x);
-  patchesDir = "${bore-scheduler-src}/patches/stable/linux-${kernelVersion}-bore";
+  yes      = lib.mkForce lib.kernel.yes;
+  no       = lib.mkForce lib.kernel.no;
+  unset    = lib.mkForce lib.kernel.unset;
+  module   = lib.mkForce lib.kernel.module;
+  freeform = x: lib.mkForce (lib.kernel.freeform x);
 
   mkPatch = name: patch: structuredExtraConfig: {
     inherit name patch structuredExtraConfig;
   };
 
-  borePatches = lib.mapAttrsToList (
-    name: _fileType: mkPatch "bore-${name}" "${patchesDir}/${name}" { }
-  ) (builtins.readDir patchesDir);
+  borePatches = builtins.map
+    (x: mkPatch "bore-${builtins.basename x}" x {})
+    [
+      "${bore-scheduler-src}/patches/stable/linux-${kernelVersion}-bore/1000-prefer-prevcpu-for-wakeup-v7.patch.txt"
+      "${bore-scheduler-src}/patches/testing/0001-linux6.18.48-bore-6.8.0.patch"
+    ];
 
 in
 borePatches
