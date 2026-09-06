@@ -22,7 +22,13 @@
 
       haskell-tools =
         let
-          pkgs-haskell   = pkgs-opt.appendOverlays [ sergv.inputs.haskell-nixpkgs-improvements.overlays.host ];
+          pkgs-haskell =
+            sergv.inputs.haskell-nixpkgs-improvements.lib.prepare-haskell-tools-pkgs
+              {
+                inherit (sergv) pkgs-pristine;
+                pkgs = pkgs-opt;
+                overlays = [ sergv.inputs.haskell-nixpkgs-improvements.overlays.host ];
+              };
           # pkgs-cross-win = pkgs-opt.appendOverlays [ sergv.inputs.haskell-nixpkgs-improvements.overlays.cross-win ];
           pkgs-cross-win = null;
         in
