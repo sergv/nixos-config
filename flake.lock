@@ -1144,15 +1144,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1788107714,
+        "lastModified": 1788401422,
         "narHash": "sha256-8VccNnZ7d0X9UFEePwwuyP9zwfqDIB4IlzCQs8UyaOI=",
-        "owner": "sergv",
+        "owner": "aanderse",
         "repo": "trix",
-        "rev": "5228b06bf7b2f3692e3f06e5834299489e6312a7",
+        "rev": "222013b234cd8db2314f8fca4fff9ac5be5e69f5",
         "type": "github"
       },
       "original": {
-        "owner": "sergv",
+        "owner": "aanderse",
         "repo": "trix",
         "type": "github"
       }
