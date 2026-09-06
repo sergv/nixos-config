@@ -153,29 +153,32 @@
         "x-gvfs-hide"
       ];
     };
+
     # sudo mkfs.f2fs -l rootfs -O extra_attr,inode_checksum,sb_checksum,compression
-    "/permanent/storage-fast" = {
-      depends = [ "/" ];
-      # device = "/dev/disk/by-label/nixos-permanent";
-      # device = "/dev/disk/by-uuid/18fdd1f5-5975-4fdc-8b6b-8f034644abf1";
-      fsType = "f2fs";
-      # options       = ["discard"]; # for ssds
-      options = [
-        "noatime"
-        "nodiratime"
-        "lazytime"
-        "compress_algorithm=lzo-rle"
-        "compress_chksum"
-        "atgc"
-        "gc_merge"
-        "inline_data"
-        "inline_dentry"
-        "x-gvfs-hide"
-      ];
-      neededForBoot = true;
-    };
+    # "${config.sergv.persistence.permanent-fast-storage}" = {
+    #   depends = [ "/" ];
+    #   # device = "/dev/disk/by-label/nixos-permanent";
+    #   # device = "/dev/disk/by-uuid/18fdd1f5-5975-4fdc-8b6b-8f034644abf1";
+    #   fsType = "f2fs";
+    #   # options       = ["discard"]; # for ssds
+    #   options = [
+    #     "noatime"
+    #     "nodiratime"
+    #     "lazytime"
+    #     "compress_algorithm=lzo-rle"
+    #     "compress_chksum"
+    #     "atgc"
+    #     "gc_merge"
+    #     "inline_data"
+    #     "inline_dentry"
+    #     "x-gvfs-hide"
+    #   ];
+    #   neededForBoot = true;
+    # };
+
     # 4Tb
-    "/permanent/storage-backup" = {
+    "${config.sergv.persistence.permanent-fast-storage}" = {
+    # "${config.sergv.persistence.permanent-slow-storage} /permanent/storage-backup" = {
       depends = [ "/" ];
       # device = "/dev/disk/by-label/nixos-permanent";
       device = "/dev/disk/by-uuid/18fdd1f5-5975-4fdc-8b6b-8f034644abf1";
@@ -192,7 +195,7 @@
       neededForBoot = true;
     };
     # 8Tb
-    "/permanent/storage" = {
+    "${config.sergv.persistence.permanent-slow-storage}" = {
       depends = [ "/" ];
       device = "/dev/disk/by-uuid/eb1eedc4-1ed2-4716-9839-e3c7823efc82";
       fsType = "ext4";

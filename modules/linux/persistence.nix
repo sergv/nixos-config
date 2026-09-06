@@ -4,7 +4,7 @@
 
   config = lib.mkIf config.sergv.persistence.enable
     {
-      environment.persistence."${config.sergv.persistence.permanent-storage-path}" = {
+      environment.persistence."${config.sergv.persistence.permanent-slow-storage}" = {
         hideMounts = true;
 
         directories = [
@@ -24,7 +24,7 @@
       home-manager.users."${config.sergv.user.name}" = {
         home.persistence = {
           # Heavyweight things from their ows device
-          "${config.sergv.persistence.permanent-storage-path}/storage" = {
+          "${config.sergv.persistence.permanent-slow-storage}" = {
             hideMounts = true;
 
             directories =
@@ -46,11 +46,13 @@
                   "manga"
                   "software"
                   "tmp"
+
+                  "VirtualBox VMs"
                 ];
           };
 
           # Regular persistent things
-          "${config.sergv.persistence.permanent-storage-path}" = {
+          "${config.sergv.persistence.permanent-fast-storage}" = {
             hideMounts = true;
 
             directories =
@@ -75,7 +77,6 @@
                   "Downloads"
                   "My Games"
                   "London"
-                  "VirtualBox VMs"
                   "art"
                   "bicycle"
                   "documents"
@@ -90,6 +91,8 @@
                   "torrents"
                   "travelling"
                   "vim"
+
+                  "games/installed"
 
                   # Supreme Commander FAF
                   # ".gapforever"
@@ -187,8 +190,8 @@
         };
 
         # systemd.user.tmpfiles.rules = [
-        #   # "L+ ${homeDir}/.vimrc            0644 -      -     - ${config.sergv.persistence.permanent-storage-path}/home/sergey/.vimrc"
-        #   # "L+ ${homeDir}/vim               0644 -      -     - ${config.sergv.persistence.permanent-storage-path}/home/sergey/vim"
+        #   # "L+ ${homeDir}/.vimrc            0644 -      -     - ${config.sergv.persistence.permanent-fast-storage}/home/sergey/.vimrc"
+        #   # "L+ ${homeDir}/vim               0644 -      -     - ${config.sergv.persistence.permanent-fast-storage}/home/sergey/vim"
         # ];
       };
     };

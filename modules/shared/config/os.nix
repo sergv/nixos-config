@@ -17,10 +17,15 @@
     persistence = {
       enable = lib.mkEnableOption "Enable persistence/impermanence";
 
-      permanent-storage-path = lib.mkOption {
+      permanent-fast-storage = lib.mkOption {
         type        = lib.types.str;
-        default     = "/permanent";
-        description = "Where real data is located";
+        default     = "/permanent/fast";
+        description = "Storage for real data with fast access but smaller capacity";
+      };
+      permanent-slow-storage = lib.mkOption {
+        type        = lib.types.str;
+        default     = "/permanent/slow";
+        description = "Storage for real data with slow access but bigger capacity";
       };
     };
   };

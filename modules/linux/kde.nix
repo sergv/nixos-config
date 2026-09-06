@@ -63,7 +63,7 @@
           {
             home-manager.users."${config.sergv.user.name}".home.persistence = {
 
-              "${config.sergv.persistence.permanent-storage-path}" = {
+              "${config.sergv.persistence.permanent-fast-storage}" = {
                 hideMounts = true;
 
                 directories =
