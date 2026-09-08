@@ -464,3 +464,8 @@ For faf but helps with others too
   ~wine reg add 'HKEY_CURRENT_USER\Software\Wine\X11 Driver' /t REG_SZ /v UseXVidMode /d N /f~
 
 - Run winecfg, enable virtual desktop 3840 by 2160 with default 96 dpi
+
+* Smartctl
+- General: ~sudo smartctl -x -a /dev/sdb~
+- Run test: ~sudo smartctl --test=short /dev/sdb~
+- Show test results: ~sudo smartctl --attributes --log=selftest /dev/sdb~
