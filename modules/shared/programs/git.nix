@@ -80,7 +80,7 @@
                 "m"   = "merge";
               };
               user = {
-                name  = config.sergv.user.name;
+                name  = config.sergv.user.fullName;
                 email = config.sergv.user.email;
               };
               advice = {
