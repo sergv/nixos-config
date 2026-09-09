@@ -224,31 +224,12 @@
 
   # New desktop
   fileSystems = {
-    # # Vanilla tmpfs root, includes /tmp.
-    # "/" = {
-    #   device  = "tmpfs";
-    #   fsType  = "tmpfs";
-    #   options = ["noatime" "nodiratime" "size=8000M" # "mode=1777"
-    #             ];
-    # };
-
-    # "/nix" = {
-    #   depends = [ "/" ];
-    #   device = "/dev/disk/by-label/nixos-root";
-    #   fsType = "ext4";
-    #   options = [
-    #     "errors=remount-ro"
-    #     "noatime"
-    #     "nodiratime"
-    #     "lazytime"
-    #     "x-gvfs-hide"
-    #     "discard"
-    #   ];
-    # };
     "/boot" = {
       depends = [ "/" ];
-      device = "/dev/disk/by-label/NIXOS-BOOT";
-      fsType = "vfat";
+      device  = "/dev/disk/by-uuid/0570-1035"; # "/dev/disk/by-label/nixos-boot";
+      # device  = pkgs.lib.mkForce "/dev/disk/by-label/NIXOS-BOOT";
+      # device  = "/dev/disk/by-uuid/459be4d4-751d-4032-abef-6faf9545790c";
+      fsType  = "vfat";
       options = [
         "nofail"
         "rw"
@@ -258,10 +239,26 @@
         "lazytime"
       ];
     };
+
+    # "/nix" = {
+    #   depends = [ "/" ];
+    #   device  = "/dev/disk/by-uuid/f34380a3-bc81-4db7-9900-f875b3b3183a"; # "/dev/disk/by-label/nixos-root";
+    #   fsType  = "ext4";
+    #   options = [
+    #     "errors=remount-ro"
+    #     "noatime"
+    #     "nodiratime"
+    #     "lazytime"
+    #     "x-gvfs-hide"
+    #     "discard"
+    #   ];
+    # };
+
     "/nix" = {
       depends = [ "/" ];
-      device = "/dev/disk/by-label/nixos-root";
-      fsType = "f2fs";
+      # device  = "/dev/disk/by-label/nixos-root";
+      device  = "/dev/disk/by-uuid/d9077782-4d7e-47b6-9060-f28015b840e0";
+      fsType  = "f2fs";
       options = [
         "noatime"
         "nodiratime"
@@ -276,31 +273,32 @@
       ];
     };
 
-    # sudo mkfs.f2fs -l rootfs -O extra_attr,inode_checksum,sb_checksum,compression
-    # "${config.sergv.persistence.permanent-fast-storage}" = {
-    #   depends = [ "/" ];
-    #   # device = "/dev/disk/by-label/nixos-permanent";
-    #   # device = "/dev/disk/by-uuid/18fdd1f5-5975-4fdc-8b6b-8f034644abf1";
-    #   fsType = "f2fs";
-    #   # options       = ["discard"]; # for ssds
-    #   options = [
-    #     "noatime"
-    #     "nodiratime"
-    #     "lazytime"
-    #     "compress_algorithm=lzo-rle"
-    #     "compress_chksum"
-    #     "atgc"
-    #     "gc_merge"
-    #     "inline_data"
-    #     "inline_dentry"
-    #     "x-gvfs-hide"
-    #   ];
-    #   neededForBoot = true;
-    # };
+    # sudo mkfs.f2fs -l LABEL -O extra_attr,inode_checksum,sb_checksum,compression
+    "${config.sergv.persistence.permanent-fast-storage}" = {
+      depends = [ "/" ];
+      # device = "/dev/disk/by-label/nixos-permanent";
+      # device = "/dev/disk/by-uuid/18fdd1f5-5975-4fdc-8b6b-8f034644abf1";
+      device  = "/dev/disk/by-uuid/7607a262-f7c6-4c69-85aa-6d40bca80586";
+      fsType = "f2fs";
+      # options       = ["discard"]; # for ssds
+      options = [
+        "noatime"
+        "nodiratime"
+        "lazytime"
+        "compress_algorithm=lzo-rle"
+        "compress_chksum"
+        "atgc"
+        "gc_merge"
+        "inline_data"
+        "inline_dentry"
+        "x-gvfs-hide"
+      ];
+      neededForBoot = true;
+    };
 
     # 4Tb
-    "${config.sergv.persistence.permanent-fast-storage}" = {
-    # "${config.sergv.persistence.permanent-slow-storage} /permanent/storage-backup" = {
+    # "${config.sergv.persistence.permanent-fast-storage}" = {
+    "/permanent/storage-backup" = {
       depends = [ "/" ];
       # device = "/dev/disk/by-label/nixos-permanent";
       device = "/dev/disk/by-uuid/18fdd1f5-5975-4fdc-8b6b-8f034644abf1";
@@ -316,6 +314,7 @@
       ];
       neededForBoot = true;
     };
+
     # 8Tb
     "${config.sergv.persistence.permanent-slow-storage}" = {
       depends = [ "/" ];
