@@ -1,4 +1,4 @@
-_:
+{ config, ... }:
 {
   config = {
 
@@ -44,13 +44,19 @@ _:
         wvous-tl-corner           = 1; # top left hot corner
         wvous-br-corner           = 1; # bottom right hot corner
         wvous-bl-corner           = 1; # bottom left hot corner
-        # persistent-apps =
-        #   [
-        #     "/System/Applications/Apps.app"
-        #     "/Applications/Nix Apps/Google Chrome.app"
-        #     "/Applications/Xcode.app"
-        #     "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
-        #   ];
+
+        persistent-apps =
+          [
+            { app = "/System/Applications/Apps.app"; }
+            { app = "/Applications/Safari.app"; }
+            # {
+            #   app = config.sergv.desktop.emacs.raw-editor-package + "/Applications/Emacs.app";
+            # }
+            # "/System/Applications/Apps.app"
+            # "/Applications/Nix Apps/Google Chrome.app"
+            # "/Applications/Xcode.app"
+            # "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
+          ];
       };
 
       finder = {
@@ -104,12 +110,27 @@ _:
           FXICloudDriveEnabled   = false;
           FXICloudDriveDesktop   = false;
           FXICloudDriveDocuments = false;
+          _FXSortFoldersFirst    = true;
+        };
+
+        "com.apple.spaces" = {
+          "spans-displays" = 0; # Display have seperate spaces
         };
 
         "com.apple.systempreferences" = {
           # Disable Resume system-wide
           NSQuitAlwaysKeepsWindows = false;
         };
+
+        "com.apple.screencapture" = {
+          location = "~/Desktop";
+          type     = "png";
+        };
+        "com.apple.AdLib" = {
+          allowApplePersonalizedAdvertising = false;
+        };
+        # Prevent Photos from opening automatically when devices are plugged in
+        "com.apple.ImageCapture".disableHotPlug = true;
 
         # "com.apple.symbolichotkeys" = {
         #   AppleSymbolicHotKeys = {
@@ -152,8 +173,8 @@ _:
         AppleShowAllExtensions                   = true;
         AppleShowScrollBars                      = "WhenScrolling";
         AppleTemperatureUnit                     = "Celsius";
-        # InitialKeyRepeat                         = 25;
-        # KeyRepeat                                = 5; # faster key repeat
+        InitialKeyRepeat                         = 36;
+        KeyRepeat                                = 10; # faster key repeat
         NSAutomaticCapitalizationEnabled         = false;
         NSAutomaticDashSubstitutionEnabled       = false;
         NSAutomaticInlinePredictionEnabled       = false;
@@ -171,6 +192,8 @@ _:
         # including buttons, checkboxes, and other controls in
         # dialogs.
         AppleKeyboardUIMode                      = 3;
+
+        "com.apple.keyboard.fnState"             = true;
       };
 
       WindowManager = {
@@ -206,7 +229,7 @@ _:
     # '';
 
     system.keyboard = {
-      enableKeyMapping = true;  # enable key mapping so that we can use `option` as `control`
+      enableKeyMapping       = true;  # enable key mapping so that we can use `option` as `control`
 
       # NOTE: do NOT support remap capslock to both control and escape at the same time
       remapCapsLockToControl = false;  # remap caps lock to control, useful for emac users

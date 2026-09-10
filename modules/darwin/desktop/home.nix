@@ -16,5 +16,19 @@
       pkgs.djview
       pkgs.xz
     ];
+
+    targets.darwin = {
+      copyApps.enable    = false;
+      linkApps.enable    = true;
+      linkApps.directory = "/Applications/Nix";
+      search             = "DuckDuckGo";
+
+      defaults."com.apple.Safari" = {
+        AutoFillCreditCardData = false;
+        AutoFillPasswords      = false;
+        AutoOpenSafeDownloads  = false;
+      };
+
+    };
   };
 }
