@@ -56,7 +56,7 @@ else
             adjustment=0
         fi
         cores="$(( cores - adjustment ))"
-        jobs="2"
+        jobs=$(( jobs > 2 ? 2 : jobs ))
         # cores=$(sysctl machdep.cpu.core_count | cut -w -f2)
     elif [[ -e /proc/cpuinfo ]]; then
         cores="$(awk '/processor/' /proc/cpuinfo | wc -l)"
