@@ -267,7 +267,7 @@
           "mount_tmpfs"
           "-e" # case-sensitive filesystem
           "-s"
-          "10g"
+          "12g"
           "/private/tmp"
         ];
         RunAtLoad = true;
