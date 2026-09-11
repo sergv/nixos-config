@@ -55,7 +55,7 @@ else
         if [[ "$jobs" == "1" ]]; then
             adjustment=0
         fi
-        cores="$(( cores - adjustment ))"
+        cores=$(( cores - adjustment ))
         jobs=$(( jobs > 2 ? 2 : jobs ))
         # cores=$(sysctl machdep.cpu.core_count | cut -w -f2)
     elif [[ -e /proc/cpuinfo ]]; then
