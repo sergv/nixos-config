@@ -1,14 +1,5 @@
 { config, pkgs, pkgs-opt, lib, sergv, ... }:
 {
-  options.sergv.desktop = {
-    dev.host-ghc-versions = lib.mkOption {
-      type        = lib.types.nullOr (lib.types.listOf lib.types.str);
-      example     = ''["ghc912", "ghc914", "default"]'';
-      default     = null;
-      description = "Names of attributes produced by haskell-nixpkgs-improvements denoting GHC versions to add to system. null means don’t filter anything out.";
-    };
-  };
-
   config =
     let
       wmctrl-pkg = pkgs.wmctrl;
@@ -20,56 +11,10 @@
 
       filtered-scripts = builtins.removeAttrs scripts ["wm-sh"];
 
-      haskell-tools =
-        let
-          pkgs-haskell =
-            sergv.inputs.haskell-nixpkgs-improvements.lib.prepare-haskell-tools-pkgs
-              {
-                inherit (sergv) pkgs-pristine;
-                pkgs = pkgs-opt;
-                overlays = [ sergv.inputs.haskell-nixpkgs-improvements.overlays.host ];
-              };
-          # pkgs-cross-win = pkgs-opt.appendOverlays [ sergv.inputs.haskell-nixpkgs-improvements.overlays.cross-win ];
-          pkgs-cross-win = null;
-        in
-        sergv.inputs.haskell-nixpkgs-improvements.lib.mk-haskell-tools {
-          inherit (pkgs) system;
-          vanilla-pkgs   = pkgs-haskell;
-          cross-win-pkgs = pkgs-cross-win;
-        };
-
-      select-ghc-versions = all-versions:
-        let selected = config.sergv.desktop.dev.host-ghc-versions;
-        in
-        if selected == null
-        then all-versions
-        else
-          builtins.foldl'
-            (acc: key: acc // { "${key}" = builtins.getAttr key all-versions; })
-            {}
-            selected;
-
-      all-haskell-tools =
-        pkgs.lib.attrsets.unionOfDisjoint haskell-tools.tools
-          (select-ghc-versions haskell-tools.ghc.host);
-      # (pkgs.lib.attrsets.unionOfDisjoint haskell-tools.ghc.host haskell-tools.ghc.cross-win);
-
       dev-pkgs = import ./dev-pkgs.nix {
         inherit sergv lib;
         pkgs = pkgs-opt;
       };
-
-      select-emacs = x:
-        if sergv.isDarwin
-        then x.bytecode
-        else x.native;
-
-      emacs = select-emacs (sergv.inputs.dotemacs.lib.mk-emacs-config {
-        inherit (pkgs) system;
-        inherit haskell-tools;
-        arch = config.sergv.native-optimizations.gccArch;
-        pkgs = pkgs-opt;
-      });
 
     in
     {
@@ -93,31 +38,22 @@
           stateVersion  = "22.05";
         };
 
-        xdg = lib.mkMerge
-          [
-            (lib.optionalAttrs sergv.isLinux {
-              desktopEntries = {
-                emacs = emacs.desktop-entry;
-              };
-              # dataFile."applications/emacs.desktop".text = emacsDesktopItem;
-              # dataFile."applications/i2p.desktop".text = i2pDesktopItem;
-            })
-
-            {
-              userDirs = {
-                enable              = true;
-                createDirectories   = true;
-                setSessionVariables = false;
-                desktop             = "$HOME/Desktop";
-                documents           = "$HOME/Documents";
-                download            = "$HOME/Downloads";
-                music               = "$HOME/Music";
-                pictures            = "$HOME/Pictures";
-                videos              = "$HOME/Videos";
-                projects            = null;
-              };
-            }
-          ];
+        xdg =
+          {
+            # dataFile."applications/i2p.desktop".text = i2pDesktopItem;
+            userDirs = {
+              enable              = true;
+              createDirectories   = true;
+              setSessionVariables = false;
+              desktop             = "$HOME/Desktop";
+              documents           = "$HOME/Documents";
+              download            = "$HOME/Downloads";
+              music               = "$HOME/Music";
+              pictures            = "$HOME/Pictures";
+              videos              = "$HOME/Videos";
+              projects            = null;
+            };
+          };
 
         # Let Home Manager install and manage itself.
         programs.home-manager.enable = true;
@@ -232,11 +168,8 @@
             pkgs-opt.nix-diff
 
             tex-pkg
-
-            emacs.built-config
           ]
           ++ builtins.attrValues dev-pkgs
-          ++ builtins.attrValues all-haskell-tools
           ++ builtins.attrValues filtered-scripts
 
           # Btrfs utils

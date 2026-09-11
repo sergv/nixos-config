@@ -239,14 +239,14 @@
       packages = import ./packages;
 
       common-user-config = _: {
-        sergv.programs.git.enable           = true;
-        sergv.programs.isabelle.enable      = true;
-        sergv.desktop.dev.host-ghc-versions = ["default" "ghc912" "ghc910"];
+        sergv.programs.git.enable                   = true;
+        sergv.programs.isabelle.enable              = true;
+        sergv.desktop.dev.haskell.host-ghc-versions = ["default" "ghc912" "ghc910"];
       };
 
       common-system-args = system: isLinux: {
         sergv = {
-          inherit utils inputs icons packages;
+          inherit system utils inputs icons packages;
           flake-self    = self;
           isLinux       = isLinux;
           isDarwin      = !isLinux;

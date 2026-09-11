@@ -78,4 +78,6 @@ in
         mkdir -p "$out/bin"
         ${builtins.concatStringsSep "\n" (builtins.map f keep-these)}
       '';
+
+  make-macos-app = import ./utils/make-macos-app.nix;
 }
