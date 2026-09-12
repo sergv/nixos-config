@@ -175,8 +175,8 @@
         AppleShowAllExtensions                   = true;
         AppleShowScrollBars                      = "WhenScrolling";
         AppleTemperatureUnit                     = "Celsius";
-        InitialKeyRepeat                         = 36;
-        KeyRepeat                                = 10; # faster key repeat
+        InitialKeyRepeat                         = 25;
+        KeyRepeat                                = 2;
         NSAutomaticCapitalizationEnabled         = false;
         NSAutomaticDashSubstitutionEnabled       = false;
         NSAutomaticInlinePredictionEnabled       = false;
