@@ -205,10 +205,20 @@
 
   boot.kernel.sysctl = {
     # Allow ‘dmesg’ without root.
-    "kernel.dmesg_restrict"      = 0;
+    "kernel.dmesg_restrict"        = 0;
     # Allow ‘perf’ without root.
-    "kernel.perf_event_paranoid" = -1;
-    "kernel.kptr_restrict"       = pkgs.lib.mkForce 0;
+    "kernel.perf_event_paranoid"   = -1;
+    "kernel.kptr_restrict"         = pkgs.lib.mkForce 0;
+
+    # Trashing mitigation: prevent working set from getting evicted
+    # for 1000 millisec, this can help to mitigate stuttering behavior
+    # under memory pressure conditions.
+    "kernel.mm.lru_gen.min_ttl_ms" = 1000;
+
+    # Prevent stuttering behavior during intense I/O writes that may
+    # involve massive page cache flushing.
+    "vm.dirty_ratio"               = 5;
+    "vm.dirty_background_ratio"    = 5;
   };
 
   # # More for legacy systems, use the GRUB 2 boot loader.
