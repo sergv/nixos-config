@@ -1,12 +1,5 @@
 { config, pkgs, pkgs-opt, lib, sergv, ... }:
 {
-  options.sergv.desktop = {
-    emacs.macos-app = lib.mkOption {
-      type        = lib.types.attrs;
-      description = "MacOS application wrapping built Emacs config";
-    };
-  };
-
   config =
     let
       select-emacs = x:
@@ -21,9 +14,7 @@
         pkgs          = pkgs-opt;
       });
 
-    in
-    {
-      sergv.desktop.emacs.macos-app = sergv.utils.make-macos-app {
+      macos-app = sergv.utils.make-macos-app {
         inherit pkgs;
         name              = "Emacs";
         version           = emacs.built-config.version;
@@ -32,17 +23,24 @@
         bundle-identifier = "org.gnu.Emacs";
         copyright         = "Copyright © 2026 Sergey Vinokurov, All Rights Reserved.";
       };
+    in lib.mkMerge
+      [
+        {
+          home-manager.users."${config.sergv.user.name}" = {
+            xdg =
+              lib.optionalAttrs sergv.isLinux {
+                desktopEntries = {
+                  emacs = emacs.desktop-entry;
+                };
+                # dataFile."applications/emacs.desktop".text = emacsDesktopItem;
+              };
 
-      home-manager.users."${config.sergv.user.name}" = {
-        xdg =
-          lib.optionalAttrs sergv.isLinux {
-            desktopEntries = {
-              emacs = emacs.desktop-entry;
-            };
-            # dataFile."applications/emacs.desktop".text = emacsDesktopItem;
+            home.packages = [ emacs.built-config ];
           };
+        }
 
-        home.packages = [ emacs.built-config ];
-      };
-    };
+        (lib.optionalAttrs sergv.isDarwin {
+          environment.systemPackages = [ macos-app ];
+        })
+      ];
 }

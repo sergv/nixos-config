@@ -49,8 +49,7 @@
           [
             { app = "/System/Applications/Apps.app"; }
             { app = "/Applications/Safari.app"; }
-
-            { app = config.sergv.desktop.emacs.macos-app + "Applications/Emacs.app"; }
+            { app = "/Applications/Nix Apps/Emacs.app"; }
 
             # {
             #   app = config.sergv.desktop.emacs.raw-editor-package + "/Applications/Emacs.app";
