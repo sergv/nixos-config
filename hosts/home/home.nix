@@ -120,6 +120,7 @@
         # its architecture properly.
         pkgs.runCommand "wrapped-winetricks"
           {
+            buildInputs       = [ wine-pkg ];
             nativeBuildInputs = [ pkgs.makeWrapper ];
           }
           # makeWrapper "${winetricks}/bin/winetricks" "$out/bin/winetricks" --set-default "WINE_BIN" "$(dirname $(readlink -f $(which wine)))/.wine"
