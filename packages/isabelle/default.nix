@@ -14,7 +14,6 @@ let
     pkgs.runCommand "isabelle-emacs-lsp"
       {
         buildInptus = [ isabelle-lsp-pkg ];
-        nativeBuildInputs = [ ];
       }
       ''
         mkdir -p "$out/bin"

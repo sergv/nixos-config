@@ -71,9 +71,7 @@ in
         '';
     in
     pkgs.runCommand ("filtered-" + name)
-      {
-        nativeBuildInputs = [ ];
-      }
+      {}
       ''
         mkdir -p "$out/bin"
         ${builtins.concatStringsSep "\n" (builtins.map f keep-these)}
