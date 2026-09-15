@@ -4,7 +4,7 @@
     let
       select-emacs = x:
         if sergv.isDarwin
-        then x.bytecode
+        then x.native
         else x.native;
 
       emacs = select-emacs (sergv.inputs.dotemacs.lib.mk-emacs-config {
