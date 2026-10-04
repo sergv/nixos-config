@@ -36,8 +36,21 @@ for x in "${@}"; do
 done
 
 if [[ "${#targets[@]}" == 0 ]]; then
-    echo "No targets" >&2
-    exit 1
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        conf="nixosConfigurations"
+        if command -v wslinfo >/dev/null 2>&1
+        then
+            target="wsl"
+        else
+            target="home"
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        target="macbook"
+        conf="darwinConfigurations"
+    fi
+
+    echo "No targets, using default: $target" >&2
+    targets+=(".#${conf}.\"${target}\".config.system.build.toplevel")
 fi
 
 cores="1"

@@ -48,9 +48,15 @@ fi
 export NIX_BUILD_CORES="$cores"
 export NINJAFLAGS="-j$cores -l$cores"
 
-system_name="home"
-rebuild="nixos-rebuild"
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    rebuild="nixos-rebuild"
+    if command -v wslinfo >/dev/null 2>&1
+    then
+        system_name="wsl"
+    else
+        system_name="home"
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
     system_name="macbook"
     rebuild="darwin-rebuild"
 fi
