@@ -162,11 +162,11 @@
               installation_mode = "force_installed";
             };
 
-            # Remove YouTube Recommends
-            "kunal@abhashtech.com" = {
-              install_url = "https://addons.mozilla.org/firefox/downloads/file/4275238/remove_youtube_recomendation-0.3resigned1.xpi";
-              installation_mode = "force_installed";
-            };
+            # # Remove YouTube Recommends
+            # "kunal@abhashtech.com" = {
+            #   install_url = "https://addons.mozilla.org/firefox/downloads/file/4275238/remove_youtube_recomendation-0.3resigned1.xpi";
+            #   installation_mode = "force_installed";
+            # };
 
             # No YouTube comments
             "jid1-YMBCq41qvDdqcA@jetpack" = {
@@ -176,7 +176,8 @@
 
             # RYS — Remove YouTube Suggestions
             "{21f1ba12-47e1-4a9b-ad4e-3a0260bbeb26}" = {
-              install_url = "https://addons.mozilla.org/firefox/downloads/file/4299785/remove_youtube_s_suggestions-4.3.60.xpi";
+              # install_url = "https://addons.mozilla.org/firefox/downloads/file/4299785/remove_youtube_s_suggestions-4.5.2.xpi";
+              install_url = "file:///${addons.remove-youtube-s-suggestions}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/{21f1ba12-47e1-4a9b-ad4e-3a0260bbeb26}.xpi";
               installation_mode = "force_installed";
             };
 
