@@ -13,7 +13,11 @@ set -o pipefail
 # Work around KDE turning this symlink into non-symlink and breaking
 # update. Bullshsit opinionated stuff that cannot follow user’s
 # intentions, read the fucking room, KDE.
-rm -f /home/sergey/.local/share/recently-used.xbel /home/sergey/.local/share/user-places.xbel.bak
+for x in /home/sergey/.local/share/recently-used.xbel /home/sergey/.local/share/user-places.xbel.bak; do
+    if [[ -e "$x" && ! -L "$x" ]]; then
+        rm -f "$x"
+    fi
+done
 
 exec ./apply-system.sh test "${@}"
 
