@@ -736,6 +736,13 @@
                 # "network.security.ports.banned.override" = 80;
                 # "browser.fixup.fallback-to-https" = false;
                 "dom.security.https_only_mode" = lib.mkForce false;
+
+                # Service workers enable offline web apps (e.g. Google
+                # Docs offline mode) and push notifications. But they
+                # persist in memory, consume CPU cycles checking for
+                # updates, and trigger background network activity
+                # even when tabs are closed.
+                "dom.serviceWorkers.enabled" = false;
               };
             };
           in
