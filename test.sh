@@ -13,7 +13,7 @@ set -o pipefail
 # Work around KDE turning this symlink into non-symlink and breaking
 # update. Bullshsit opinionated stuff that cannot follow user’s
 # intentions, read the fucking room, KDE.
-for x in /home/sergey/.local/share/recently-used.xbel /home/sergey/.local/share/user-places.xbel.bak; do
+for x in /home/sergey/.local/share/recently-used.xbel /home/sergey/.local/share/user-places.xbel.bak /home/sergey/.config/mimeapps.list; do
     if [[ -e "$x" && ! -L "$x" ]]; then
         rm -f "$x"
     fi
