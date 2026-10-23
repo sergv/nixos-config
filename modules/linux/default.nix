@@ -4,7 +4,6 @@
     [
       ./compressed-root.nix
       ./desktop
-      ./i2p.nix
       ./kde.nix
       ./kernel
       ./nvidia.nix

@@ -409,6 +409,9 @@
 
               (_: {
                 sergv.system.nix-daemon-build-dir = "/tmp/nix-daemon";
+
+                sergv.programs.firefox.enable     = true;
+                sergv.i2p.enable                  = false;
               })
 
               # (_: {

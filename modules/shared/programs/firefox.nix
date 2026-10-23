@@ -26,11 +26,16 @@
         configPath = ".mozilla/firefox";
 
         # package = pkgs.firefox;
-        package = pkgs-opt.wrapFirefox (pkgs-opt.firefox-esr-unwrapped.override (old: {
-          # Speed up builds.
-          enableDebugSymbols   = false;
-          crashreporterSupport = false;
-        })) { };
+        package =
+          if sergv.isDarwin
+          then
+             pkgs.firefox-esr
+          else
+            pkgs-opt.wrapFirefox (pkgs-opt.firefox-esr-unwrapped.override (old: {
+              # Speed up builds.
+              enableDebugSymbols   = false;
+              crashreporterSupport = false;
+            })) { };
 
         # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
         policies = {
