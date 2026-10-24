@@ -186,6 +186,12 @@
               installation_mode = "force_installed";
             };
 
+            # Stylus - custom css for websites
+            "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = {
+              install_url = "file:///${addons.stylus}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}.xpi";
+              installation_mode = "force_installed";
+            };
+
             # "7esoorv3@alefvanoon.anonaddy.me" = {
             # # LibRedirect
             # install_url = "file:///${addons.libredirect}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/7esoorv3@alefvanoon.anonaddy.me.xpi";
@@ -225,11 +231,6 @@
             # "jid1-MnnxcxisBPnSXQ@jetpack" = {
             #   # Privacy Badger
             #   install_url = "file:///${addons.privacy-badger}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/jid1-MnnxcxisBPnSXQ@jetpack.xpi";
-            #   installation_mode = "force_installed";
-            # };
-            # "uBlock0@raymondhill.net" = {
-            #   # uBlock Origin
-            #   install_url = "file:///${addons.ublock-origin}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/uBlock0@raymondhill.net.xpi";
             #   installation_mode = "force_installed";
             # };
           };
