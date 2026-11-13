@@ -139,6 +139,8 @@
       # Joystick
       "hid_pl"
       "ff_memless"
+      # USB flash drives, Moergo 80 keyboard flashing
+      "usb_storage"
     ];
   boot.extraModulePackages = [ ];
 
