@@ -164,7 +164,7 @@
         keyboard = {
           layout  = "us,ru";
           variant = "dvorak,";
-          options = [ "grp:shifts_toggle" "caps:escape" ];
+          options = [ "grp:win_space_toggle" "caps:escape" ];
         };
       };
 
