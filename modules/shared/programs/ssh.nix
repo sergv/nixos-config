@@ -3,7 +3,8 @@
   config = lib.mkMerge
     [
       {
-        # Recommendations for secure secure shell, https://stribika.github.io/2015/01/04/secure-secure-shell.html
+        # Recommendations for secure secure shell,
+        # https://stribika.github.io/2015/01/04/secure-secure-shell.html
         programs.ssh.extraConfig = ''
           PubkeyAcceptedKeyTypes ssh-ed25519,ssh-rsa
           HostKeyAlgorithms ssh-ed25519,ssh-rsa
@@ -28,10 +29,15 @@
                   user         = "git";
                   identityFile = config.sergv.user.homeDirectory + "/.ssh/github_sergv_id_rsa";
                 };
+                "codeberg.org" = {
+                  hostname     = "codeberg.org";
+                  user         = "git";
+                  identityFile = config.sergv.user.homeDirectory + "/.ssh/codeberg-sergv.key";
+                };
                 "gitlab.com" = {
                   hostname     = "gitlab.com";
                   user         = "git";
-                  identityFile = config.sergv.user.homeDirectory + "/.ssh/anon-gitlab-key";
+                  identityFile = config.sergv.user.homeDirectory + "/.ssh/gitlab-sergv.key";
                 };
                 "gitlab.haskell.org" = {
                   hostname     = "gitlab.haskell.org";
